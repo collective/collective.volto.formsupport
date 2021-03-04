@@ -13,13 +13,13 @@
   -->
   <!--<includeDependencies package="." />-->
 
-  <include package=".browser" />
+  <include package=".restapi" />
 
   <include file="permissions.zcml" />
 
   <genericsetup:registerProfile
       name="default"
-      title="collective.volto.formsupport"
+      title="Volto: Form support"
       directory="profiles/default"
       description="Installs the collective.volto.formsupport add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
@@ -28,7 +28,7 @@
 
   <genericsetup:registerProfile
       name="uninstall"
-      title="collective.volto.formsupport (uninstall)"
+      title="Volto: Form support (uninstall)"
       directory="profiles/uninstall"
       description="Uninstalls the collective.volto.formsupport add-on."
       provides="Products.GenericSetup.interfaces.EXTENSION"
