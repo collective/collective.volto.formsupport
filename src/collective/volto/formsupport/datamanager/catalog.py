@@ -1,19 +1,17 @@
 # -*- coding: utf-8 -*-
-from zope.interface import implementer
-from repoze.catalog.catalog import Catalog
-from souper.interfaces import ICatalogFactory
-from zope.component import adapter
 from collective.volto.formsupport.interfaces import IFormDataStore
-from zope.interface import Interface
-from plone.dexterity.interfaces import IDexterityContent
-from souper.soup import get_soup
-from plone.restapi.deserializer import json_body
-from souper.soup import Record
 from datetime import datetime
+from plone.dexterity.interfaces import IDexterityContent
+from plone.restapi.deserializer import json_body
+from repoze.catalog.catalog import Catalog
 from repoze.catalog.indexes.field import CatalogFieldIndex
+from souper.interfaces import ICatalogFactory
+from souper.soup import get_soup
 from souper.soup import NodeAttributeIndexer
-from zope.i18n import translate
-from collective.volto.formsupport import _
+from souper.soup import Record
+from zope.component import adapter
+from zope.interface import implementer
+from zope.interface import Interface
 
 import logging
 

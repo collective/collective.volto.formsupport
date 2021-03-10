@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
+from collective.volto.formsupport.testing import (
+    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,  # noqa: E501,
+)
+from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import SITE_OWNER_NAME
 from plone.app.testing import SITE_OWNER_PASSWORD
 from plone.app.testing import TEST_USER_ID
-from plone.registry.interfaces import IRegistry
-from collective.volto.formsupport.testing import (
-    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,  # noqa: E501,
-)
 from plone.restapi.testing import RelativeSession
-from plone import api
-from Products.MailHost.interfaces import IMailHost
-from zope.component import getUtility
 
 import transaction
 import unittest
