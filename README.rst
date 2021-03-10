@@ -17,7 +17,7 @@
 collective.volto.formsupport
 ============================
 
-Add some helper routes and functionalities for Volto sites with **form** blocks provided by **INSERT_VOLTO_PLUGIN_NAME_HERE** Volto plugin.
+Add some helper routes and functionalities for Volto sites with ``form`` blocks provided by `volto-form-block <https://github.com/collective/volto-form-block>`_ Volto plugin.
 
 plone.restapi endpoints
 =======================
@@ -33,17 +33,22 @@ You can call it with a POST on the context where the block form is stored like t
 
 where:
 
-- **my-form** is the context where we have a form block
-- **block_id** is the id of the block
-- **data** contains the submitted form data
+- ``my-form`` is the context where we have a form block
+- ``block_id`` is the id of the block
+- ``data`` contains the submitted form data
 
-Calling this endpoint, it will do some actions (based on block settings) and returns a **204** response.
+Calling this endpoint, it will do some actions (based on block settings) and returns a ``204`` response.
 
 
 @form-data
 ----------
 
-Returns the stored data (only for users that have "Modify portal content" permission)::
+This is an expansion component.
+
+There is a rule that returns a ``form-data`` item into "components" slot if the user can edit the 
+context (**Modify portal content** permission) and there is a block that can store data.
+
+Calling with "expand=true", this endpoint returns the stored data::
 
 > curl -i -X GET http://localhost:8080/Plone/my-form/@form-data -H 'Accept: application/json' -H 'Content-Type: application/json' --user admin:admin
 
@@ -68,7 +73,7 @@ And replies with something similar::
 @form-data-export
 -----------------
 
-Returns a csv file with all data (only for users that have "Modify portal content" permission)::
+Returns a csv file with all data (only for users that have **Modify portal content** permission)::
 
 > curl -i -X GET http://localhost:8080/Plone/my-form/@form-data-export -H 'Accept: application/json' -H 'Content-Type: application/json' --user admin:admin
 
@@ -77,7 +82,7 @@ If form fields changed between some submissions, you will see also columns relat
 @form-data-clear
 ----------------
 
-Reset the store (only for users that have "Modify portal content" permission)::
+Reset the store (only for users that have **Modify portal content** permission)::
 
 > curl -i -X GET http://localhost:8080/Plone/my-form/@form-data-clear -H 'Accept: application/json' -H 'Content-Type: application/json' --user admin:admin
 
@@ -85,7 +90,7 @@ Reset the store (only for users that have "Modify portal content" permission)::
 Form actions
 ============
 
-Using **INSERT_VOLTO_PLUGIN_NAME_HERE** you can set if the form submit should send data to an email address
+Using `volto-form-block <https://github.com/collective/volto-form-block>`_ you can set if the form submit should send data to an email address
 or store it into an internal catalog (or both).
 
 Send
@@ -93,7 +98,7 @@ Send
 
 If block is set to send data, an email with form data will be sent to the recipient set in block settings or (if not set) to the site address.
 
-If ther is an **attachments** field in the POST data, these files will be attached to the emal sent.
+If ther is an ``attachments`` field in the POST data, these files will be attached to the emal sent.
 
 Store
 -----
@@ -107,12 +112,13 @@ Only fields that are also in block settings are stored. Missing ones will be ski
 Block serializer
 ================
 
-There is a custom block serializer for type "*form*".
+There is a custom block serializer for type ``form``.
 
 This serializer removes all fields that start with "default_" if the user can't edit the current context.
 
 This is useful because we don't want to expose some internals configurations (for example the recipient email address)
 to external users that should only fill the form.
+
 
 Examples
 ========

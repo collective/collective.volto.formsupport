@@ -7,16 +7,17 @@
     method="GET"
     name="@form-data"
     for="plone.restapi.behaviors.IBlocks"
-    factory=".get.FormDataGet"
+    factory=".form_data.FormDataGet"
     permission="cmf.ModifyPortalContent"
     layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
     />
-  
+  <adapter factory=".form_data.FormData" name="form-data"/>
+
   <plone:service
     method="GET"
     name="@form-data-clear"
     for="plone.restapi.behaviors.IBlocks"
-    factory=".get.FormDataClear"
+    factory=".clear.FormDataClear"
     permission="cmf.ModifyPortalContent"
     layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
     />
@@ -25,7 +26,7 @@
     method="GET"
     name="@form-data-export"
     for="plone.restapi.behaviors.IBlocks"
-    factory=".get.FormDataExportGet"
+    factory=".csv.FormDataExportGet"
     permission="cmf.ModifyPortalContent"
     layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
     />
