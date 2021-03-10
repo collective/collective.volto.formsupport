@@ -13,15 +13,6 @@
     />
   
   <plone:service
-    method="POST"
-    name="@form-data-delete"
-    for="plone.restapi.behaviors.IBlocks"
-    factory=".post.FormDataDeletePost"
-    permission="cmf.ModifyPortalContent"
-    layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
-    />
-  
-  <plone:service
     method="GET"
     name="@form-data-clear"
     for="plone.restapi.behaviors.IBlocks"

@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
-from collective.volto.formsupport import _
 from collective.volto.formsupport.interfaces import IFormDataStore
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
 from six import StringIO
-from zExceptions import BadRequest
 from zope.component import getMultiAdapter
-from zope.i18n import translate
 from zope.interface import alsoProvides
 
 import csv
@@ -51,20 +48,9 @@ class FormDataExportGet(Service):
 
     def get_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
-        if not store.block_id:
-            raise BadRequest(
-                translate(
-                    _("missing_blockid_label", default="Missing block_id"),
-                    context=self.request,
-                )
-            )
-        form_fields = store.get_form_fields()
-        if not form_fields:
-            return None
-
         sbuf = StringIO()
 
-        columns = form_fields["ids"] + ["date"]
+        columns = []
 
         rows = []
         for item in store.search():
