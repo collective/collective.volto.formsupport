@@ -182,7 +182,7 @@ class TestMailSend(unittest.TestCase):
             data={
                 "from": "john@doe.com",
                 "data": [
-                    {"label": "Message", "value": "just want to say hi",},
+                    {"label": "Message", "value": "just want to say hi"},
                     {"label": "Name", "value": "John"},
                 ],
                 "subject": "test subject",
