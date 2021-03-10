@@ -1,3 +1,18 @@
+.. image:: https://img.shields.io/pypi/v/collective.volto.formsupport.svg
+    :target: https://pypi.python.org/pypi/collective.volto.formsupport/
+    :alt: Latest Version
+
+.. image:: https://img.shields.io/pypi/status/collective.volto.formsupport.svg
+    :target: https://pypi.python.org/pypi/collective.volto.formsupport
+    :alt: Egg Status
+
+.. image:: https://img.shields.io/pypi/pyversions/collective.volto.formsupport.svg?style=plastic   :alt: Supported - Python Versions
+
+.. image:: https://img.shields.io/pypi/l/collective.volto.formsupport.svg
+    :target: https://pypi.python.org/pypi/collective.volto.formsupport/
+    :alt: License
+
+
 ============================
 collective.volto.formsupport
 ============================
@@ -18,7 +33,7 @@ You can call it with a POST on the context where the block form is stored like t
 
 where:
 
-- `my-form`is the context where we have a form block
+- `my-form` is the context where we have a form block
 - `block_id` is the id of the block
 - `data` contains the submitted form data
 
@@ -35,20 +50,20 @@ Returns the stored data (only for users that have "Modify portal content" permis
 
 And replies with something similar::
 
-{
-  "@id": "http://localhost:8080/Plone/my-form/@form-data",
-  "items": [
     {
-      "block_id": "123456789",
-      "date": "2021-03-10T12:25:24",
-      "from": "support@foo.com",
-      "id": 912078826,
-      "name": "John Doe"
-    },
-    ...
-  ],
-  "items_total": 42
-}
+    "@id": "http://localhost:8080/Plone/my-form/@form-data",
+    "items": [
+        {
+        "block_id": "123456789",
+        "date": "2021-03-10T12:25:24",
+        "from": "support@foo.com",
+        "id": 912078826,
+        "name": "John Doe"
+        },
+        ...
+    ],
+    "items_total": 42
+    }
 
 @form-data-export
 -----------------
@@ -81,7 +96,7 @@ If block is set to send data, an email with form data will be sent to the recipi
 Store
 -----
 
-If block is set to store data, we store it into the content that has that block (with a `souper.plone https://pypi.org/project/souper.plone`_ catalog).
+If block is set to store data, we store it into the content that has that block (with a `souper.plone <https://pypi.org/project/souper.plone>`_ catalog).
 
 The store is an adapter registered for `IFormDataStore` interface, so you can override it easily.
 
