@@ -2,13 +2,6 @@
    If you want to learn more about writing documentation, please check out: http://docs.plone.org/about/documentation_styleguide.html
    This text does not appear on pypi or github. It is a comment.
 
-.. image:: https://travis-ci.org/collective/collective.volto.formsupport.svg?branch=master
-    :target: https://travis-ci.org/collective/collective.volto.formsupport
-
-.. image:: https://coveralls.io/repos/github/collective/collective.volto.formsupport/badge.svg?branch=master
-    :target: https://coveralls.io/github/collective/collective.volto.formsupport?branch=master
-    :alt: Coveralls
-
 .. image:: https://img.shields.io/pypi/v/collective.volto.formsupport.svg
     :target: https://pypi.python.org/pypi/collective.volto.formsupport/
     :alt: Latest Version

@@ -5,9 +5,9 @@
 
   <plone:service
     method="POST"
-    name="@send-action-form"
+    name="@submit-form"
     for="plone.restapi.behaviors.IBlocks"
-    factory=".post.SendActionFormPost"
+    factory=".post.SubmitPost"
     permission="zope2.View"
     layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
     />

@@ -1,0 +1,14 @@
+<tal:root xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    i18n:domain="collective.volto.formsupport"
+    define="parameters python:options.get('parameters', {});
+            url python:options.get('url', '');
+            title python:options.get('title', '');">
+  <p i18n:translate="send_mail_text">
+    A new form has been submitted from <a href="${url}" i18n:name="url">${title}</a>:
+  </p>
+  <ul>
+    <li tal:repeat="field parameters">
+        <strong>${field/label}:</strong> ${field/value}
+    </li>
+  </ul>
+</tal:root>

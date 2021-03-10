@@ -29,6 +29,7 @@ class VoltoFormsupportLayer(PloneSandboxLayer):
         self.loadZCML(package=collective.volto.formsupport)
 
     def setUpPloneSite(self, portal):
+        applyProfile(portal, "plone.restapi:blocks")
         applyProfile(portal, "collective.volto.formsupport:default")
 
 

@@ -18,4 +18,10 @@
       directory="static"
       />
 
+    <browser:page
+        for="*"
+        name="send_mail_template"
+        template="send_mail_template.pt"
+        permission="zope2.View"
+        />
 </configure>

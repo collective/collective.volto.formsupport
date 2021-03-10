@@ -13,6 +13,8 @@
   -->
   <!--<includeDependencies package="." />-->
 
+  <include package=".browser" />
+  <include package=".datamanager" />
   <include package=".restapi" />
 
   <include file="permissions.zcml" />
@@ -39,7 +41,5 @@
       factory=".setuphandlers.HiddenProfiles"
       name="collective.volto.formsupport-hiddenprofiles"
       />
-
-  <!-- -*- extra stuff goes here -*- -->
 
 </configure>

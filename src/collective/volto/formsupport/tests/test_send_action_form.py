@@ -16,7 +16,7 @@ import transaction
 import unittest
 
 
-class SendActionFormEndpoint(unittest.TestCase):
+class TestMailSend(unittest.TestCase):
 
     layer = VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING
 
@@ -29,7 +29,7 @@ class SendActionFormEndpoint(unittest.TestCase):
         self.mailhost = getUtility(IMailHost)
 
         registry = getUtility(IRegistry)
-        registry["plone.email_from_address"] = "info@test.org"
+        registry["plone.email_from_address"] = "site_addr@plone.com"
         registry["plone.email_from_name"] = u"Plone test site"
 
         self.api_session = RelativeSession(self.portal_url)
@@ -60,7 +60,7 @@ class SendActionFormEndpoint(unittest.TestCase):
         transaction.commit()
 
     def submit_form(self, data):
-        url = "{}/@send-action-form".format(self.document_url)
+        url = "{}/@submit-form".format(self.document_url)
         response = self.api_session.post(url, json=data,)
         transaction.commit()
         return response
@@ -73,7 +73,7 @@ class SendActionFormEndpoint(unittest.TestCase):
 
         res = response.json()
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(res["message"], "block_id mancante")
+        self.assertEqual(res["message"], "Missing block_id")
 
     def test_email_not_send_if_block_id_is_incorrect_or_not_present(self):
         response = self.submit_form(
@@ -89,7 +89,9 @@ class SendActionFormEndpoint(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             res["message"],
-            'Blocco di tipo "form" con id "unknown" non trovato',
+            'Block with @type "form" and id "unknown" not found in this context: {}'.format(  # noqa
+                self.document_url
+            ),
         )
 
         response = self.submit_form(
@@ -105,91 +107,153 @@ class SendActionFormEndpoint(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             res["message"],
-            'Blocco di tipo "form" con id "text-id" non trovato',
+            'Block with @type "form" and id "text-id" not found in this context: {}'.format(  # noqa
+                self.document_url
+            ),
         )
 
-    def test_email_not_send_if_block_id_is_correct_but_required_fields_missing(
-        self,
-    ):
+    def test_email_not_send_if_no_action_set(self):
+
         response = self.submit_form(
-            data={
-                "from": "john@doe.com",
-                "message": "Just want to say hi.",
-                "block_id": "form-id",
-            },
+            data={"from": "john@doe.com", "block_id": "form-id"},
         )
         transaction.commit()
-
         res = response.json()
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
             res["message"],
-            "Campo obbligatorio tra message, subject e from mancante",
+            'You need to set at least one form action between "send" and "store".',  # noqa
         )
 
-    def test_email_sent_with_site_recipient(self,):
-        response = self.submit_form(
-            data={
-                "from": "john@doe.com",
-                "message": "Just want to say hi.",
-                "subject": "test subject",
-                "block_id": "form-id",
-            },
-        )
-        transaction.commit()
-
-        self.assertEqual(response.status_code, 204)
-        msg = self.mailhost.messages[0]
-        if isinstance(msg, bytes) and bytes is not str:
-            # Python 3 with Products.MailHost 4.10+
-            msg = msg.decode("utf-8")
-        self.assertIn("Subject: test subject", msg)
-        self.assertIn("From: john@doe.com", msg)
-        self.assertIn("To: info@test.org", msg)
-        self.assertIn("Reply-To: john@doe.com", msg)
-        self.assertIn("Just want to say hi.", msg)
-
-    def test_email_sent_ignore_passed_recipient(self,):
-
-        response = self.submit_form(
-            data={
-                "from": "john@doe.com",
-                "to": "to@spam.com",
-                "message": "Just want to say hi.",
-                "subject": "test subject",
-                "block_id": "form-id",
-            },
-        )
-        transaction.commit()
-        self.assertEqual(response.status_code, 204)
-        msg = self.mailhost.messages[0]
-        if isinstance(msg, bytes) and bytes is not str:
-            # Python 3 with Products.MailHost 4.10+
-            msg = msg.decode("utf-8")
-        self.assertIn("Subject: test subject", msg)
-        self.assertIn("From: john@doe.com", msg)
-        self.assertIn("To: info@test.org", msg)
-        self.assertIn("Reply-To: john@doe.com", msg)
-        self.assertIn("Just want to say hi.", msg)
-
-    def test_email_sent_with_block_recipient_if_set(self,):
+    def test_email_not_send_if_block_id_is_correct_but_form_data_missing(
+        self,
+    ):
 
         self.document.blocks = {
-            "text-id": {"@type": "text"},
-            "form-id": {"@type": "form", "to": "to@block.com"},
+            "form-id": {"@type": "form", "send": True},
         }
         transaction.commit()
 
         response = self.submit_form(
             data={
                 "from": "john@doe.com",
-                "message": "Just want to say hi.",
                 "subject": "test subject",
                 "block_id": "form-id",
             },
         )
         transaction.commit()
+        res = response.json()
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            res["message"], "Empty form data.",
+        )
 
+    def test_email_not_send_if_block_id_is_correct_but_required_fields_missing(
+        self,
+    ):
+
+        self.document.blocks = {
+            "form-id": {"@type": "form", "send": True},
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "block_id": "form-id",
+                "data": [{"label": "foo", "value": "bar"}],
+            },
+        )
+        transaction.commit()
+        res = response.json()
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            res["message"], "Missing required field: subject or from.",
+        )
+
+    def test_email_sent_with_site_recipient(self,):
+
+        self.document.blocks = {
+            "form-id": {"@type": "form", "send": True},
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": [
+                    {"label": "Message", "value": "just want to say hi",},
+                    {"label": "Name", "value": "John"},
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+        self.assertEqual(response.status_code, 204)
+        msg = self.mailhost.messages[0]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+        self.assertIn("Subject: test subject", msg)
+        self.assertIn("From: john@doe.com", msg)
+        self.assertIn("To: site_addr@plone.com", msg)
+        self.assertIn("Reply-To: john@doe.com", msg)
+        self.assertIn("<strong>Message:</strong> just want to say hi", msg)
+        self.assertIn("<strong>Name:</strong> John", msg)
+
+    def test_email_sent_ignore_passed_recipient(self,):
+
+        self.document.blocks = {
+            "form-id": {"@type": "form", "send": True},
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "to": "to@spam.com",
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "John"},
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+        self.assertEqual(response.status_code, 204)
+        msg = self.mailhost.messages[0]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+        self.assertIn("Subject: test subject", msg)
+        self.assertIn("From: john@doe.com", msg)
+        self.assertIn("To: site_addr@plone.com", msg)
+        self.assertIn("Reply-To: john@doe.com", msg)
+        self.assertIn("<strong>Message:</strong> just want to say hi", msg)
+        self.assertIn("<strong>Name:</strong> John", msg)
+
+    def test_email_sent_with_block_recipient_if_set(self,):
+
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {"@type": "form", "to": "to@block.com", "send": True},
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "John"},
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
         self.assertEqual(response.status_code, 204)
         msg = self.mailhost.messages[0]
         if isinstance(msg, bytes) and bytes is not str:
@@ -199,20 +263,28 @@ class SendActionFormEndpoint(unittest.TestCase):
         self.assertIn("From: john@doe.com", msg)
         self.assertIn("To: to@block.com", msg)
         self.assertIn("Reply-To: john@doe.com", msg)
-        self.assertIn("Just want to say hi.", msg)
+        self.assertIn("<strong>Message:</strong> just want to say hi", msg)
+        self.assertIn("<strong>Name:</strong> John", msg)
 
     def test_email_sent_with_block_subject_if_set_and_not_passed(self,):
 
         self.document.blocks = {
             "text-id": {"@type": "text"},
-            "form-id": {"@type": "form", "default_subject": "block subject"},
+            "form-id": {
+                "@type": "form",
+                "default_subject": "block subject",
+                "send": True,
+            },
         }
         transaction.commit()
 
         response = self.submit_form(
             data={
                 "from": "john@doe.com",
-                "message": "Just want to say hi.",
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "John"},
+                ],
                 "block_id": "form-id",
             },
         )
@@ -225,6 +297,7 @@ class SendActionFormEndpoint(unittest.TestCase):
             msg = msg.decode("utf-8")
         self.assertIn("Subject: block subject", msg)
         self.assertIn("From: john@doe.com", msg)
-        self.assertIn("To: info@test.org", msg)
+        self.assertIn("To: site_addr@plone.com", msg)
         self.assertIn("Reply-To: john@doe.com", msg)
-        self.assertIn("Just want to say hi.", msg)
+        self.assertIn("<strong>Message:</strong> just want to say hi", msg)
+        self.assertIn("<strong>Name:</strong> John", msg)

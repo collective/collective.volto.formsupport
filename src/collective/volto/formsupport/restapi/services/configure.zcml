@@ -2,9 +2,7 @@
     xmlns="http://namespaces.zope.org/zope"
     xmlns:zcml="http://namespaces.zope.org/zcml">
 
-  <include package="plone.restapi"  />
-
-  <include package=".services" />
-  <include package=".serializer" />
+  <include package=".submit_form" />
+  <include package=".form_data" />
 
 </configure>

@@ -1,0 +1,42 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    xmlns:zcml="http://namespaces.zope.org/zcml">
+
+  <plone:service
+    method="GET"
+    name="@form-data"
+    for="plone.restapi.behaviors.IBlocks"
+    factory=".get.FormDataGet"
+    permission="cmf.ModifyPortalContent"
+    layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
+    />
+  
+  <plone:service
+    method="POST"
+    name="@form-data-delete"
+    for="plone.restapi.behaviors.IBlocks"
+    factory=".post.FormDataDeletePost"
+    permission="cmf.ModifyPortalContent"
+    layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
+    />
+  
+  <plone:service
+    method="GET"
+    name="@form-data-clear"
+    for="plone.restapi.behaviors.IBlocks"
+    factory=".get.FormDataClear"
+    permission="cmf.ModifyPortalContent"
+    layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
+    />
+
+  <plone:service
+    method="GET"
+    name="@form-data-export"
+    for="plone.restapi.behaviors.IBlocks"
+    factory=".get.FormDataExportGet"
+    permission="cmf.ModifyPortalContent"
+    layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
+    />
+
+</configure>
