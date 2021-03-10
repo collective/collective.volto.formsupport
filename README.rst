@@ -17,7 +17,7 @@
 collective.volto.formsupport
 ============================
 
-Add some helper routes and functionalities for Volto sites with `form` blocks provided by `INSERT_VOLTO_PLUGIN_NAME_HERE` Volto plugin.
+Add some helper routes and functionalities for Volto sites with **form** blocks provided by **INSERT_VOLTO_PLUGIN_NAME_HERE** Volto plugin.
 
 plone.restapi endpoints
 =======================
@@ -33,11 +33,11 @@ You can call it with a POST on the context where the block form is stored like t
 
 where:
 
-- `my-form` is the context where we have a form block
-- `block_id` is the id of the block
-- `data` contains the submitted form data
+- **my-form** is the context where we have a form block
+- **block_id** is the id of the block
+- **data** contains the submitted form data
 
-Calling this endpoint, it will do some actions (based on block settings) and returns a `204` response.
+Calling this endpoint, it will do some actions (based on block settings) and returns a **204** response.
 
 
 @form-data
@@ -51,18 +51,18 @@ Returns the stored data (only for users that have "Modify portal content" permis
 And replies with something similar::
 
     {
-    "@id": "http://localhost:8080/Plone/my-form/@form-data",
-    "items": [
-        {
-        "block_id": "123456789",
-        "date": "2021-03-10T12:25:24",
-        "from": "support@foo.com",
-        "id": 912078826,
-        "name": "John Doe"
-        },
-        ...
-    ],
-    "items_total": 42
+        "@id": "http://localhost:8080/Plone/my-form/@form-data",
+        "items": [
+            {
+            "block_id": "123456789",
+            "date": "2021-03-10T12:25:24",
+            "from": "support@foo.com",
+            "id": 912078826,
+            "name": "John Doe"
+            },
+            ...
+        ],
+        "items_total": 42
     }
 
 @form-data-export
@@ -85,7 +85,7 @@ Reset the store (only for users that have "Modify portal content" permission)::
 Form actions
 ============
 
-Using `INSERT_VOLTO_PLUGIN_NAME_HERE` you can set if the form submit should send data to an email address
+Using **INSERT_VOLTO_PLUGIN_NAME_HERE** you can set if the form submit should send data to an email address
 or store it into an internal catalog (or both).
 
 Send
@@ -98,7 +98,7 @@ Store
 
 If block is set to store data, we store it into the content that has that block (with a `souper.plone <https://pypi.org/project/souper.plone>`_ catalog).
 
-The store is an adapter registered for `IFormDataStore` interface, so you can override it easily.
+The store is an adapter registered for *IFormDataStore* interface, so you can override it easily.
 
 Only fields that are also in block settings are stored. Missing ones will be skipped.
 
