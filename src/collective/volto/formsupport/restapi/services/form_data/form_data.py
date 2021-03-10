@@ -9,6 +9,9 @@ from zope.component import getMultiAdapter
 from zope.interface import implementer
 from zope.interface import Interface
 
+import json
+import six
+
 
 @implementer(IExpandableElement)
 @adapter(Interface, Interface)
@@ -49,6 +52,10 @@ class FormData(object):
         ):
             return False
         blocks = getattr(self.context, "blocks", {})
+        if isinstance(blocks, six.text_type):
+            blocks = json.loads(blocks)
+        if not blocks:
+            return False
         for block in blocks.values():
             if block.get("@type", "") == "form" and block.get("store", False):
                 return True
