@@ -93,6 +93,8 @@ Send
 
 If block is set to send data, an email with form data will be sent to the recipient set in block settings or (if not set) to the site address.
 
+If ther is an **attachments** field in the POST data, these files will be attached to the emal sent.
+
 Store
 -----
 
@@ -101,6 +103,16 @@ If block is set to store data, we store it into the content that has that block 
 The store is an adapter registered for *IFormDataStore* interface, so you can override it easily.
 
 Only fields that are also in block settings are stored. Missing ones will be skipped.
+
+Block serializer
+================
+
+There is a custom block serializer for type "*form*".
+
+This serializer removes all fields that start with "default_" if the user can't edit the current context.
+
+This is useful because we don't want to expose some internals configurations (for example the recipient email address)
+to external users that should only fill the form.
 
 Examples
 ========
