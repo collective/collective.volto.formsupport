@@ -53,12 +53,14 @@ class SubmitPost(Service):
                 translate(
                     _(
                         "block_form_not_found_label",
-                        default='Block with @type "form" and id "{}" not found in this context: {}'.format(  # noqa
-                            block_id, self.context.absolute_url()
-                        ),
+                        default='Block with @type "form" and id "$block" not found in this context: $context',
+                        mapping={
+                            "block": block_id,
+                            "context": self.context.absolute_url(),
+                        },
                     ),
                     context=self.request,
-                )
+                ),
             )
 
         if not block.get("store", False) and not block.get("send", False):

@@ -1,10 +1,7 @@
-# --- PLEASE EDIT THE LINES BELOW CORRECTLY ---
-# SOME DESCRIPTIVE TITLE.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2021-03-10 13:50+0000\n"
+"POT-Creation-Date: 2021-03-10 13:49+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,7 +12,7 @@ msgstr ""
 "Language-Code: en\n"
 "Language-Name: English\n"
 "Preferred-Encodings: utf-8 latin1\n"
-"Domain: collective.volto.formsupport\n"
+"Domain: DOMAIN\n"
 
 #: collective/volto/formsupport/configure.zcml:29
 msgid "Installs the collective.volto.formsupport add-on."
@@ -36,29 +33,29 @@ msgstr ""
 #. Default: "Block with @type \"form\" and id \"$block\" not found in this context: $context"
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:54
 msgid "block_form_not_found_label"
-msgstr ""
+msgstr "Blocco con @type \"form\" e id \"$block\" non trovato nel contesto: $context"
 
 #. Default: "Empty form data."
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:80
 msgid "empty_form_data"
-msgstr ""
+msgstr "Form senza dati."
 
 #. Default: "You need to set at least one form action between \"send\" and \"store\"."
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:69
 msgid "missing_action"
-msgstr ""
+msgstr "Devi selezionare almeno un'azione tra \"salva\" e \"invia\"."
 
 #. Default: "Missing block_id"
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:46
 msgid "missing_blockid_label"
-msgstr ""
+msgstr "Campo block_id mancante."
 
 #. Default: "A new form has been submitted from ${url}:"
 #: collective/volto/formsupport/browser/send_mail_template.pt:7
 msgid "send_mail_text"
-msgstr ""
+msgstr "Un nuovo form è stato compilato da ${url}:"
 
 #. Default: "Missing required field: subject or from."
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:104
 msgid "send_required_field_missing"
-msgstr ""
+msgstr "Campo obbligatorio mancante: subject o from."
