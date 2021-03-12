@@ -21,12 +21,11 @@ class FormData(object):
         self.request = request
 
     def __call__(self, expand=False):
-
         if not self.show_component():
             return {}
 
         result = {
-            "form-data": {
+            "form_data": {
                 "@id": "{}/@form-data".format(self.context.absolute_url())
             }
         }
@@ -42,7 +41,7 @@ class FormData(object):
             "items_total": len(items),
         }
 
-        result["form-data"] = data
+        result["form_data"] = data
         return result
 
     def show_component(self):
