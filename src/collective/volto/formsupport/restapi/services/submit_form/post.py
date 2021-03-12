@@ -116,9 +116,6 @@ class SubmitPost(Service):
         if overview_controlpanel.mailhost_warning():
             raise BadRequest("MailHost is not configured.")
 
-        # Disable CSRF protection
-        alsoProvides(self.request, IDisableCSRFProtection)
-
         registry = getUtility(IRegistry)
         mail_settings = registry.forInterface(IMailSchema, prefix="plone")
         mto = block.get("to", mail_settings.email_from_address)
@@ -195,6 +192,9 @@ class SubmitPost(Service):
                 )
 
     def store_data(self, form):
+        # Disable CSRF protection
+        alsoProvides(self.request, IDisableCSRFProtection)
+
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
         res = store.add(data=form.get("data", {}))
         if not res:
