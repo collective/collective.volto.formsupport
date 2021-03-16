@@ -28,6 +28,9 @@ class SubmitPost(Service):
         store_action = block.get("store", False)
         send_action = block.get("send", False)
 
+        # Disable CSRF protection
+        alsoProvides(self.request, IDisableCSRFProtection)
+
         if store_action:
             self.store_data(form=form_data)
         if send_action:
@@ -192,8 +195,6 @@ class SubmitPost(Service):
                 )
 
     def store_data(self, form):
-        # Disable CSRF protection
-        alsoProvides(self.request, IDisableCSRFProtection)
 
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
         res = store.add(data=form.get("data", {}))
