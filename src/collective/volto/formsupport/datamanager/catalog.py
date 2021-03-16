@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from collective.volto.formsupport.interfaces import IFormDataStore
+from copy import deepcopy
 from datetime import datetime
 from plone.dexterity.interfaces import IDexterityContent
 from plone.restapi.deserializer import json_body
@@ -12,6 +13,9 @@ from souper.soup import Record
 from zope.component import adapter
 from zope.interface import implementer
 from zope.interface import Interface
+from zope.component import getUtility
+from plone.i18n.normalizer.interfaces import IIDNormalizer
+
 
 import logging
 
@@ -56,15 +60,10 @@ class FormDataStore(object):
                 continue
             block_type = block.get("@type", "")
             if block_type == "form":
-                form_block = block
+                form_block = deepcopy(block)
         if not form_block:
             return {}
-        return {
-            "ids": [
-                x.get("field_id", "") for x in form_block.get("subblocks", [])
-            ],
-            "fields": form_block.get("subblocks", []),
-        }
+        return form_block.get("subblocks", [])
 
     def add(self, data):
         form_fields = self.get_form_fields()
@@ -76,12 +75,20 @@ class FormDataStore(object):
             )
             return None
 
+        form_ids = [x.get("field_id", "") for x in form_fields]
         record = Record()
+        # record.attrs["metadata"] = {}
+        normalizer = getUtility(IIDNormalizer)
         for field in data:
-            key = field.get("field_id", "")
+            field_id = field.get("field_id", "")
+            id = normalizer.normalize(field.get("label", ""))
             value = field.get("value", "")
-            if key in form_fields["ids"]:
-                record.attrs[key] = value
+            if field_id in form_ids:
+                record.attrs[id] = value
+                # record.attrs["metadata"][id] = {
+                #     "field_id": field_id,
+                #     "label": field.get("label", ""),
+                # }
         record.attrs["date"] = datetime.now()
         record.attrs["block_id"] = self.block_id
         return self.soup.add(record)
@@ -91,8 +98,11 @@ class FormDataStore(object):
 
     def search(self, query=None):
         if not query:
-            records = self.soup.data.values()
-
+            records = sorted(
+                self.soup.data.values(),
+                key=lambda k: k.attrs.get("date", ""),
+                reverse=True,
+            )
         return records
 
     def delete(self, id):

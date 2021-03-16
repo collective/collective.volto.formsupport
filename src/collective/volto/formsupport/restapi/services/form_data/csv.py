@@ -29,18 +29,18 @@ class FormDataExportGet(Service):
     def get_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
         sbuf = StringIO()
-
+        fixed_columns = ["date", "block_id"]
         columns = []
 
         rows = []
         for item in store.search():
             data = {}
             for k, v in item.attrs.items():
-                if k not in columns:
+                if k not in columns and k not in fixed_columns:
                     columns.append(k)
                 data[k] = json_compatible(v)
             rows.append(data)
-
+        columns.extend(fixed_columns)
         writer = csv.DictWriter(sbuf, fieldnames=columns, delimiter=",")
         writer.writeheader()
         for row in rows:
