@@ -29,13 +29,15 @@ class FormDataExportGet(Service):
     def get_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
         sbuf = StringIO()
-        fixed_columns = ["date", "block_id"]
+        fixed_columns = ["date"]
         columns = []
 
         rows = []
         for item in store.search():
             data = {}
             for k, v in item.attrs.items():
+                if k == "block_id":
+                    continue
                 if k not in columns and k not in fixed_columns:
                     columns.append(k)
                 data[k] = json_compatible(v)
