@@ -7,8 +7,11 @@
     A new form has been submitted from <a href="${url}" i18n:name="url">${title}</a>:
   </p>
   <ul>
-    <li tal:repeat="field parameters">
-        <strong>${field/label}:</strong> ${field/value}
-    </li>
+    <tal:field repeat="field parameters">
+      <li tal:define="value field/value|nothing;
+                      label field/label|nothing">
+          <strong>${label}:</strong> ${value}
+      </li>
+    </tal:field>
   </ul>
 </tal:root>
