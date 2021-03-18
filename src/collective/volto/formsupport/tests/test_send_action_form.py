@@ -238,7 +238,11 @@ class TestMailSend(unittest.TestCase):
 
         self.document.blocks = {
             "text-id": {"@type": "text"},
-            "form-id": {"@type": "form", "to": "to@block.com", "send": True},
+            "form-id": {
+                "@type": "form",
+                "default_to": "to@block.com",
+                "send": True,
+            },
         }
         transaction.commit()
 
