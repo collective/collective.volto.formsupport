@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.0.2 (unreleased)
+1.0.2 (2021-03-24)
 ------------------
 
 - Fix form_data for anon.
