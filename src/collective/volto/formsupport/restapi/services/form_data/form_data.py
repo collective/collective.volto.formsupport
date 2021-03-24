@@ -69,4 +69,4 @@ class FormData(object):
 class FormDataGet(Service):
     def reply(self):
         form_data = FormData(self.context, self.request)
-        return form_data(expand=True)["form_data"]
+        return form_data(expand=True).get("form_data", {})
