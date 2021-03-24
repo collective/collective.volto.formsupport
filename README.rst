@@ -114,7 +114,7 @@ Block serializer
 
 There is a custom block serializer for type ``form``.
 
-This serializer removes all fields that start with "default_" if the user can't edit the current context.
+This serializer removes all fields that start with "\**default_**\" if the user can't edit the current context.
 
 This is useful because we don't want to expose some internals configurations (for example the recipient email address)
 to external users that should only fill the form.
