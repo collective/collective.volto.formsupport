@@ -39,7 +39,9 @@ class TestMailSend(unittest.TestCase):
         self.anon_api_session.headers.update({"Accept": "application/json"})
 
         self.document = api.content.create(
-            type="Document", title="Example context", container=self.portal,
+            type="Document",
+            title="Example context",
+            container=self.portal,
         )
         self.document.blocks = {
             "text-id": {"@type": "text"},
@@ -61,7 +63,10 @@ class TestMailSend(unittest.TestCase):
 
     def submit_form(self, data):
         url = "{}/@submit-form".format(self.document_url)
-        response = self.api_session.post(url, json=data,)
+        response = self.api_session.post(
+            url,
+            json=data,
+        )
         transaction.commit()
         return response
 
@@ -145,7 +150,8 @@ class TestMailSend(unittest.TestCase):
         res = response.json()
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
-            res["message"], "Empty form data.",
+            res["message"],
+            "Empty form data.",
         )
 
     def test_email_not_send_if_block_id_is_correct_but_required_fields_missing(
@@ -168,10 +174,13 @@ class TestMailSend(unittest.TestCase):
         res = response.json()
         self.assertEqual(response.status_code, 400)
         self.assertEqual(
-            res["message"], "Missing required field: subject or from.",
+            res["message"],
+            "Missing required field: subject or from.",
         )
 
-    def test_email_sent_with_site_recipient(self,):
+    def test_email_sent_with_site_recipient(
+        self,
+    ):
 
         self.document.blocks = {
             "form-id": {"@type": "form", "send": True},
@@ -202,7 +211,9 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> John", msg)
 
-    def test_email_sent_ignore_passed_recipient(self,):
+    def test_email_sent_ignore_passed_recipient(
+        self,
+    ):
 
         self.document.blocks = {
             "form-id": {"@type": "form", "send": True},
@@ -234,7 +245,9 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> John", msg)
 
-    def test_email_sent_with_block_recipient_if_set(self,):
+    def test_email_sent_with_block_recipient_if_set(
+        self,
+    ):
 
         self.document.blocks = {
             "text-id": {"@type": "text"},
@@ -270,7 +283,9 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> John", msg)
 
-    def test_email_sent_with_block_subject_if_set_and_not_passed(self,):
+    def test_email_sent_with_block_subject_if_set_and_not_passed(
+        self,
+    ):
 
         self.document.blocks = {
             "text-id": {"@type": "text"},
@@ -306,7 +321,9 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> John", msg)
 
-    def test_email_with_use_as_reply_to(self,):
+    def test_email_with_use_as_reply_to(
+        self,
+    ):
 
         self.document.blocks = {
             "text-id": {"@type": "text"},
@@ -319,7 +336,8 @@ class TestMailSend(unittest.TestCase):
                     {
                         "field_id": "contact",
                         "field_type": "from",
-                        "use_as_reply_to": True},
+                        "use_as_reply_to": True,
+                    },
                 ],
             },
         }
@@ -331,7 +349,6 @@ class TestMailSend(unittest.TestCase):
                     {"label": "Message", "value": "just want to say hi"},
                     {"label": "Name", "value": "Smith"},
                     {"field_id": "contact", "label": "Email", "value": "smith@doe.com"},
-
                 ],
                 "block_id": "form-id",
             },

@@ -70,9 +70,7 @@ class SubmitPost(Service):
                 ),
             )
 
-        if not self.block.get("store", False) and not self.block.get(
-            "send", False
-        ):
+        if not self.block.get("store", False) and not self.block.get("send", False):
             raise BadRequest(
                 translate(
                     _(
@@ -86,7 +84,10 @@ class SubmitPost(Service):
         if not self.form_data.get("data", []):
             raise BadRequest(
                 translate(
-                    _("empty_form_data", default="Empty form data.",),
+                    _(
+                        "empty_form_data",
+                        default="Empty form data.",
+                    ),
                     context=self.request,
                 )
             )
@@ -105,7 +106,7 @@ class SubmitPost(Service):
         return {}
 
     def get_reply_to(self):
-        """ This method retrieves the correct field to be used as 'reply to'.
+        """This method retrieves the correct field to be used as 'reply to'.
 
         Three "levels" of logic:
         1. If there is a field marked with 'use_as_reply_to' set to True, that
@@ -128,11 +129,9 @@ class SubmitPost(Service):
                 for data in self.form_data.get("data", ""):
                     if data.get("field_id", "") == field_id:
                         print(f"data['value']: {data['value']}\n")
-                        return data['value']
+                        return data["value"]
 
-        return self.form_data.get("from", "") or self.block.get(
-            "default_from", ""
-        )
+        return self.form_data.get("from", "") or self.block.get("default_from", "")
 
     def send_data(self):
         subject = self.form_data.get("subject", "") or self.block.get(
