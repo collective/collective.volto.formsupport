@@ -104,13 +104,43 @@ class SubmitPost(Service):
             return block
         return {}
 
+    def get_reply_to(self):
+        """ This method retrieves the correct field to be used as 'reply to'.
+
+        Three "levels" of logic:
+        1. If there is a field marked with 'use_as_reply_to' set to True, that
+           field wins and we use that.
+           If not:
+        2. We search for the "from" field.
+           If not present:
+        3. We use the fallback field: "default_from"
+        """
+
+        sublocks = self.block.get("sublocks", "")
+        if sublocks:
+            print(f"\n\nsublocks: {sublocks}")
+            for field in sublocks:
+                if field.get("use_as_reply_to", False):
+                    field_id = field.get("field_id", "")
+
+            print(f"Field id: {field_id}\n")
+            if field_id:
+                for data in self.form_data.get("data", ""):
+                    if data.get("field_id", "") == field_id:
+                        print(f"data['value']: {data['value']}\n")
+                        return data['value']
+
+        return self.form_data.get("from", "") or self.block.get(
+            "default_from", ""
+        )
+
     def send_data(self):
         subject = self.form_data.get("subject", "") or self.block.get(
             "default_subject", ""
         )
-        mfrom = self.form_data.get("from", "") or self.block.get(
-            "default_from", ""
-        )
+
+        mfrom = self.get_reply_to()
+
         if not subject or not mfrom:
             raise BadRequest(
                 translate(
