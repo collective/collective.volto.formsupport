@@ -4,7 +4,9 @@ Changelog
 1.0.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- NEW: The @submit-form entry-point now takes into account if a field is "marked"
+  with "use_as_reply_to" and use that field for "from" and "reply to".
+  [arsenico13]
 
 
 1.0.2 (2021-03-24)
