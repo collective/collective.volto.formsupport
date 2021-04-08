@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.0.3 (unreleased)
+1.0.3 (2021-04-08)
 ------------------
 
 - NEW: The @submit-form entry-point now takes into account if a field is "marked"
