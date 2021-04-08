@@ -332,7 +332,7 @@ class TestMailSend(unittest.TestCase):
                 "default_subject": "block subject",
                 "default_from": "john@doe.com",
                 "send": True,
-                "sublocks": [
+                "subblocks": [
                     {
                         "field_id": "contact",
                         "field_type": "from",

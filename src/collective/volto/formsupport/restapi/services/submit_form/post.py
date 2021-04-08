@@ -122,11 +122,10 @@ class SubmitPost(Service):
             for field in subblocks:
                 if field.get("use_as_reply_to", False):
                     field_id = field.get("field_id", "")
-
-            if field_id:
-                for data in self.form_data.get("data", ""):
-                    if data.get("field_id", "") == field_id:
-                        return data["value"]
+                    if field_id:
+                        for data in self.form_data.get("data", ""):
+                            if data.get("field_id", "") == field_id:
+                                return data["value"]
 
         return self.form_data.get("from", "") or self.block.get("default_from", "")
 
