@@ -117,9 +117,9 @@ class SubmitPost(Service):
         3. We use the fallback field: "default_from"
         """
 
-        sublocks = self.block.get("sublocks", "")
-        if sublocks:
-            for field in sublocks:
+        subblocks = self.block.get("subblocks", "")
+        if subblocks:
+            for field in subblocks:
                 if field.get("use_as_reply_to", False):
                     field_id = field.get("field_id", "")
 
