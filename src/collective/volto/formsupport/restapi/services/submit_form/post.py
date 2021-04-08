@@ -134,7 +134,8 @@ class SubmitPost(Service):
             "default_subject", ""
         )
 
-        mfrom = self.get_reply_to()
+        mfrom = self.form_data.get("from", "") or self.block.get("default_from", "")
+        mreply_to = self.get_reply_to()
 
         if not subject or not mfrom:
             raise BadRequest(
@@ -165,7 +166,7 @@ class SubmitPost(Service):
         msg["Subject"] = subject
         msg["From"] = mfrom
         msg["To"] = mto
-        msg["Reply-To"] = mfrom
+        msg["Reply-To"] = mreply_to
         msg.replace_header("Content-Type", 'text/html; charset="utf-8"')
 
         self.manage_attachments(msg=msg)

@@ -361,7 +361,7 @@ class TestMailSend(unittest.TestCase):
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
         self.assertIn("Subject: block subject", msg)
-        self.assertIn("From: smith@doe.com", msg)
+        self.assertIn("From: john@doe.com", msg)
         self.assertIn("To: site_addr@plone.com", msg)
         self.assertIn("Reply-To: smith@doe.com", msg)
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
