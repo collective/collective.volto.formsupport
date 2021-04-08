@@ -119,16 +119,13 @@ class SubmitPost(Service):
 
         sublocks = self.block.get("sublocks", "")
         if sublocks:
-            print(f"\n\nsublocks: {sublocks}")
             for field in sublocks:
                 if field.get("use_as_reply_to", False):
                     field_id = field.get("field_id", "")
 
-            print(f"Field id: {field_id}\n")
             if field_id:
                 for data in self.form_data.get("data", ""):
                     if data.get("field_id", "") == field_id:
-                        print(f"data['value']: {data['value']}\n")
                         return data["value"]
 
         return self.form_data.get("from", "") or self.block.get("default_from", "")
