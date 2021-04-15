@@ -4,7 +4,9 @@ Changelog
 1.0.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Changed the classifiers inside setup.py. This should fix some installation
+  issues.
+  [arsenico13]
 
 
 1.0.3 (2021-04-08)
