@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.0.4 (unreleased)
+1.0.4 (2021-04-15)
 ------------------
 
 - Changed the classifiers inside setup.py. This should fix some installation
