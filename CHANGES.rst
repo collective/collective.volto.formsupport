@@ -4,7 +4,8 @@ Changelog
 1.0.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added Brazilian Portuguese (pt_BR) translations.
+  [ericof]
 
 
 1.0.4 (2021-04-15)
