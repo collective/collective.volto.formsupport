@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.0.5 (unreleased)
+1.0.5 (2021-05-12)
 ------------------
 
 - Added Brazilian Portuguese (pt_BR) translations.
