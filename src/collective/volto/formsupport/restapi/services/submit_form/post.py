@@ -14,6 +14,7 @@ from zope.i18n import translate
 from zope.interface import alsoProvides
 
 import codecs
+import json
 import six
 
 
@@ -251,3 +252,24 @@ class SubmitPost(Service):
         res = store.add(data=self.filter_parameters())
         if not res:
             raise BadRequest("Unable to store data")
+
+
+class PloneSiteSubmitPost(Service):
+    """Submit post service for plone root"""
+
+    def get_block_data(self, block_id):
+        blocks = getattr(self.context, "blocks", {})
+        if not blocks:
+            return {}
+
+        if isinstance(blocks, str):
+            blocks = json.loads(blocks)
+
+        for id, block in blocks.items():
+            if id != block_id:
+                continue
+            block_type = block.get("@type", "")
+            if block_type != "form":
+                continue
+            return block
+        return {}

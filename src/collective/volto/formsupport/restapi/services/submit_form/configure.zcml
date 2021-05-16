@@ -16,10 +16,8 @@
     method="POST"
     name="@submit-form"
     for="Products.CMFPlone.interfaces.siteroot.IPloneSiteRoot"
-    factory=".post.SubmitPost"
+    factory=".post.PloneSiteSubmitPost"
     permission="zope2.View"
-    layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
     />
-
 
 </configure>
