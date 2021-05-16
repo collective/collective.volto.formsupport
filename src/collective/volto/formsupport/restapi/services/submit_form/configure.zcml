@@ -12,4 +12,14 @@
     layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
     />
 
+  <plone:service
+    method="POST"
+    name="@submit-form"
+    for="Products.CMFPlone.interfaces.siteroot.IPloneSiteRoot"
+    factory=".post.SubmitPost"
+    permission="zope2.View"
+    layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
+    />
+
+
 </configure>

@@ -31,3 +31,4 @@ report.html
 .tox/
 reports/
 # excludes
+*~

@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from collective.volto.formsupport import _
+from collective.volto.formsupport.interfaces import IFormDataStore
 from email.message import EmailMessage
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
@@ -7,12 +9,9 @@ from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
 from zExceptions import BadRequest
-from zope.component import getMultiAdapter
-from zope.component import getUtility
-from zope.interface import alsoProvides
-from collective.volto.formsupport import _
+from zope.component import getMultiAdapter, getUtility
 from zope.i18n import translate
-from collective.volto.formsupport.interfaces import IFormDataStore
+from zope.interface import alsoProvides
 
 import codecs
 import six
@@ -29,6 +28,9 @@ class SubmitPost(Service):
             self.block = self.get_block_data(block_id=self.block_id)
 
     def reply(self):
+        import pdb
+
+        pdb.set_trace()
         self.validate_form()
 
         store_action = self.block.get("store", False)
