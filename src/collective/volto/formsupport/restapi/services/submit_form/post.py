@@ -28,9 +28,6 @@ class SubmitPost(Service):
             self.block = self.get_block_data(block_id=self.block_id)
 
     def reply(self):
-        import pdb
-
-        pdb.set_trace()
         self.validate_form()
 
         store_action = self.block.get("store", False)
