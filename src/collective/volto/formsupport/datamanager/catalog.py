@@ -3,21 +3,19 @@ from collective.volto.formsupport.interfaces import IFormDataStore
 from copy import deepcopy
 from datetime import datetime
 from plone.dexterity.interfaces import IDexterityContent
+from plone.i18n.normalizer.interfaces import IIDNormalizer
 from plone.restapi.deserializer import json_body
+from Products.CMFPlone.interfaces.siteroot import IPloneSiteRoot
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.indexes.field import CatalogFieldIndex
 from souper.interfaces import ICatalogFactory
-from souper.soup import get_soup
-from souper.soup import NodeAttributeIndexer
-from souper.soup import Record
-from zope.component import adapter
-from zope.interface import implementer
-from zope.interface import Interface
-from zope.component import getUtility
-from plone.i18n.normalizer.interfaces import IIDNormalizer
+from souper.soup import get_soup, NodeAttributeIndexer, Record
+from zope.component import adapter, getUtility
+from zope.interface import implementer, Interface
 
-
+import json
 import logging
+
 
 logger = logging.getLogger(__name__)
 
@@ -111,3 +109,26 @@ class FormDataStore(object):
 
     def clear(self):
         self.soup.clear()
+
+
+@implementer(IFormDataStore)
+@adapter(IPloneSiteRoot, Interface)
+class PloneSiteFormDataStore(FormDataStore):
+    def get_form_fields(self):
+        blocks = getattr(self.context, "blocks", {})
+        if not blocks:
+            return {}
+        form_block = {}
+
+        if isinstance(blocks, str):
+            blocks = json.loads(blocks)
+
+        for id, block in blocks.items():
+            if id != self.block_id:
+                continue
+            block_type = block.get("@type", "")
+            if block_type == "form":
+                form_block = deepcopy(block)
+        if not form_block:
+            return {}
+        return form_block.get("subblocks", [])
