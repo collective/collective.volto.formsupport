@@ -115,6 +115,7 @@ class FormDataStore(object):
 @adapter(IPloneSiteRoot, Interface)
 class PloneSiteFormDataStore(FormDataStore):
     def get_form_fields(self):
+        # TODO: should this be getProperty?
         blocks = getattr(self.context, "blocks", {})
         if not blocks:
             return {}
