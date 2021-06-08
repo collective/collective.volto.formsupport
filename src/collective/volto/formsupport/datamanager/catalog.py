@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
+
 from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.utils import flatten_block_hierachy
 from copy import deepcopy
 from datetime import datetime
 from plone.dexterity.interfaces import IDexterityContent
 from plone.i18n.normalizer.interfaces import IIDNormalizer
 from plone.restapi.deserializer import json_body
+from plone.restapi.slots.interfaces import ISlots
 from Products.CMFPlone.interfaces.siteroot import IPloneSiteRoot
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.indexes.field import CatalogFieldIndex
@@ -52,6 +55,15 @@ class FormDataStore(object):
         blocks = getattr(self.context, "blocks", {})
         if not blocks:
             return {}
+
+        slots = ISlots(self.context)
+        slot_names = slots.discover_slots()
+
+        for name in slot_names:
+            flat = list((flatten_block_hierachy(
+                slots.get_blocks(name)['blocks'] or {})))
+            blocks.update(flat)
+
         form_block = {}
         for id, block in blocks.items():
             if id != self.block_id:
@@ -119,10 +131,18 @@ class PloneSiteFormDataStore(FormDataStore):
         blocks = getattr(self.context, "blocks", {})
         if not blocks:
             return {}
-        form_block = {}
-
         if isinstance(blocks, str):
             blocks = json.loads(blocks)
+
+        slots = ISlots(self.context)
+        slot_names = slots.discover_slots()
+
+        for name in slot_names:
+            flat = list((flatten_block_hierachy(
+                slots.get_blocks(name)['blocks'] or {})))
+            blocks.update(flat)
+
+        form_block = {}
 
         for id, block in blocks.items():
             if id != self.block_id:
@@ -130,6 +150,8 @@ class PloneSiteFormDataStore(FormDataStore):
             block_type = block.get("@type", "")
             if block_type == "form":
                 form_block = deepcopy(block)
+
         if not form_block:
             return {}
+
         return form_block.get("subblocks", [])

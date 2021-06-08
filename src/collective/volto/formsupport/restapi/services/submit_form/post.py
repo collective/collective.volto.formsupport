@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 from collective.volto.formsupport import _
 from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.utils import flatten_block_hierachy
 from email.message import EmailMessage
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
+from plone.restapi.slots.interfaces import ISlots
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
 from zExceptions import BadRequest
 from zope.component import getMultiAdapter, getUtility
@@ -94,8 +96,17 @@ class SubmitPost(Service):
 
     def get_block_data(self, block_id):
         blocks = getattr(self.context, "blocks", {})
+        slots = ISlots(self.context)
+        slot_names = slots.discover_slots()
+
+        for name in slot_names:
+            flat = list((flatten_block_hierachy(
+                slots.get_blocks(name)['blocks'] or {})))
+            blocks.update(flat)
+
         if not blocks:
             return {}
+
         for id, block in blocks.items():
             if id != block_id:
                 continue
@@ -248,6 +259,8 @@ class SubmitPost(Service):
                 )
 
     def store_data(self):
+        import pdb
+        pdb.set_trace()
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
         res = store.add(data=self.filter_parameters())
         if not res:
@@ -259,11 +272,19 @@ class PloneSiteSubmitPost(SubmitPost):
 
     def get_block_data(self, block_id):
         blocks = getattr(self.context, "blocks", {})
-        if not blocks:
-            return {}
-
         if isinstance(blocks, str):
             blocks = json.loads(blocks)
+
+        slots = ISlots(self.context)
+        slot_names = slots.discover_slots()
+
+        for name in slot_names:
+            flat = list((flatten_block_hierachy(
+                slots.get_blocks(name)['blocks'] or {})))
+            blocks.update(flat)
+
+        if not blocks:
+            return {}
 
         for id, block in blocks.items():
             if id != block_id:
