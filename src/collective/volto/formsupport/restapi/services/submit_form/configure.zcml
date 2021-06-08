@@ -16,8 +16,17 @@
     method="POST"
     name="@submit-form"
     for="Products.CMFPlone.interfaces.siteroot.IPloneSiteRoot"
-    factory=".post.PloneSiteSubmitPost"
+    factory=".post.FallbackSubmitPost"
     permission="zope2.View"
+    />
+
+  <plone:service
+    method="POST"
+    name="@submit-form"
+    for="plone.dexterity.interfaces.IDexterityContent"
+    factory=".post.FallbackSubmitPost"
+    permission="zope2.View"
+    layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
     />
 
 </configure>

@@ -265,7 +265,7 @@ class SubmitPost(Service):
             raise BadRequest("Unable to store data")
 
 
-class PloneSiteSubmitPost(SubmitPost):
+class FallbackSubmitPost(SubmitPost):
     """Submit post service for plone root"""
 
     def get_block_data(self, block_id):
