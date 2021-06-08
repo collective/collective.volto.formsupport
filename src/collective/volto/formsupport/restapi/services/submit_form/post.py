@@ -259,8 +259,6 @@ class SubmitPost(Service):
                 )
 
     def store_data(self):
-        import pdb
-        pdb.set_trace()
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
         res = store.add(data=self.filter_parameters())
         if not res:
