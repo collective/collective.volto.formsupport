@@ -15,7 +15,7 @@
   <plone:service
     method="POST"
     name="@submit-form"
-    for="Products.CMFPlone.interfaces.siteroot.IPloneSiteRoot"
+    for="*"
     factory=".post.FallbackSubmitPost"
     permission="zope2.View"
     />

@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 from collective.volto.formsupport import _
 from collective.volto.formsupport.interfaces import IFormDataStore
-from collective.volto.formsupport.utils import flatten_block_hierachy
+from collective.volto.formsupport.utils import get_blocks
 from email.message import EmailMessage
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
-from plone.restapi.slots.interfaces import ISlots
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
 from zExceptions import BadRequest
 from zope.component import getMultiAdapter, getUtility
@@ -16,7 +15,6 @@ from zope.i18n import translate
 from zope.interface import alsoProvides
 
 import codecs
-import json
 import six
 
 
@@ -95,14 +93,7 @@ class SubmitPost(Service):
             )
 
     def get_block_data(self, block_id):
-        blocks = getattr(self.context, "blocks", {})
-        slots = ISlots(self.context)
-        slot_names = slots.discover_slots()
-
-        for name in slot_names:
-            flat = list((flatten_block_hierachy(
-                slots.get_blocks(name)['blocks'] or {})))
-            blocks.update(flat)
+        blocks = get_blocks(self.context)
 
         if not blocks:
             return {}
@@ -269,17 +260,7 @@ class FallbackSubmitPost(SubmitPost):
     """Submit post service for plone root"""
 
     def get_block_data(self, block_id):
-        blocks = getattr(self.context, "blocks", {})
-        if isinstance(blocks, str):
-            blocks = json.loads(blocks)
-
-        slots = ISlots(self.context)
-        slot_names = slots.discover_slots()
-
-        for name in slot_names:
-            flat = list((flatten_block_hierachy(
-                slots.get_blocks(name)['blocks'] or {})))
-            blocks.update(flat)
+        blocks = get_blocks(self.context)
 
         if not blocks:
             return {}

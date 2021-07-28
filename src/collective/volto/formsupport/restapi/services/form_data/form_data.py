@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
+
 from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.utils import get_blocks
 from plone import api
 from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
 from zope.component import adapter, getMultiAdapter
 from zope.interface import implementer, Interface
-
-import json
-import six
 
 
 @implementer(IExpandableElement)
@@ -46,14 +45,15 @@ class FormData(object):
             "Modify portal content", user=current, obj=self.context
         ):
             return False
-        blocks = getattr(self.context, "blocks", {})
-        if isinstance(blocks, six.text_type):
-            blocks = json.loads(blocks)
+        blocks = get_blocks(self.context)
+
         if not blocks:
             return False
+
         for block in blocks.values():
             if block.get("@type", "") == "form" and block.get("store", False):
                 return True
+
         return False
 
     def expand_records(self, record):
