@@ -15,6 +15,15 @@
   <plone:service
     method="GET"
     name="@form-data"
+    for="*"
+    factory=".form_data.FormDataGet"
+    permission="cmf.ModifyPortalContent"
+    layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
+    />
+
+  <plone:service
+    method="GET"
+    name="@form-data"
     for="Products.CMFPlone.interfaces.siteroot.IPloneSiteRoot"
     factory=".form_data.FormDataGet"
     permission="cmf.ModifyPortalContent"

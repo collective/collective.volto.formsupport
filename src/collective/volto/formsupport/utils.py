@@ -1,5 +1,5 @@
 from collections import deque
-from plone.restapi.slots.interfaces import ISlots
+from plone.restapi.slots.interfaces import ISlot, ISlots
 
 import copy
 import json
@@ -36,6 +36,9 @@ def get_blocks(context):
     blocks = copy.deepcopy(getattr(context, "blocks", {}))
     if isinstance(blocks, six.text_type):
         blocks = json.loads(blocks)
+
+    if ISlot.providedBy(context):
+        return blocks
 
     slots = ISlots(context)
     slot_names = slots.discover_slots()
