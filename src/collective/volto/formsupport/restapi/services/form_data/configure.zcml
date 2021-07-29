@@ -43,8 +43,26 @@
 
   <plone:service
     method="GET"
+    name="@form-data-clear"
+    for="Products.CMFPlone.interfaces.siteroot.IPloneSiteRoot"
+    factory=".clear.FormDataClear"
+    permission="cmf.ModifyPortalContent"
+    layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
+    />
+
+  <plone:service
+    method="GET"
     name="@form-data-export"
     for="plone.restapi.behaviors.IBlocks"
+    factory=".csv.FormDataExportGet"
+    permission="cmf.ModifyPortalContent"
+    layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
+    />
+
+  <plone:service
+    method="GET"
+    name="@form-data-export"
+    for="Products.CMFPlone.interfaces.siteroot.IPloneSiteRoot"
     factory=".csv.FormDataExportGet"
     permission="cmf.ModifyPortalContent"
     layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
