@@ -18,6 +18,7 @@
   <include package=".restapi" />
 
   <include file="permissions.zcml" />
+  <include file="upgrades.zcml" />
 
   <genericsetup:registerProfile
       name="default"
