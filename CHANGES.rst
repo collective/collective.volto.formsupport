@@ -4,7 +4,9 @@ Changelog
 1.0.6 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Convert field types: checkbox => multiple_choice and radio => single_choice
+  to follow new schema in volto-form-block (https://github.com/collective/volto-form-block/pull/7).
+  [cekk]
 
 
 1.0.5 (2021-05-12)
