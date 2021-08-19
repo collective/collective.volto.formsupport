@@ -1,7 +1,7 @@
 Changelog
 =========
 
-1.0.6 (unreleased)
+2.0.0 (2021-08-19)
 ------------------
 
 - Convert field types: checkbox => multiple_choice and radio => single_choice
