@@ -237,15 +237,13 @@ class SubmitPost(Service):
                 if isinstance(file_data, six.text_type):
                     file_data = file_data.encode("utf-8")
             else:
-
                 file_data = value
-            for attachment in attachments:
-                msg.add_attachment(
-                    file_data,
-                    maintype=content_type,
-                    subtype=content_type,
-                    filename=filename,
-                )
+            msg.add_attachment(
+                file_data,
+                maintype=content_type,
+                subtype=content_type,
+                filename=filename,
+            )
 
     def store_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)

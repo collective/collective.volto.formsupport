@@ -4,7 +4,8 @@ Changelog
 2.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- [fix] do not send attachments multiple times.
+  [cekk]
 
 
 2.0.0 (2021-08-19)
