@@ -16,7 +16,7 @@ long_description = "\n\n".join(
 
 setup(
     name="collective.volto.formsupport",
-    version="2.0.1",
+    version="2.0.2.dev0",
     description="Add support for customizable forms in Volto",
     long_description=long_description,
     # Get more from https://pypi.org/classifiers/
