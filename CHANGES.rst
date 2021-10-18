@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.0.1 (unreleased)
+2.0.1 (2021-10-18)
 ------------------
 
 - [fix] do not send attachments multiple times.
