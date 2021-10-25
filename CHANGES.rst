@@ -4,7 +4,8 @@ Changelog
 2.0.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix permission checks in serializer.
+  [nzambello]
 
 
 2.0.2 (2021-10-25)
