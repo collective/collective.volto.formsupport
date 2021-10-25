@@ -4,7 +4,8 @@ Changelog
 2.0.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix permission checks.
+  [cekk]
 
 
 2.0.1 (2021-10-18)

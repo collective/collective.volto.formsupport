@@ -25,9 +25,7 @@ class FormData(object):
             return {}
 
         result = {
-            "form_data": {
-                "@id": "{}/@form-data".format(self.context.absolute_url())
-            }
+            "form_data": {"@id": "{}/@form-data".format(self.context.absolute_url())}
         }
         if not expand:
             return result
@@ -45,10 +43,7 @@ class FormData(object):
         return result
 
     def show_component(self):
-        current = api.user.get_current()
-        if not api.user.has_permission(
-            "Modify portal content", user=current, obj=self.context
-        ):
+        if not api.user.has_permission("Modify portal content", obj=self.context):
             return False
         blocks = getattr(self.context, "blocks", {})
         if isinstance(blocks, six.text_type):
