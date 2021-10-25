@@ -27,9 +27,8 @@ class FormSerializer(object):
         Otherwise, skip default values because we need them only in edit and
         to send emails from the backend.
         """
-        current = api.user.get_current()
         if api.user.has_permission(
-            "Modify portal content", user=current, obj=self.context
+            "Modify portal content", obj=self.context
         ):
             return value
         return {k: v for k, v in value.items() if not k.startswith("default_")}
