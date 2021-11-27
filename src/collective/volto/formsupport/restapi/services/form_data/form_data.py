@@ -40,10 +40,7 @@ class FormData(object):
         return result
 
     def show_component(self):
-        current = api.user.get_current()
-        if not api.user.has_permission(
-            "Modify portal content", user=current, obj=self.context
-        ):
+        if not api.user.has_permission("Modify portal content", obj=self.context):
             return False
         blocks = get_blocks(self.context)
 

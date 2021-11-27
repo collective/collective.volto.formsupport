@@ -1,10 +1,39 @@
 Changelog
 =========
 
-1.0.6 (unreleased)
+2.0.4 (unreleased)
 ------------------
 
 - Nothing changed yet.
+
+
+2.0.3 (2021-10-25)
+------------------
+
+- Fix permission checks in serializer.
+  [nzambello]
+
+
+2.0.2 (2021-10-25)
+------------------
+
+- Fix permission checks.
+  [cekk]
+
+
+2.0.1 (2021-10-18)
+------------------
+
+- [fix] do not send attachments multiple times.
+  [cekk]
+
+
+2.0.0 (2021-08-19)
+------------------
+
+- Convert field types: checkbox => multiple_choice and radio => single_choice
+  to follow new schema in volto-form-block (https://github.com/collective/volto-form-block/pull/7).
+  [cekk]
 
 
 1.0.5 (2021-05-12)
