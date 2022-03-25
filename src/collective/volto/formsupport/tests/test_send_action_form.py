@@ -366,3 +366,50 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("Reply-To: smith@doe.com", msg)
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> Smith", msg)
+
+    def test_email_field_used_as_bcc(
+        self,
+    ):
+
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {
+                "@type": "form",
+                "default_subject": "block subject",
+                "default_from": "john@doe.com",
+                "send": True,
+                "subblocks": [
+                    {
+                        "field_id": "contact",
+                        "field_type": "from",
+                        "use_as_bcc": True,
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {"field_id": "contact", "label": "Email", "value": "smith@doe.com"},
+                ],
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(len(self.mailhost.messages), 2)
+        msg = self.mailhost.messages[0]
+        bcc_msg = self.mailhost.messages[1]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+            bcc_msg = bcc_msg.decode("utf-8")
+        self.assertIn("To: site_addr@plone.com", msg)
+        self.assertNotIn("To: smith@doe.com", msg)
+        self.assertNotIn("To: site_addr@plone.com", bcc_msg)
+        self.assertIn("To: smith@doe.com", bcc_msg)
