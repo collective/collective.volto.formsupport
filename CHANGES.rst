@@ -4,7 +4,8 @@ Changelog
 2.0.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Support for user_as_bcc field in volto-form-block: send a separate mail for each email field with that flag.
+  [cekk]
 
 
 2.0.3 (2021-10-25)

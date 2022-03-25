@@ -129,6 +129,23 @@ class SubmitPost(Service):
 
         return self.form_data.get("from", "") or self.block.get("default_from", "")
 
+    def get_bcc(self):
+        bcc = []
+        bcc_fields = []
+        for field in self.block.get("subblocks", []):
+            if field.get("use_as_bcc", False):
+                field_id = field.get("field_id", "")
+                if field_id not in bcc_fields:
+                    bcc_fields.append(field_id)
+        bcc = []
+        for data in self.form_data.get("data", []):
+            value = data.get("value", "")
+            if not value:
+                continue
+            if data.get("field_id", "") in bcc_fields:
+                bcc.append(data["value"])
+        return bcc
+
     def send_data(self):
         subject = self.form_data.get("subject", "") or self.block.get(
             "default_subject", ""
@@ -167,11 +184,17 @@ class SubmitPost(Service):
         msg["From"] = mfrom
         msg["To"] = mto
         msg["Reply-To"] = mreply_to
+
         msg.replace_header("Content-Type", 'text/html; charset="utf-8"')
 
         self.manage_attachments(msg=msg)
 
         self.send_mail(msg=msg, encoding=encoding)
+
+        for bcc in self.get_bcc():
+            # send a copy also to the fields with bcc flag
+            msg.replace_header("To", bcc)
+            self.send_mail(msg=msg, encoding=encoding)
 
     def prepare_message(self):
         message_template = api.content.get_view(
