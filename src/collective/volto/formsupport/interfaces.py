@@ -24,3 +24,9 @@ class IFormDataStore(Interface):
         """
         @return: items that match query
         """
+
+
+class IPostEvent(Interface):
+    """
+    Event fired when a form is submitted (before actions)
+    """

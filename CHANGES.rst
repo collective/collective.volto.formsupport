@@ -1,10 +1,10 @@
 Changelog
 =========
 
-2.1.1 (unreleased)
+2.2.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Notify an event on sumbit.
 
 
 2.1.0 (2022-03-25)
