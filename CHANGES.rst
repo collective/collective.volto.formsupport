@@ -5,6 +5,7 @@ Changelog
 ------------------
 
 - Notify an event on sumbit.
+  [mamico]
 
 
 2.1.0 (2022-03-25)
