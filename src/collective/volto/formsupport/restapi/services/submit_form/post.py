@@ -9,13 +9,23 @@ from Products.CMFPlone.interfaces.controlpanel import IMailSchema
 from zExceptions import BadRequest
 from zope.component import getMultiAdapter
 from zope.component import getUtility
+from zope.interface import implementer
 from zope.interface import alsoProvides
+from zope.event import notify
 from collective.volto.formsupport import _
 from zope.i18n import translate
 from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.interfaces import IPostEvent
 
 import codecs
 import six
+
+
+@implementer(IPostEvent)
+class PostEventService(object):
+    def __init__(self, context, data):
+        self.context = context
+        self.data = data
 
 
 class SubmitPost(Service):
@@ -36,6 +46,8 @@ class SubmitPost(Service):
 
         # Disable CSRF protection
         alsoProvides(self.request, IDisableCSRFProtection)
+
+        notify(PostEventService(self.context, self.form_data))
 
         if store_action:
             self.store_data()
