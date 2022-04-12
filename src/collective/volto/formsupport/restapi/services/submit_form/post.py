@@ -20,6 +20,7 @@ from collective.volto.formsupport.interfaces import ICaptchaSupport
 import codecs
 import six
 
+
 @implementer(IPostEvent)
 class PostEventService(object):
     def __init__(self, context, data):
@@ -105,7 +106,9 @@ class SubmitPost(Service):
 
         if self.block.get("captcha", False):
             getMultiAdapter(
-                (self.context, self.request), ICaptchaSupport, name=self.block["captcha"]
+                (self.context, self.request),
+                ICaptchaSupport,
+                name=self.block["captcha"],
             ).verify(self.form_data["captcha"])
 
     def get_block_data(self, block_id):
