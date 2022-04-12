@@ -16,10 +16,9 @@ from collective.volto.formsupport import _
 from zope.i18n import translate
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.interfaces import IPostEvent
-
+from collective.volto.formsupport.interfaces import ICaptchaSupport
 import codecs
 import six
-
 
 @implementer(IPostEvent)
 class PostEventService(object):
@@ -103,6 +102,11 @@ class SubmitPost(Service):
                     context=self.request,
                 )
             )
+
+        if self.block.get("captcha", False):
+            getMultiAdapter(
+                (self.context, self.request), ICaptchaSupport, name=self.block["captcha"]
+            ).verify(self.form_data["captcha"])
 
     def get_block_data(self, block_id):
         blocks = getattr(self.context, "blocks", {})
@@ -238,19 +242,7 @@ class SubmitPost(Service):
 
     def send_mail(self, msg, encoding):
         host = api.portal.get_tool(name="MailHost")
-        # try:
-
         host.send(msg, charset=encoding)
-
-        # except (SMTPException, RuntimeError):
-        #     plone_utils = api.portal.get_tool(name="plone_utils")
-        #     exception = plone_utils.exceptionString()
-        #     message = "Unable to send mail: {}".format(exception)
-
-        #     self.request.response.setStatus(500)
-        #     return dict(
-        #         error=dict(type="InternalServerError", message=message)
-        #     )
 
     def manage_attachments(self, msg):
         attachments = self.form_data.get("attachments", {})

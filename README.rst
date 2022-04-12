@@ -19,6 +19,8 @@ collective.volto.formsupport
 
 Add some helper routes and functionalities for Volto sites with ``form`` blocks provided by `volto-form-block <https://github.com/collective/volto-form-block>`_ Volto plugin.
 
+For captcha support `volto-form-block` version >= 2.4.0 is required.
+
 plone.restapi endpoints
 =======================
 
@@ -45,7 +47,7 @@ Calling this endpoint, it will do some actions (based on block settings) and ret
 
 This is an expansion component.
 
-There is a rule that returns a ``form-data`` item into "components" slot if the user can edit the 
+There is a rule that returns a ``form-data`` item into "components" slot if the user can edit the
 context (**Modify portal content** permission) and there is a block that can store data.
 
 Calling with "expand=true", this endpoint returns the stored data::

@@ -30,3 +30,13 @@ class IPostEvent(Interface):
     """
     Event fired when a form is submitted (before actions)
     """
+
+
+class ICaptchaSupport(Interface):
+    def __init__(self, context, request):
+        """Initialize adpater"""
+
+    def verify(self, data):
+        """Verify the captcha
+        @return: True if verified, Raise exception otherwise
+        """
