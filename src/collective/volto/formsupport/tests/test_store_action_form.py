@@ -67,10 +67,14 @@ class TestMailSend(unittest.TestCase):
         transaction.commit()
         return response
 
+    def export_data(self):
+        url = "{}/@form-data".format(self.document_url)
+        response = self.api_session.get(url)
+        return response
+
     def export_csv(self):
         url = "{}/@form-data-export".format(self.document_url)
         response = self.api_session.get(url)
-        # transaction.commit()
         return response
 
     def clear_data(self):
@@ -138,11 +142,12 @@ class TestMailSend(unittest.TestCase):
         )
         transaction.commit()
         self.assertEqual(response.status_code, 204)
-        response = self.export_csv()
-        data = [*csv.reader(StringIO(response.text), delimiter=',')]
-        self.assertEqual(len(data), 2)
-        self.assertEqual(data[0], ["message", "name", "date"])
-        self.assertEqual(data[1][:-1], ["just want to say hi", "John"])
+        response = self.export_data()
+        data = response.json()
+        self.assertEqual(len(data['items']), 1)
+        self.assertEqual(sorted(data["items"][0].keys()), ["block_id", "date", "id", "message", "name"])
+        self.assertEqual(data["items"][0]["message"], "just want to say hi")
+        self.assertEqual(data["items"][0]["name"], "John")
         response = self.submit_form(
             data={
                 "from": "sally@doe.com",
@@ -156,13 +161,16 @@ class TestMailSend(unittest.TestCase):
         )
         transaction.commit()
         self.assertEqual(response.status_code, 204)
-        response = self.export_csv()
-        data = [*csv.reader(StringIO(response.text), delimiter=',')]
-        self.assertEqual(len(data), 3)
-        self.assertEqual(data[0], ["message", "name", "date"])
-        sorted_data = sorted(data[1:])
-        self.assertEqual(sorted_data[0][:-1], ["bye", "Sally"])
-        self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John"])
+        response = self.export_data()
+        data = response.json()
+        self.assertEqual(len(data["items"]), 2)
+        self.assertEqual(sorted(data["items"][0].keys()), ["block_id", "date", "id", "message", "name"])
+        self.assertEqual(sorted(data["items"][1].keys()), ["block_id", "date", "id", "message", "name"])
+        sorted_data = sorted(data["items"], key=lambda x: x["name"])
+        self.assertEqual(sorted_data[0]["name"], "John")
+        self.assertEqual(sorted_data[0]["message"], "just want to say hi")
+        self.assertEqual(sorted_data[1]["name"], "Sally")
+        self.assertEqual(sorted_data[1]["message"], "bye")
 
         # clear data
         response = self.clear_data()
@@ -171,3 +179,58 @@ class TestMailSend(unittest.TestCase):
         data = [*csv.reader(StringIO(response.text), delimiter=',')]
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0], ["date"])
+
+    def test_export_csv(self):
+        self.document.blocks = {
+            "form-id": {
+                "@type": "form",
+                "store": True,
+                "subblocks": [
+                    {
+                        "label": "Message",
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
+                    {
+                        "label": "Name",
+                        "field_id": "name",
+                        "field_type": "text",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": [
+                    {"field_id": "message", "value": "just want to say hi"},
+                    {"field_id": "name", "value": "John"},
+                    {"field_id": "foo", "value": "skip this"},
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+
+        response = self.submit_form(
+            data={
+                "from": "sally@doe.com",
+                "data": [
+                    {"field_id": "message", "value": "bye"},
+                    {"field_id": "name", "value": "Sally"},
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+
+        self.assertEqual(response.status_code, 204)
+        response = self.export_csv()
+        data = [*csv.reader(StringIO(response.text), delimiter=',')]
+        self.assertEqual(len(data), 3)
+        self.assertEqual(data[0], ["message", "name", "date"])
+        sorted_data = sorted(data[1:])
+        self.assertEqual(sorted_data[0][:-1], ["bye", "Sally"])
+        self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John"])
