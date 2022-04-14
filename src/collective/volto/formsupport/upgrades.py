@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 DEFAULT_PROFILE = "profile-collective.volto.formsupport:default"
 
 
-def to_1100(context):  # noqa: C901
+def to_1100(context):  # noqa: C901 # pragma: no cover
     logger.info("### START CONVERSION FORM BLOCKS ###")
 
     def fix_block(blocks, url):

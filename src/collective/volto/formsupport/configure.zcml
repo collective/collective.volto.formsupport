@@ -13,6 +13,8 @@
   -->
   <!--<includeDependencies package="." />-->
 
+  <include package="souper.plone" />
+
   <include package=".browser" />
   <include package=".datamanager" />
   <include package=".restapi" />

@@ -75,15 +75,15 @@ class FormDataStore(object):
             )
             return None
 
-        form_ids = [x.get("field_id", "") for x in form_fields]
+        fields = {x["field_id"]: x.get("label", x["field_id"]) for x in form_fields}
         record = Record()
         # record.attrs["metadata"] = {}
         normalizer = getUtility(IIDNormalizer)
-        for field in data:
-            field_id = field.get("field_id", "")
-            id = normalizer.normalize(field.get("label", ""))
-            value = field.get("value", "")
-            if field_id in form_ids:
+        for field_data in data:
+            field_id = field_data.get("field_id", "")
+            value = field_data.get("value", "")
+            if field_id in fields:
+                id = normalizer.normalize(fields[field_id])
                 record.attrs[id] = value
                 # record.attrs["metadata"][id] = {
                 #     "field_id": field_id,
