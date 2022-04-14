@@ -109,7 +109,7 @@ class SubmitPost(Service):
                 (self.context, self.request),
                 ICaptchaSupport,
                 name=self.block["captcha"],
-            ).verify(self.form_data["captcha"])
+            ).verify(self.form_data.get("captcha"))
 
     def get_block_data(self, block_id):
         blocks = getattr(self.context, "blocks", {})

@@ -74,6 +74,8 @@ setup(
             "plone.app.contenttypes",
             "plone.app.robotframework[debug]",
             "collective.MockMailHost",
+            "plone.formwidget.hcaptcha",
+            "plone.formwidget.recaptcha",
         ],
     },
     entry_points="""
