@@ -13,7 +13,6 @@ from plone.testing import z2
 import collective.MockMailHost
 import collective.volto.formsupport
 import plone.restapi
-import souper.plone
 
 
 class VoltoFormsupportLayer(PloneSandboxLayer):
