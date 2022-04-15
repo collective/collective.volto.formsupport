@@ -12,6 +12,9 @@
     :target: https://pypi.python.org/pypi/collective.volto.formsupport/
     :alt: License
 
+.. image:: ./coverage.svg
+   :alt: coverage
+
 
 ============================
 collective.volto.formsupport
