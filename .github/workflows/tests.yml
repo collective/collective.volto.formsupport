@@ -69,7 +69,7 @@ jobs:
       #    branch: ${{ github.ref }}
       #
 
-coveralls_finish:
+  coveralls_finish:
     needs: build
     runs-on: ubuntu-latest
     steps:
