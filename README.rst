@@ -12,8 +12,9 @@
     :target: https://pypi.python.org/pypi/collective.volto.formsupport/
     :alt: License
 
-.. |Coverage| image:: https://coveralls.io/repos/github/collective/collective.volto.formsupport/badge.svg
+.. image:: https://coveralls.io/repos/github/collective/collective.volto.formsupport/badge.svg
     :target: https://coveralls.io/github/collective/collective.volto.formsupport
+    :alt: Coverage
 
 
 ============================
