@@ -36,24 +36,44 @@ jobs:
           bin/code-analysis
       - name: Run tests
         run: |
-          bin/test-coverage
-      - name: Coverage Badge
-        uses: tj-actions/coverage-badge-py@v1.8
-      - name: Verify Changed files
-        uses: tj-actions/verify-changed-files@v9
-        id: changed_files
-        with:
-          files: coverage.svg
-      - name: Commit files
-        if: steps.changed_files.outputs.files_changed == 'true'
+          bin/test
+          # bin/test-coverage
+      - name: createcoverage
         run: |
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add coverage.svg
-          git commit -m "Updated coverage.svg"
-      - name: Push changes
-        if: steps.changed_files.outputs.files_changed == 'true'
-        uses: ad-m/github-push-action@master
+            bin/createcoverage -t '--all'
+            bin/coverage json -i
+      - name: Coveralls
+        uses: AndreMiras/coveralls-python-action@develop
         with:
-          github_token: ${{ secrets.github_token }}
-          branch: ${{ github.ref }}
+          parallel: true
+          flag-name: ${{ matrix.plone }}-${{ matrix.python }}
+      #- name: Coverage Badge
+      #  uses: tj-actions/coverage-badge-py@v1.8
+      #- name: Verify Changed files
+      #  uses: tj-actions/verify-changed-files@v9
+      #  id: changed_files
+      #  with:
+      #    files: coverage.svg
+      #- name: Commit files
+      #  if: steps.changed_files.outputs.files_changed == 'true'
+      #  run: |
+      #    git config --local user.email "github-actions[bot]@users.noreply.github.com"
+      #    git config --local user.name "github-actions[bot]"
+      #    git add coverage.svg
+      #    git commit -m "Updated coverage.svg"
+      #- name: Push changes
+      #  if: steps.changed_files.outputs.files_changed == 'true'
+      #  uses: ad-m/github-push-action@master
+      #  with:
+      #    github_token: ${{ secrets.github_token }}
+      #    branch: ${{ github.ref }}
+      #
+
+coveralls_finish:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+    - name: Coveralls Finished
+      uses: AndreMiras/coveralls-python-action@develop
+      with:
+        parallel-finished: true
