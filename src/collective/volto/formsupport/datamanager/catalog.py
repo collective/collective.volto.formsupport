@@ -28,7 +28,7 @@ class FormDataSoupCatalogFactory(object):
         #  do not set any index here..maybe on each form
         catalog = Catalog()
         block_id_indexer = NodeAttributeIndexer("block_id")
-        catalog[u"block_id"] = CatalogFieldIndex(block_id_indexer)
+        catalog["block_id"] = CatalogFieldIndex(block_id_indexer)
         return catalog
 
 

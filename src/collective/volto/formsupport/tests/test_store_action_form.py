@@ -84,8 +84,7 @@ class TestMailSend(unittest.TestCase):
         return response
 
     def test_unable_to_store_data(self):
-        """form schema not defined, unable to store data
-        """
+        """form schema not defined, unable to store data"""
         self.document.blocks = {
             "form-id": {"@type": "form", "store": True},
         }
@@ -144,8 +143,11 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(response.status_code, 204)
         response = self.export_data()
         data = response.json()
-        self.assertEqual(len(data['items']), 1)
-        self.assertEqual(sorted(data["items"][0].keys()), ["block_id", "date", "id", "message", "name"])
+        self.assertEqual(len(data["items"]), 1)
+        self.assertEqual(
+            sorted(data["items"][0].keys()),
+            ["block_id", "date", "id", "message", "name"],
+        )
         self.assertEqual(data["items"][0]["message"], "just want to say hi")
         self.assertEqual(data["items"][0]["name"], "John")
         response = self.submit_form(
@@ -164,8 +166,14 @@ class TestMailSend(unittest.TestCase):
         response = self.export_data()
         data = response.json()
         self.assertEqual(len(data["items"]), 2)
-        self.assertEqual(sorted(data["items"][0].keys()), ["block_id", "date", "id", "message", "name"])
-        self.assertEqual(sorted(data["items"][1].keys()), ["block_id", "date", "id", "message", "name"])
+        self.assertEqual(
+            sorted(data["items"][0].keys()),
+            ["block_id", "date", "id", "message", "name"],
+        )
+        self.assertEqual(
+            sorted(data["items"][1].keys()),
+            ["block_id", "date", "id", "message", "name"],
+        )
         sorted_data = sorted(data["items"], key=lambda x: x["name"])
         self.assertEqual(sorted_data[0]["name"], "John")
         self.assertEqual(sorted_data[0]["message"], "just want to say hi")
@@ -176,7 +184,7 @@ class TestMailSend(unittest.TestCase):
         response = self.clear_data()
         self.assertEqual(response.status_code, 204)
         response = self.export_csv()
-        data = [*csv.reader(StringIO(response.text), delimiter=',')]
+        data = [*csv.reader(StringIO(response.text), delimiter=",")]
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0], ["date"])
 
@@ -228,7 +236,7 @@ class TestMailSend(unittest.TestCase):
 
         self.assertEqual(response.status_code, 204)
         response = self.export_csv()
-        data = [*csv.reader(StringIO(response.text), delimiter=',')]
+        data = [*csv.reader(StringIO(response.text), delimiter=",")]
         self.assertEqual(len(data), 3)
         self.assertEqual(data[0], ["message", "name", "date"])
         sorted_data = sorted(data[1:])

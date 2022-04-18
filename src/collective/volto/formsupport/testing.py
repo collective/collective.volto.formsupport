@@ -53,9 +53,7 @@ class VoltoFormsupportRestApiLayer(PloneRestApiDXLayer):
     defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
-        super(VoltoFormsupportRestApiLayer, self).setUpZope(
-            app, configurationContext
-        )
+        super(VoltoFormsupportRestApiLayer, self).setUpZope(app, configurationContext)
         self.loadZCML(package=collective.MockMailHost)
         self.loadZCML(package=plone.restapi)
         self.loadZCML(package=collective.volto.formsupport)

@@ -41,9 +41,7 @@ class TestSetup(unittest.TestCase):
         )
         from plone.browserlayer import utils
 
-        self.assertIn(
-            ICollectiveVoltoFormsupportLayer, utils.registered_layers()
-        )
+        self.assertIn(ICollectiveVoltoFormsupportLayer, utils.registered_layers())
 
 
 class TestUninstall(unittest.TestCase):
@@ -74,6 +72,4 @@ class TestUninstall(unittest.TestCase):
         )
         from plone.browserlayer import utils
 
-        self.assertNotIn(
-            ICollectiveVoltoFormsupportLayer, utils.registered_layers()
-        )
+        self.assertNotIn(ICollectiveVoltoFormsupportLayer, utils.registered_layers())

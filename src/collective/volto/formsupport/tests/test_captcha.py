@@ -91,27 +91,6 @@ class TestCaptcha(unittest.TestCase):
                 "captcha": "recaptcha",
             },
         }
-        transaction.commit()
-        response = self.submit_form(
-            data={
-                "data": [
-                    {"label": "Message", "value": "just want to say hi"},
-                ],
-                "block_id": "form-id",
-            },
-        )
-        transaction.commit()
-        self.assertEqual(response.status_code, 503)
-        self.assertEqual(
-            response.json()["message"],
-            "'Interface `plone.formwidget.recaptcha.interfaces.IReCaptchaSettings` "
-            "defines a field `public_key`, for which there is no record.'"
-        )
-        self.assertEqual(
-            response.json()["type"],
-            "KeyError"
-        )
-
         self.registry.registerInterface(IReCaptchaSettings)
         transaction.commit()
         response = self.submit_form(
@@ -127,7 +106,7 @@ class TestCaptcha(unittest.TestCase):
         self.assertEqual(
             response.json()["message"],
             "No recaptcha private key configured. Go to path/to/site/@@recaptcha-settings "
-            "to configure."
+            "to configure.",
         )
 
     def test_recaptcha(self):
@@ -165,12 +144,11 @@ class TestCaptcha(unittest.TestCase):
         )
         transaction.commit()
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.json()["message"],
-            "No captcha token provided."
-        )
+        self.assertEqual(response.json()["message"], "No captcha token provided.")
 
-        with patch("collective.volto.formsupport.captcha.recaptcha.submit") as mock_submit:
+        with patch(
+            "collective.volto.formsupport.captcha.recaptcha.submit"
+        ) as mock_submit:
             mock_submit.return_value = Mock(is_valid=False)
             response = self.submit_form(
                 data={
@@ -182,14 +160,16 @@ class TestCaptcha(unittest.TestCase):
                 },
             )
             transaction.commit()
-            mock_submit.assert_called_once_with('12345', 'private', '127.0.0.1')
+            mock_submit.assert_called_once_with("12345", "private", "127.0.0.1")
             self.assertEqual(response.status_code, 400)
             self.assertEqual(
                 response.json()["message"],
-                "The code you entered was wrong, please enter the new one."
+                "The code you entered was wrong, please enter the new one.",
             )
 
-        with patch("collective.volto.formsupport.captcha.recaptcha.submit") as mock_submit:
+        with patch(
+            "collective.volto.formsupport.captcha.recaptcha.submit"
+        ) as mock_submit:
             mock_submit.return_value = Mock(is_valid=True)
             response = self.submit_form(
                 data={
@@ -201,7 +181,7 @@ class TestCaptcha(unittest.TestCase):
                 },
             )
             transaction.commit()
-            mock_submit.assert_called_once_with('12345', 'private', '127.0.0.1')
+            mock_submit.assert_called_once_with("12345", "private", "127.0.0.1")
             self.assertEqual(response.status_code, 204)
 
     def test_hcaptcha(
@@ -241,12 +221,11 @@ class TestCaptcha(unittest.TestCase):
         )
         transaction.commit()
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(
-            response.json()["message"],
-            "No captcha token provided."
-        )
+        self.assertEqual(response.json()["message"], "No captcha token provided.")
 
-        with patch("collective.volto.formsupport.captcha.hcaptcha.submit") as mock_submit:
+        with patch(
+            "collective.volto.formsupport.captcha.hcaptcha.submit"
+        ) as mock_submit:
             mock_submit.return_value = Mock(is_valid=False)
             response = self.submit_form(
                 data={
@@ -258,14 +237,16 @@ class TestCaptcha(unittest.TestCase):
                 },
             )
             transaction.commit()
-            mock_submit.assert_called_once_with('12345', 'private', '127.0.0.1')
+            mock_submit.assert_called_once_with("12345", "private", "127.0.0.1")
             self.assertEqual(response.status_code, 400)
             self.assertEqual(
                 response.json()["message"],
-                "The code you entered was wrong, please enter the new one."
+                "The code you entered was wrong, please enter the new one.",
             )
 
-        with patch("collective.volto.formsupport.captcha.hcaptcha.submit") as mock_submit:
+        with patch(
+            "collective.volto.formsupport.captcha.hcaptcha.submit"
+        ) as mock_submit:
             mock_submit.return_value = Mock(is_valid=True)
             response = self.submit_form(
                 data={
@@ -277,5 +258,5 @@ class TestCaptcha(unittest.TestCase):
                 },
             )
             transaction.commit()
-            mock_submit.assert_called_once_with('12345', 'private', '127.0.0.1')
+            mock_submit.assert_called_once_with("12345", "private", "127.0.0.1")
             self.assertEqual(response.status_code, 204)

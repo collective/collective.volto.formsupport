@@ -12,7 +12,18 @@ class RecaptchaSupport(CaptchaSupport):
     def __init__(self, context, request):
         super().__init__(context, request)
         registry = queryUtility(IRegistry)
-        self.settings = registry.forInterface(IReCaptchaSettings)
+        self.settings = registry.forInterface(IReCaptchaSettings, check=False)
+
+    def serialize(self):
+        if not self.settings.public_key:
+            raise ValueError(
+                "No recaptcha public key configured. Go to "
+                "path/to/site/@@recaptcha-settings to configure."
+            )
+        return {
+            "provider": "recaptcha",
+            "public_key": self.settings.public_key,
+        }
 
     def verify(self, data):
         if not self.settings.private_key:

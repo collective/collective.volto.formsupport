@@ -22,8 +22,6 @@ collective.volto.formsupport
 
 Add some helper routes and functionalities for Volto sites with ``form`` blocks provided by `volto-form-block <https://github.com/collective/volto-form-block>`_ Volto plugin.
 
-For captcha support `volto-form-block` version >= 2.4.0 is required.
-
 plone.restapi endpoints
 =======================
 
@@ -124,6 +122,32 @@ This serializer removes all fields that start with "\**default_**\" if the user 
 This is useful because we don't want to expose some internals configurations (for example the recipient email address)
 to external users that should only fill the form.
 
+If the block has a field ``captcha``, an additional property ``captcha_props`` is serialized by the ``serialize``
+method provided by the ICaptchaSupport named adapter, the result contains useful metadata for the client, as the
+captcha public_key, ie::
+
+    {
+        "subblocks": [
+            ...
+        ],
+        "captcha": "recaptcha",
+        "captcha_props": {
+            "provider": "recaptcha",
+            "public_key": "aaaaaaaaaaaaa"
+        }
+    }
+
+Captcha support
+===============
+
+Captcha support requires a specific name adapter that implements ``ICaptchaSupport``.
+This product contains implementations for HCaptcha and Google ReCaptcha,
+using plone.formwidget.hcaptcha and plone.formwidget.recaptcha respectively,
+which must be included, installed and configured separately.
+
+During the form post, the token captcha will be verified with the defined captcha method.
+
+For captcha support `volto-form-block` version >= 2.4.0 is required.
 
 Examples
 ========

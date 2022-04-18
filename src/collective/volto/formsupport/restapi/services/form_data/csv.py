@@ -10,6 +10,7 @@ import six
 
 
 class FormDataExportGet(Service):
+
     def render(self):
         self.check_permission()
 
@@ -17,10 +18,7 @@ class FormDataExportGet(Service):
             "Content-Disposition",
             'attachment; filename="{0}.csv"'.format(self.__name__),
         )
-        self.request.response.setHeader(
-            "Content-Type", "text/comma-separated-values"
-        )
-
+        self.request.response.setHeader("Content-Type", "text/comma-separated-values")
         data = self.get_data()
         if isinstance(data, six.text_type):
             data = data.encode("utf-8")

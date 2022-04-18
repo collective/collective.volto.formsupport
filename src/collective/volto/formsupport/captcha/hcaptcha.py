@@ -2,6 +2,7 @@ from . import CaptchaSupport
 from collective.volto.formsupport import _
 from plone.formwidget.hcaptcha.interfaces import IHCaptchaSettings
 from plone.formwidget.hcaptcha.nohcaptcha import submit
+
 # from plone.formwidget.hcaptcha.validator import WrongCaptchaCode
 from plone.registry.interfaces import IRegistry
 from zExceptions import BadRequest
@@ -13,7 +14,18 @@ class HCaptchaSupport(CaptchaSupport):
     def __init__(self, context, request):
         super().__init__(context, request)
         registry = queryUtility(IRegistry)
-        self.settings = registry.forInterface(IHCaptchaSettings)
+        self.settings = registry.forInterface(IHCaptchaSettings, check=False)
+
+    def serialize(self):
+        if not self.settings.public_key:
+            raise ValueError(
+                "No hcaptcha public key configured. Go to "
+                "path/to/site/@@hcaptcha-settings to configure."
+            )
+        return {
+            "provider": "hcaptcha",
+            "public_key": self.settings.public_key,
+        }
 
     def verify(self, data):
         if not self.settings.private_key:
