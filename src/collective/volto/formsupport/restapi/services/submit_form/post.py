@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 from collective.volto.formsupport import _
-from collective.volto.formsupport.interfaces import (
-    ICaptchaSupport,
-    IFormDataStore,
-    IPostEvent,
-)
+from collective.volto.formsupport.interfaces import ICaptchaSupport
+from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.interfaces import IPostEvent
 from email.message import EmailMessage
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
@@ -13,10 +11,12 @@ from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
 from zExceptions import BadRequest
-from zope.component import getMultiAdapter, getUtility
+from zope.component import getMultiAdapter
+from zope.component import getUtility
 from zope.event import notify
 from zope.i18n import translate
-from zope.interface import alsoProvides, implementer
+from zope.interface import alsoProvides
+from zope.interface import implementer
 
 import codecs
 import six

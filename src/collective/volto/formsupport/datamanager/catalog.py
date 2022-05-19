@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collective.volto.formsupport import logger
 from collective.volto.formsupport.interfaces import IFormDataStore
 from copy import deepcopy
 from datetime import datetime
@@ -8,14 +9,13 @@ from plone.restapi.deserializer import json_body
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.indexes.field import CatalogFieldIndex
 from souper.interfaces import ICatalogFactory
-from souper.soup import get_soup, NodeAttributeIndexer, Record
-from zope.component import adapter, getUtility
-from zope.interface import implementer, Interface
-
-import logging
-
-
-logger = logging.getLogger(__name__)
+from souper.soup import get_soup
+from souper.soup import NodeAttributeIndexer
+from souper.soup import Record
+from zope.component import adapter
+from zope.component import getUtility
+from zope.interface import implementer
+from zope.interface import Interface
 
 
 @implementer(ICatalogFactory)

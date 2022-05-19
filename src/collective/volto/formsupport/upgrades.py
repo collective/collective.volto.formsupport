@@ -13,11 +13,10 @@ try:
 except ImportError:
     HAS_BLOCKSFIELD = False
 
+from collective.volto.formsupport import logger
+
 import json
-import logging
 
-
-logger = logging.getLogger(__name__)
 
 DEFAULT_PROFILE = "profile-collective.volto.formsupport:default"
 

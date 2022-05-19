@@ -4,7 +4,7 @@ Changelog
 2.2.1 (unreleased)
 ------------------
 
-- Captcha support.
+- Captcha support #13.
   [mamico]
 
 
