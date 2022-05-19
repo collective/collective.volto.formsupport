@@ -4,10 +4,8 @@ from plone import api
 from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
-from zope.component import adapter
-from zope.component import getMultiAdapter
-from zope.interface import implementer
-from zope.interface import Interface
+from zope.component import adapter, getMultiAdapter
+from zope.interface import implementer, Interface
 
 import json
 import six

@@ -5,6 +5,7 @@ from plone import api
 from plone.dexterity.utils import iterSchemata
 from zope.schema import getFields
 
+
 try:
     from collective.volto.blocksfield.field import BlocksField
 
@@ -12,8 +13,9 @@ try:
 except ImportError:
     HAS_BLOCKSFIELD = False
 
-import logging
 import json
+import logging
+
 
 logger = logging.getLogger(__name__)
 

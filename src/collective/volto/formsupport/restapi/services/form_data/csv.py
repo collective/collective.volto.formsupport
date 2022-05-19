@@ -10,7 +10,6 @@ import six
 
 
 class FormDataExportGet(Service):
-
     def render(self):
         self.check_permission()
 

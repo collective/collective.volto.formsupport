@@ -11,11 +11,24 @@
         />
 
     <adapter
+        zcml:condition="installed plone.formwidget.hcaptcha"
+        factory=".hcaptcha.HCaptchaInvisibleSupport"
+        provides="..interfaces.ICaptchaSupport"
+        for="* zope.publisher.interfaces.browser.IBrowserRequest"
+        name="hcaptcha_invisble"
+        />
+
+    <adapter
         zcml:condition="installed plone.formwidget.recaptcha"
         factory=".recaptcha.RecaptchaSupport"
         provides="..interfaces.ICaptchaSupport"
         for="* zope.publisher.interfaces.browser.IBrowserRequest"
         name="recaptcha"
+        />
+
+    <utility
+        name="collective.volto.formsupport.captcha.providers"
+        component=".vocabularies.captcha_providers_vocabulary_factory"
         />
 
 </configure>

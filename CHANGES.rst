@@ -4,7 +4,8 @@ Changelog
 2.2.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Captcha support.
+  [mamico]
 
 
 2.2.0 (2022-04-07)
