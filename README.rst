@@ -113,6 +113,13 @@ The store is an adapter registered for *IFormDataStore* interface, so you can ov
 
 Only fields that are also in block settings are stored. Missing ones will be skipped.
 
+Each Record stores also two *service* attributes:
+
+- **fields_labels**: a mapping of field ids to field labels. This is useful when we export csv files, so we can labels for the columns.
+- **fields_order**: sorted list of field ids. This can be used in csv export to keep the order of fields.
+
+We store these attributes because the form can change over time and we want to have a snapshot of the fields in the Record.
+
 Block serializer
 ================
 
