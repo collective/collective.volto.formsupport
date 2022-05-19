@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from collective.volto.formsupport.interfaces import IFormDataStore
-from dataclasses import field
 from plone import api
 from plone.memoize import view
 from plone.restapi.interfaces import IExpandableElement

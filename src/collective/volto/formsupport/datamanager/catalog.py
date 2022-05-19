@@ -13,8 +13,6 @@ from souper.soup import Record
 from zope.component import adapter
 from zope.interface import implementer
 from zope.interface import Interface
-from zope.component import getUtility
-from plone.i18n.normalizer.interfaces import IIDNormalizer
 
 
 import logging
