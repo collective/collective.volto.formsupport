@@ -15,10 +15,6 @@ from zope.component import adapter
 from zope.interface import implementer
 from zope.interface import Interface
 
-import logging
-
-logger = logging.getLogger(__name__)
-
 
 @implementer(ICatalogFactory)
 class FormDataSoupCatalogFactory(object):
