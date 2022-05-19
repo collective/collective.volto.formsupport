@@ -148,8 +148,11 @@ class TestMailSend(unittest.TestCase):
             sorted(data["items"][0].keys()),
             ["block_id", "date", "id", "message", "name"],
         )
-        self.assertEqual(data["items"][0]["message"], "just want to say hi")
-        self.assertEqual(data["items"][0]["name"], "John")
+        self.assertEqual(
+            data["items"][0]["message"],
+            {"label": "Message", "value": "just want to say hi"},
+        )
+        self.assertEqual(data["items"][0]["name"], {"label": "Name", "value": "John"})
         response = self.submit_form(
             data={
                 "from": "sally@doe.com",
@@ -174,11 +177,11 @@ class TestMailSend(unittest.TestCase):
             sorted(data["items"][1].keys()),
             ["block_id", "date", "id", "message", "name"],
         )
-        sorted_data = sorted(data["items"], key=lambda x: x["name"])
-        self.assertEqual(sorted_data[0]["name"], "John")
-        self.assertEqual(sorted_data[0]["message"], "just want to say hi")
-        self.assertEqual(sorted_data[1]["name"], "Sally")
-        self.assertEqual(sorted_data[1]["message"], "bye")
+        sorted_data = sorted(data["items"], key=lambda x: x["name"]["value"])
+        self.assertEqual(sorted_data[0]["name"]["value"], "John")
+        self.assertEqual(sorted_data[0]["message"]["value"], "just want to say hi")
+        self.assertEqual(sorted_data[1]["name"]["value"], "Sally")
+        self.assertEqual(sorted_data[1]["message"]["value"], "bye")
 
         # clear data
         response = self.clear_data()
@@ -238,7 +241,7 @@ class TestMailSend(unittest.TestCase):
         response = self.export_csv()
         data = [*csv.reader(StringIO(response.text), delimiter=",")]
         self.assertEqual(len(data), 3)
-        self.assertEqual(data[0], ["message", "name", "date"])
+        self.assertEqual(data[0], ["Message", "Name", "date"])
         sorted_data = sorted(data[1:])
         self.assertEqual(sorted_data[0][:-1], ["bye", "Sally"])
         self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John"])
