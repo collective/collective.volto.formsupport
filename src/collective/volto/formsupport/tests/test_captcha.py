@@ -7,16 +7,17 @@ from plone.app.testing import setRoles
 from plone.app.testing import SITE_OWNER_NAME
 from plone.app.testing import SITE_OWNER_PASSWORD
 from plone.app.testing import TEST_USER_ID
-from plone.formwidget.recaptcha.interfaces import IReCaptchaSettings
 from plone.formwidget.hcaptcha.interfaces import IHCaptchaSettings
+from plone.formwidget.recaptcha.interfaces import IReCaptchaSettings
 from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
-import transaction
-import unittest
 from unittest.mock import Mock
 from unittest.mock import patch
 from zope.component import getUtility
+
+import transaction
+import unittest
 
 
 class TestCaptcha(unittest.TestCase):
@@ -260,3 +261,38 @@ class TestCaptcha(unittest.TestCase):
             transaction.commit()
             mock_submit.assert_called_once_with("12345", "private", "127.0.0.1")
             self.assertEqual(response.status_code, 204)
+
+    def test_get_vocabulary(self):
+        response = self.api_session.get(
+            "/@vocabularies/collective.volto.formsupport.captcha.providers"
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        # no adapters configured
+        self.assertTrue(
+            data["@id"].endswith(
+                "@vocabularies/collective.volto.formsupport.captcha.providers"
+            )
+        )
+        self.assertEqual(data["items_total"], 0)
+        self.assertEqual(data["items"], [])
+
+        # configure recaptcha
+        self.registry.registerInterface(IReCaptchaSettings)
+        settings = self.registry.forInterface(IReCaptchaSettings)
+        settings.public_key = "public"
+        settings.private_key = "private"
+        transaction.commit()
+        response = self.api_session.get(
+            "/@vocabularies/collective.volto.formsupport.captcha.providers"
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        # no adapters configured
+        self.assertTrue(
+            data["@id"].endswith(
+                "@vocabularies/collective.volto.formsupport.captcha.providers"
+            )
+        )
+        self.assertEqual(data["items_total"], 1)
+        self.assertEqual(data["items"], [{"title": "Google ReCaptcha", "token": "recaptcha"}])

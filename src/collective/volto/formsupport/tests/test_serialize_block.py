@@ -11,9 +11,10 @@ from plone.formwidget.hcaptcha.interfaces import IHCaptchaSettings
 from plone.formwidget.recaptcha.interfaces import IReCaptchaSettings
 from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
+from zope.component import getUtility
+
 import transaction
 import unittest
-from zope.component import getUtility
 
 
 class TestBlockSerialization(unittest.TestCase):

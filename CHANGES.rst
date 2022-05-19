@@ -10,6 +10,9 @@ Changelog
   [cekk]
 - Generate csv columns with proper field labels, and keep the form order.
   [cekk]
+- Captcha support #13.
+  [mamico]
+
 
 2.2.0 (2022-04-07)
 ------------------

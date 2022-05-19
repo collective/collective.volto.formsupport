@@ -11,6 +11,7 @@ from souper.soup import Record
 from zope.component import getUtility
 from plone.i18n.normalizer.interfaces import IIDNormalizer
 
+
 try:
     from collective.volto.blocksfield.field import BlocksField
 
@@ -18,10 +19,10 @@ try:
 except ImportError:
     HAS_BLOCKSFIELD = False
 
-import logging
+from collective.volto.formsupport import logger
+
 import json
 
-logger = logging.getLogger(__name__)
 
 DEFAULT_PROFILE = "profile-collective.volto.formsupport:default"
 

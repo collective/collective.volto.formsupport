@@ -3,6 +3,9 @@ class CaptchaSupport(object):
         self.context = context
         self.request = request
 
+    def isEnabled(self):
+        return True
+
     def verify(self):
         """
         Verify the captcha

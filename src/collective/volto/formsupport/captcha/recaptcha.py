@@ -9,10 +9,15 @@ from zope.i18n import translate
 
 
 class RecaptchaSupport(CaptchaSupport):
+    name = _("Google ReCaptcha")
+
     def __init__(self, context, request):
         super().__init__(context, request)
         registry = queryUtility(IRegistry)
         self.settings = registry.forInterface(IReCaptchaSettings, check=False)
+
+    def isEnabled(self):
+        return self.settings and self.settings.public_key and self.settings.private_key
 
     def serialize(self):
         if not self.settings.public_key:

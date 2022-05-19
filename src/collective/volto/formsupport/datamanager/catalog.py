@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collective.volto.formsupport import logger
 from collective.volto.formsupport.interfaces import IFormDataStore
 from copy import deepcopy
 from datetime import datetime
@@ -13,7 +14,6 @@ from souper.soup import Record
 from zope.component import adapter
 from zope.interface import implementer
 from zope.interface import Interface
-
 
 import logging
 

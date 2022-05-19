@@ -10,10 +10,11 @@ from plone.app.testing import TEST_USER_ID
 from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
-import transaction
-import unittest
 from zope.component import getUtility
 from zope.configuration import xmlconfig
+
+import transaction
+import unittest
 
 
 def event_handler(event):

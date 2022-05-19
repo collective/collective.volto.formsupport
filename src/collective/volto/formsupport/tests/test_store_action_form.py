@@ -2,7 +2,6 @@
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
-import csv
 from io import StringIO
 from plone import api
 from plone.app.testing import setRoles
@@ -11,9 +10,11 @@ from plone.app.testing import SITE_OWNER_PASSWORD
 from plone.app.testing import TEST_USER_ID
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
+from zope.component import getUtility
+
+import csv
 import transaction
 import unittest
-from zope.component import getUtility
 
 
 class TestMailSend(unittest.TestCase):

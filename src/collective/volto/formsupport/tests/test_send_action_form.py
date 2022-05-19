@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from collective.volto.formsupport.testing import (
-    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,  # noqa: E501,
+from collective.volto.formsupport.testing import (  # noqa: E501,
+    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
 from plone import api
 from plone.app.testing import setRoles
