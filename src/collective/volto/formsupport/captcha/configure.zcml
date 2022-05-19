@@ -15,7 +15,7 @@
         factory=".hcaptcha.HCaptchaInvisibleSupport"
         provides="..interfaces.ICaptchaSupport"
         for="* zope.publisher.interfaces.browser.IBrowserRequest"
-        name="hcaptcha_invisble"
+        name="hcaptcha_invisible"
         />
 
     <adapter
