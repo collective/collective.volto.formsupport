@@ -4,8 +4,12 @@ Changelog
 2.2.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Breaking change: changed the way to store data keys. Now we use field_id as key for Records.
+  [cekk]
+- Fix quoting in csv export.
+  [cekk]
+- Generate csv columns with proper field labels, and keep the form order.
+  [cekk]
 
 2.2.0 (2022-04-07)
 ------------------

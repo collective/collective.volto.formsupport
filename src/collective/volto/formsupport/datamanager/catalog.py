@@ -77,18 +77,17 @@ class FormDataStore(object):
 
         fields = {x["field_id"]: x.get("label", x["field_id"]) for x in form_fields}
         record = Record()
-        # record.attrs["metadata"] = {}
-        normalizer = getUtility(IIDNormalizer)
+        fields_labels = {}
+        fields_order = []
         for field_data in data:
             field_id = field_data.get("field_id", "")
             value = field_data.get("value", "")
             if field_id in fields:
-                id = normalizer.normalize(fields[field_id])
-                record.attrs[id] = value
-                # record.attrs["metadata"][id] = {
-                #     "field_id": field_id,
-                #     "label": field.get("label", ""),
-                # }
+                record.attrs[field_id] = value
+                fields_labels[field_id] = fields[field_id]
+                fields_order.append(field_id)
+        record.attrs["fields_labels"] = fields_labels
+        record.attrs["fields_order"] = fields_order
         record.attrs["date"] = datetime.now()
         record.attrs["block_id"] = self.block_id
         return self.soup.add(record)
