@@ -4,7 +4,6 @@ from collective.volto.formsupport.interfaces import IFormDataStore
 from copy import deepcopy
 from datetime import datetime
 from plone.dexterity.interfaces import IDexterityContent
-from plone.i18n.normalizer.interfaces import IIDNormalizer
 from plone.restapi.deserializer import json_body
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.indexes.field import CatalogFieldIndex
@@ -13,7 +12,6 @@ from souper.soup import get_soup
 from souper.soup import NodeAttributeIndexer
 from souper.soup import Record
 from zope.component import adapter
-from zope.component import getUtility
 from zope.interface import implementer
 from zope.interface import Interface
 
@@ -73,18 +71,17 @@ class FormDataStore(object):
 
         fields = {x["field_id"]: x.get("label", x["field_id"]) for x in form_fields}
         record = Record()
-        # record.attrs["metadata"] = {}
-        normalizer = getUtility(IIDNormalizer)
+        fields_labels = {}
+        fields_order = []
         for field_data in data:
             field_id = field_data.get("field_id", "")
             value = field_data.get("value", "")
             if field_id in fields:
-                id = normalizer.normalize(fields[field_id])
-                record.attrs[id] = value
-                # record.attrs["metadata"][id] = {
-                #     "field_id": field_id,
-                #     "label": field.get("label", ""),
-                # }
+                record.attrs[field_id] = value
+                fields_labels[field_id] = fields[field_id]
+                fields_order.append(field_id)
+        record.attrs["fields_labels"] = fields_labels
+        record.attrs["fields_order"] = fields_order
         record.attrs["date"] = datetime.now()
         record.attrs["block_id"] = self.block_id
         return self.soup.add(record)

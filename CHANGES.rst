@@ -4,6 +4,12 @@ Changelog
 2.2.1 (unreleased)
 ------------------
 
+- Breaking change: changed the way to store data keys. Now we use field_id as key for Records.
+  [cekk]
+- Fix quoting in csv export.
+  [cekk]
+- Generate csv columns with proper field labels, and keep the form order.
+  [cekk]
 - Captcha support #13.
   [mamico]
 
