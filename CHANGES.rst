@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.2.1 (unreleased)
+2.3.0 (2022-05-26)
 ------------------
 
 - Breaking change: changed the way to store data keys. Now we use field_id as key for Records.
