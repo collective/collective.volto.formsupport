@@ -26,6 +26,14 @@
         name="recaptcha"
         />
 
+    <adapter
+        zcml:condition="installed collective.z3cform.norobots"
+        factory=".norobots.NoRobotsSupport"
+        provides="..interfaces.ICaptchaSupport"
+        for="* zope.publisher.interfaces.browser.IBrowserRequest"
+        name="norobots-captcha"
+        />
+
     <utility
         name="collective.volto.formsupport.captcha.providers"
         component=".vocabularies.captcha_providers_vocabulary_factory"

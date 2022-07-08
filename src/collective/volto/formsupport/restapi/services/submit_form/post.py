@@ -104,7 +104,6 @@ class SubmitPost(Service):
                     context=self.request,
                 )
             )
-
         if self.block.get("captcha", False):
             getMultiAdapter(
                 (self.context, self.request),
