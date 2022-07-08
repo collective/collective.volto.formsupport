@@ -149,9 +149,9 @@ Captcha support
 ===============
 
 Captcha support requires a specific name adapter that implements ``ICaptchaSupport``.
-This product contains implementations for HCaptcha and Google ReCaptcha,
-using plone.formwidget.hcaptcha and plone.formwidget.recaptcha respectively,
-which must be included, installed and configured separately.
+This product contains implementations for HCaptcha, Google ReCaptcha and questions and answers
+captcha using plone.formwidget.hcaptcha, plone.formwidget.recaptcha and collective.z3cform.norobots
+respectively, which must be included, installed and configured separately.
 
 During the form post, the token captcha will be verified with the defined captcha method.
 

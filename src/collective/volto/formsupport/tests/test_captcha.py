@@ -2,6 +2,7 @@
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
+from hashlib import md5
 from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import SITE_OWNER_NAME
@@ -9,6 +10,7 @@ from plone.app.testing import SITE_OWNER_PASSWORD
 from plone.app.testing import TEST_USER_ID
 from plone.formwidget.hcaptcha.interfaces import IHCaptchaSettings
 from plone.formwidget.recaptcha.interfaces import IReCaptchaSettings
+from collective.z3cform.norobots.browser.interfaces import INorobotsWidgetSettings
 from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
@@ -16,6 +18,7 @@ from unittest.mock import Mock
 from unittest.mock import patch
 from zope.component import getUtility
 
+import json
 import transaction
 import unittest
 
@@ -52,6 +55,7 @@ class TestCaptcha(unittest.TestCase):
             "form-id": {"@type": "form"},
         }
         self.document_url = self.document.absolute_url()
+
         transaction.commit()
 
     def tearDown(self):
@@ -296,3 +300,104 @@ class TestCaptcha(unittest.TestCase):
         )
         self.assertEqual(data["items_total"], 1)
         self.assertEqual(data["items"], [{"title": "Google ReCaptcha", "token": "recaptcha"}])
+
+    def test_norobots(self):
+        """ test that using norobots the captcha can be passed"""
+        self.registry.registerInterface(INorobotsWidgetSettings)
+        settings = self.registry.forInterface(INorobotsWidgetSettings)
+        settings.questions = ("Write five using cipers::5", "How much is 10 + 4::14")
+        transaction.commit()
+
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {
+                "@type": "form",
+                "default_subject": "block subject",
+                "default_from": "john@doe.com",
+                "send": True,
+                "subblocks": [
+                    {
+                        "field_id": "contact",
+                        "field_type": "from",
+                        "use_as_bcc": True,
+                    },
+                ],
+                "captcha": "norobots-captcha",
+            },
+        }
+        transaction.commit()
+
+        captcha_token = json.dumps(
+            {
+                "value": "5",
+                "id": "question0",
+                "id_check": md5("Write five using cipers".encode("ascii", "ignore")).hexdigest(),
+            }
+        )
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                ],
+                "block_id": "form-id",
+                "captcha": {
+                    'provider': 'norobots-captcha',
+                    'token': captcha_token
+                }
+            },
+        )
+        self.assertEqual(response.status_code, 204)
+
+    def test_norobots_wrong_captcha(self):
+        """ test that using norobots and a wrong answer, the captcha is not passed"""
+        self.registry.registerInterface(INorobotsWidgetSettings)
+        settings = self.registry.forInterface(INorobotsWidgetSettings)
+        settings.questions = ("Write five using cipers::5", "How much is 10 + 4::14")
+        transaction.commit()
+
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {
+                "@type": "form",
+                "default_subject": "block subject",
+                "default_from": "john@doe.com",
+                "send": True,
+                "subblocks": [
+                    {
+                        "field_id": "contact",
+                        "field_type": "from",
+                        "use_as_bcc": True,
+                    },
+                ],
+                "captcha": "norobots-captcha",
+            },
+        }
+        transaction.commit()
+
+        captcha_token = json.dumps(
+            {
+                "value": "15",
+                "id": "question0",
+                "id_check": md5("Write five using cipers".encode("ascii", "ignore")).hexdigest(),
+            }
+        )
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                ],
+                "block_id": "form-id",
+                "captcha": {
+                    'provider': 'norobots-captcha',
+                    'token': captcha_token
+                }
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.json()["message"],
+            "The code you entered was wrong, please enter the new one.",
+        )

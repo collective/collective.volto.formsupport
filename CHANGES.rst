@@ -4,8 +4,8 @@ Changelog
 2.3.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Add collective.z3cform.norobots support
+  [erral]
 
 2.3.0 (2022-05-26)
 ------------------

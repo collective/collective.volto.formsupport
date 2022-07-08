@@ -65,6 +65,9 @@ setup(
         "recaptcha": [
             "plone.formwidget.recaptcha",
         ],
+        "norobots": [
+            "collective.z3cform.norobots",
+        ],
         "test": [
             "plone.app.testing",
             # Plone KGS does not use this version, because it would break
@@ -76,6 +79,7 @@ setup(
             "collective.MockMailHost",
             "plone.formwidget.hcaptcha",
             "plone.formwidget.recaptcha",
+            "collective.z3cform.norobots",
         ],
     },
     entry_points="""
