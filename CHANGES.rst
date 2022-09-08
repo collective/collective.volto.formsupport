@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.3.1 (unreleased)
+2.4.0 (2022-09-08)
 ------------------
 
 - Add collective.z3cform.norobots support
