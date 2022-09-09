@@ -40,7 +40,6 @@ setup(
         "PyPI": "https://pypi.python.org/pypi/collective.volto.formsupport",
         "Source": "https://github.com/collective/collective.volto.formsupport",
         "Tracker": "https://github.com/collective/collective.volto.formsupport/issues",
-        # 'Documentation': 'https://collective.volto.formsupport.readthedocs.io/en/latest/',
     },
     license="GPL version 2",
     packages=find_packages("src", exclude=["ez_setup"]),
@@ -51,12 +50,12 @@ setup(
     python_requires=">=3.6",
     install_requires=[
         "setuptools",
-        # -*- Extra requirements: -*-
         "z3c.jbot",
         "plone.api>=1.8.4",
         "plone.restapi",
         "plone.app.dexterity",
         "souper.plone",
+        "collective.honeypot",
     ],
     extras_require={
         "hcaptcha": [
@@ -67,6 +66,9 @@ setup(
         ],
         "norobots": [
             "collective.z3cform.norobots",
+        ],
+        "honeypot": [
+            "collective.honeypot",
         ],
         "test": [
             "plone.app.testing",
@@ -80,6 +82,7 @@ setup(
             "plone.formwidget.hcaptcha",
             "plone.formwidget.recaptcha",
             "collective.z3cform.norobots",
+            "collective.honeypot",
         ],
     },
     entry_points="""
