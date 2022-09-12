@@ -278,8 +278,12 @@ class TestCaptcha(unittest.TestCase):
                 "@vocabularies/collective.volto.formsupport.captcha.providers"
             )
         )
-        self.assertEqual(data["items_total"], 0)
-        self.assertEqual(data["items"], [])
+
+        # honeypot is always active if it's in buildout
+        self.assertEqual(data["items_total"], 1)
+        self.assertEqual(
+            data["items"], [{"title": "Honeypot Support", "token": "honeypot"}]
+        )
 
         # configure recaptcha
         self.registry.registerInterface(IReCaptchaSettings)
@@ -298,11 +302,17 @@ class TestCaptcha(unittest.TestCase):
                 "@vocabularies/collective.volto.formsupport.captcha.providers"
             )
         )
-        self.assertEqual(data["items_total"], 1)
-        self.assertEqual(data["items"], [{"title": "Google ReCaptcha", "token": "recaptcha"}])
+        self.assertEqual(data["items_total"], 2)
+        self.assertEqual(
+            data["items"],
+            [
+                {"title": "Google ReCaptcha", "token": "recaptcha"},
+                {"title": "Honeypot Support", "token": "honeypot"},
+            ],
+        )
 
     def test_norobots(self):
-        """ test that using norobots the captcha can be passed"""
+        """test that using norobots the captcha can be passed"""
         self.registry.registerInterface(INorobotsWidgetSettings)
         settings = self.registry.forInterface(INorobotsWidgetSettings)
         settings.questions = ("Write five using cipers::5", "How much is 10 + 4::14")
@@ -331,7 +341,9 @@ class TestCaptcha(unittest.TestCase):
             {
                 "value": "5",
                 "id": "question0",
-                "id_check": md5("Write five using cipers".encode("ascii", "ignore")).hexdigest(),
+                "id_check": md5(
+                    "Write five using cipers".encode("ascii", "ignore")
+                ).hexdigest(),
             }
         )
 
@@ -341,16 +353,13 @@ class TestCaptcha(unittest.TestCase):
                     {"label": "Message", "value": "just want to say hi"},
                 ],
                 "block_id": "form-id",
-                "captcha": {
-                    'provider': 'norobots-captcha',
-                    'token': captcha_token
-                }
+                "captcha": {"provider": "norobots-captcha", "token": captcha_token},
             },
         )
         self.assertEqual(response.status_code, 204)
 
     def test_norobots_wrong_captcha(self):
-        """ test that using norobots and a wrong answer, the captcha is not passed"""
+        """test that using norobots and a wrong answer, the captcha is not passed"""
         self.registry.registerInterface(INorobotsWidgetSettings)
         settings = self.registry.forInterface(INorobotsWidgetSettings)
         settings.questions = ("Write five using cipers::5", "How much is 10 + 4::14")
@@ -379,7 +388,9 @@ class TestCaptcha(unittest.TestCase):
             {
                 "value": "15",
                 "id": "question0",
-                "id_check": md5("Write five using cipers".encode("ascii", "ignore")).hexdigest(),
+                "id_check": md5(
+                    "Write five using cipers".encode("ascii", "ignore")
+                ).hexdigest(),
             }
         )
 
@@ -389,10 +400,7 @@ class TestCaptcha(unittest.TestCase):
                     {"label": "Message", "value": "just want to say hi"},
                 ],
                 "block_id": "form-id",
-                "captcha": {
-                    'provider': 'norobots-captcha',
-                    'token': captcha_token
-                }
+                "captcha": {"provider": "norobots-captcha", "token": captcha_token},
             },
         )
 
