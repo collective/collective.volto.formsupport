@@ -170,6 +170,13 @@ During the form post, the token captcha will be verified with the defined captch
 
 For captcha support `volto-form-block` version >= 2.4.0 is required.
 
+Honeypot configuration
+----------------------
+
+If honeypot dependency is available in the buildout, the honeypot validation is enabled and selectable in forms.
+
+Default field name is `protected_1` and you can change it with an environment variable. See `collective.honeypot <https://github.com/collective/collective.honeypot#id7>`_ for details.
+
 Examples
 ========
 
