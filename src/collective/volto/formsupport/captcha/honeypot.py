@@ -6,8 +6,6 @@ from plone.restapi.deserializer import json_body
 from zExceptions import BadRequest
 from zope.i18n import translate
 
-import json
-
 
 class HoneypotSupport(CaptchaSupport):
     name = _("Honeypot Support")
