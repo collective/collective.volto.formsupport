@@ -20,6 +20,11 @@ from zope.interface import implementer
 
 import codecs
 import six
+import os
+import logging
+import math
+
+logger = logging.getLogger(__name__)
 
 
 @implementer(IPostEvent)
@@ -50,10 +55,24 @@ class SubmitPost(Service):
 
         notify(PostEventService(self.context, self.form_data))
 
+        if send_action:
+            try:
+                self.send_data()
+            except BadRequest as e:
+                raise e
+            except Exception as e:
+                logger.exception(e)
+                message = translate(
+                    _(
+                        "mail_send_exception",
+                        default="Unable to send confirm email. Please retry later or contact site administator.",
+                    ),
+                    context=self.request,
+                )
+                self.request.response.setStatus(500)
+                return dict(type="InternalServerError", message=message)
         if store_action:
             self.store_data()
-        if send_action:
-            self.send_data()
 
         return self.reply_no_content()
 
@@ -104,12 +123,44 @@ class SubmitPost(Service):
                     context=self.request,
                 )
             )
+
+        self.validate_attachments()
         if self.block.get("captcha", False):
             getMultiAdapter(
                 (self.context, self.request),
                 ICaptchaSupport,
                 name=self.block["captcha"],
             ).verify(self.form_data.get("captcha"))
+
+    def validate_attachments(self):
+        attachments_limit = os.environ.get("FORM_ATTACHMENTS_LIMIT", "")
+        if not attachments_limit:
+            return
+        attachments = self.form_data.get("attachments", {})
+        attachments_len = 0
+        for attachment in attachments.values():
+            data = attachment.get("data", "")
+            attachments_len += (len(data) * 3) / 4 - data.count("=", -2)
+        if attachments_len > float(attachments_limit) * pow(1024, 2):
+            size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+            i = int(math.floor(math.log(attachments_len, 1024)))
+            p = math.pow(1024, i)
+            s = round(attachments_len / p, 2)
+            uploaded_str = "{} {}".format(s, size_name[i])
+            raise BadRequest(
+                translate(
+                    _(
+                        "attachments_too_big",
+                        default="Attachments too big. You uploaded ${uploaded_str},"
+                        " but limit is ${max} Mb. Try to compress files.",
+                        mapping={
+                            "max": attachments_limit,
+                            "uploaded_str": uploaded_str,
+                        },
+                    ),
+                    context=self.request,
+                )
+            )
 
     def get_block_data(self, block_id):
         blocks = getattr(self.context, "blocks", {})
@@ -207,7 +258,6 @@ class SubmitPost(Service):
         msg.replace_header("Content-Type", 'text/html; charset="utf-8"')
 
         self.manage_attachments(msg=msg)
-
         self.send_mail(msg=msg, encoding=encoding)
 
         for bcc in self.get_bcc():
@@ -245,7 +295,7 @@ class SubmitPost(Service):
 
     def send_mail(self, msg, encoding):
         host = api.portal.get_tool(name="MailHost")
-        host.send(msg, charset=encoding)
+        host.send(msg, charset=encoding, immediate=True)
 
     def manage_attachments(self, msg):
         attachments = self.form_data.get("attachments", {})
