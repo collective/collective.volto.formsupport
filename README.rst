@@ -166,7 +166,7 @@ Forms can have one or more attachment field to allow users to upload some files.
 These files will be sent via mail, so it could be a good idea setting a limit to them.
 For example if you use Gmail as mail server, you can't send messages with attachments > 25mb.
 
-There is an environment variable that you can use to set that limit::
+There is an environment variable that you can use to set that limit (in MB)::
 
     [instance]
     environment-vars =
