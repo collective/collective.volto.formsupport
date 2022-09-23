@@ -295,6 +295,8 @@ class SubmitPost(Service):
 
     def send_mail(self, msg, encoding):
         host = api.portal.get_tool(name="MailHost")
+        # we set immediate=True because we need to catch exceptions.
+        # by default (False) exceptions are handled by MailHost and we can't catch them.
         host.send(msg, charset=encoding, immediate=True)
 
     def manage_attachments(self, msg):
