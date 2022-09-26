@@ -61,7 +61,7 @@ msgstr ""
 msgid "Volto: Form support (uninstall)"
 msgstr ""
 
-#. Default: "Attachments too big. You uploaded ${uploaded_str}, but limit is ${max} Mb. Try to compress files."
+#. Default: "Attachments too big. You uploaded ${uploaded_str}, but limit is ${max} MB. Try to compress files."
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:152
 msgid "attachments_too_big"
 msgstr ""

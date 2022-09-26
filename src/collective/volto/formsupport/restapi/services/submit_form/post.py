@@ -152,7 +152,7 @@ class SubmitPost(Service):
                     _(
                         "attachments_too_big",
                         default="Attachments too big. You uploaded ${uploaded_str},"
-                        " but limit is ${max} Mb. Try to compress files.",
+                        " but limit is ${max} MB. Try to compress files.",
                         mapping={
                             "max": attachments_limit,
                             "uploaded_str": uploaded_str,
