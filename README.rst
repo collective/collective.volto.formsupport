@@ -157,6 +157,25 @@ During the form post, the token captcha will be verified with the defined captch
 
 For captcha support `volto-form-block` version >= 2.4.0 is required.
 
+
+Attachments upload limits
+=========================
+
+Forms can have one or more attachment field to allow users to upload some files.
+
+These files will be sent via mail, so it could be a good idea setting a limit to them.
+For example if you use Gmail as mail server, you can't send messages with attachments > 25MB.
+
+There is an environment variable that you can use to set that limit (in MB)::
+
+    [instance]
+    environment-vars =
+        FORM_ATTACHMENTS_LIMIT 25
+
+By default this is not set.
+
+The upload limit is also passed to the frontend in the form data with the `attachments_limit` key.
+
 Examples
 ========
 

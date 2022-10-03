@@ -4,9 +4,10 @@ Changelog
 2.4.1 (unreleased)
 ------------------
 
+- Add limit attachments validation. Can be configured with environment variable.
+  [cekk]
 - Export also compiling date in csv.
   [cekk]
-
 
 2.4.0 (2022-09-08)
 ------------------

@@ -15,6 +15,7 @@ from zope.component import getUtility
 
 import transaction
 import unittest
+import os
 
 
 class TestBlockSerialization(unittest.TestCase):
@@ -184,3 +185,52 @@ class TestBlockSerializationHCaptcha(unittest.TestCase):
             res["blocks"]["form-id"]["captcha_props"],
             {"provider": "hcaptcha", "public_key": "public"},
         )
+
+
+class TestBlockSerializationAttachmentsLimit(unittest.TestCase):
+
+    layer = VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING
+
+    def setUp(self):
+        self.app = self.layer["app"]
+        self.portal = self.layer["portal"]
+        self.portal_url = self.portal.absolute_url()
+        setRoles(self.portal, TEST_USER_ID, ["Manager"])
+
+        self.api_session = RelativeSession(self.portal_url)
+        self.api_session.headers.update({"Accept": "application/json"})
+        self.api_session.auth = (SITE_OWNER_NAME, SITE_OWNER_PASSWORD)
+        self.anon_api_session = RelativeSession(self.portal_url)
+        self.anon_api_session.headers.update({"Accept": "application/json"})
+
+        self.document = api.content.create(
+            type="Document",
+            title="Example context",
+            container=self.portal,
+        )
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {
+                "@type": "form",
+                "default_from": "foo@foo.com",
+                "default_bar": "bar",
+                "subblocks": [
+                    {"field_id": "name", "label": "Name", "type": "text"},
+                    {"field_id": "surname", "label": "Surname", "type": "text"},
+                ],
+            },
+        }
+        self.document_url = self.document.absolute_url()
+        api.content.transition(obj=self.document, transition="publish")
+
+        transaction.commit()
+
+    def tearDown(self):
+        self.api_session.close()
+        self.anon_api_session.close()
+        os.environ["FORM_ATTACHMENTS_LIMIT"] = ""
+
+    def test_serializer_without_attachments_limit(self):
+        response = self.anon_api_session.get(self.document_url)
+        res = response.json()
+        self.assertNotIn("attachments_limit", res["blocks"]["form-id"])
