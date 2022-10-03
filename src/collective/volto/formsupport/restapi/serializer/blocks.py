@@ -9,6 +9,8 @@ from zope.component import adapter
 from zope.component import getMultiAdapter
 from zope.interface import implementer
 
+import os
+
 
 class FormSerializer(object):
     """ """
@@ -32,6 +34,9 @@ class FormSerializer(object):
                 ICaptchaSupport,
                 name=value["captcha"],
             ).serialize()
+        attachments_limit = os.environ.get("FORM_ATTACHMENTS_LIMIT", "")
+        if attachments_limit:
+            value["attachments_limit"] = attachments_limit
         if api.user.has_permission("Modify portal content", obj=self.context):
             return value
         return {k: v for k, v in value.items() if not k.startswith("default_")}
