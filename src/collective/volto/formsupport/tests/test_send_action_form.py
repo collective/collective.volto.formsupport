@@ -500,7 +500,7 @@ class TestMailSend(unittest.TestCase):
         transaction.commit()
         self.assertEqual(response.status_code, 400)
         self.assertIn(
-            "Attachments too big. You uploaded 7.1 MB, but limit is 1 Mb",
+            "Attachments too big. You uploaded 7.1 MB, but limit is 1 MB",
             response.json()["message"],
         )
         self.assertEqual(len(self.mailhost.messages), 0)
