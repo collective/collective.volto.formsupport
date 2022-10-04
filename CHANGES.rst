@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.4.1 (unreleased)
+2.5.0 (2022-10-04)
 ------------------
 
 - Add limit attachments validation. Can be configured with environment variable.
