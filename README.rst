@@ -177,6 +177,24 @@ If honeypot dependency is available in the buildout, the honeypot validation is 
 
 Default field name is `protected_1` and you can change it with an environment variable. See `collective.honeypot <https://github.com/collective/collective.honeypot#id7>`_ for details.
 
+Attachments upload limits
+=========================
+
+Forms can have one or more attachment field to allow users to upload some files.
+
+These files will be sent via mail, so it could be a good idea setting a limit to them.
+For example if you use Gmail as mail server, you can't send messages with attachments > 25MB.
+
+There is an environment variable that you can use to set that limit (in MB)::
+
+    [instance]
+    environment-vars =
+        FORM_ATTACHMENTS_LIMIT 25
+
+By default this is not set.
+
+The upload limit is also passed to the frontend in the form data with the `attachments_limit` key.
+
 Examples
 ========
 

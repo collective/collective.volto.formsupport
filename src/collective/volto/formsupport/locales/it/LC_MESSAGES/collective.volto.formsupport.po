@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2021-03-10 13:49+0000\n"
+"POT-Creation-Date: 2022-09-20 08:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,39 +14,77 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: DOMAIN\n"
 
-#: collective/volto/formsupport/configure.zcml:29
+#: collective/volto/formsupport/captcha/recaptcha.py:12
+msgid "Google ReCaptcha"
+msgstr ""
+
+#: collective/volto/formsupport/captcha/hcaptcha.py:13
+msgid "HCaptcha"
+msgstr ""
+
+#: collective/volto/formsupport/captcha/hcaptcha.py:62
+msgid "HCaptcha Invisible"
+msgstr ""
+
+#: collective/volto/formsupport/configure.zcml:33
 msgid "Installs the collective.volto.formsupport add-on."
 msgstr ""
 
-#: collective/volto/formsupport/configure.zcml:38
+#: collective/volto/formsupport/captcha/hcaptcha.py:43
+#: collective/volto/formsupport/captcha/norobots.py:53
+#: collective/volto/formsupport/captcha/recaptcha.py:42
+msgid "No captcha token provided."
+msgstr "Nessun token captcha fornito."
+
+#: collective/volto/formsupport/captcha/norobots.py:16
+msgid "NoRobots ReCaptcha Support"
+msgstr ""
+
+#: collective/volto/formsupport/captcha/hcaptcha.py:55
+#: collective/volto/formsupport/captcha/norobots.py:69
+#: collective/volto/formsupport/captcha/recaptcha.py:54
+msgid "The code you entered was wrong, please enter the new one."
+msgstr "Il codice che hai inserito è sbagliato, per favore prova con un altro."
+
+#: collective/volto/formsupport/configure.zcml:42
 msgid "Uninstalls the collective.volto.formsupport add-on."
 msgstr ""
 
-#: collective/volto/formsupport/configure.zcml:29
+#: collective/volto/formsupport/configure.zcml:33
 msgid "Volto: Form support"
 msgstr ""
 
-#: collective/volto/formsupport/configure.zcml:38
+#: collective/volto/formsupport/configure.zcml:42
 msgid "Volto: Form support (uninstall)"
 msgstr ""
 
+#. Default: "Attachments too big. You uploaded ${uploaded_str}, but limit is ${max} MB. Try to compress files."
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:152
+msgid "attachments_too_big"
+msgstr "Allegati troppo grandi. Hai caricato ${uploaded_str}, ma il limite è di ${max} MB. Prova a comprimerli."
+
 #. Default: "Block with @type \"form\" and id \"$block\" not found in this context: $context"
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:54
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:93
 msgid "block_form_not_found_label"
 msgstr "Blocco con @type \"form\" e id \"$block\" non trovato nel contesto: $context"
 
 #. Default: "Empty form data."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:80
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:119
 msgid "empty_form_data"
 msgstr "Form senza dati."
 
+#. Default: "Unable to send confirm email. Please retry later or contact site administator."
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:66
+msgid "mail_send_exception"
+msgstr "Impossibile inviare la mail di conferma. Per favore riprova più tardi o contatta l'amministratore del sito."
+
 #. Default: "You need to set at least one form action between \"send\" and \"store\"."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:69
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:108
 msgid "missing_action"
 msgstr "Devi selezionare almeno un'azione tra \"salva\" e \"invia\"."
 
 #. Default: "Missing block_id"
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:46
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:86
 msgid "missing_blockid_label"
 msgstr "Campo block_id mancante."
 
@@ -56,6 +94,6 @@ msgid "send_mail_text"
 msgstr "Un nuovo form è stato compilato da ${url}:"
 
 #. Default: "Missing required field: subject or from."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:104
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:230
 msgid "send_required_field_missing"
 msgstr "Campo obbligatorio mancante: subject o from."

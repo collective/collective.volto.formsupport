@@ -2,6 +2,7 @@
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
+from datetime import datetime
 from io import StringIO
 from plone import api
 from plone.app.testing import setRoles
@@ -212,7 +213,6 @@ class TestMailSend(unittest.TestCase):
             },
         }
         transaction.commit()
-
         response = self.submit_form(
             data={
                 "from": "john@doe.com",
@@ -246,3 +246,8 @@ class TestMailSend(unittest.TestCase):
         sorted_data = sorted(data[1:])
         self.assertEqual(sorted_data[0][:-1], ["bye", "Sally"])
         self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John"])
+
+        # check date column. Skip seconds because can change during test
+        now = datetime.utcnow().strftime("%Y-%m-%dT%H:%M")
+        self.assertTrue(sorted_data[0][-1].startswith(now))
+        self.assertTrue(sorted_data[1][-1].startswith(now))

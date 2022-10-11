@@ -1,10 +1,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2021-03-10 13:49+0000\n"
+"POT-Creation-Date: 2022-09-20 08:23+0000\n"
 "PO-Revision-Date: 2021-05-11 18:49-0300\n"
 "Last-Translator: Érico Andrei <ericof@plone.org>, 2021\n"
-"Language: pt_BR\n"
 "Language-Team: Portuguese (https://www.transifex.com/plone/teams/14552/pt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -14,41 +13,80 @@ msgstr ""
 "Language-Name: Português do Brasil\n"
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: collective.volto.formsupport\n"
+"Language: pt_BR\n"
 "X-Generator: Poedit 2.4.3\n"
 
-#: collective/volto/formsupport/configure.zcml:29
+#: collective/volto/formsupport/captcha/recaptcha.py:12
+msgid "Google ReCaptcha"
+msgstr ""
+
+#: collective/volto/formsupport/captcha/hcaptcha.py:13
+msgid "HCaptcha"
+msgstr ""
+
+#: collective/volto/formsupport/captcha/hcaptcha.py:62
+msgid "HCaptcha Invisible"
+msgstr ""
+
+#: collective/volto/formsupport/configure.zcml:33
 msgid "Installs the collective.volto.formsupport add-on."
 msgstr "Instala o complemento collective.volto.formsupport."
 
-#: collective/volto/formsupport/configure.zcml:38
+#: collective/volto/formsupport/captcha/hcaptcha.py:43
+#: collective/volto/formsupport/captcha/norobots.py:53
+#: collective/volto/formsupport/captcha/recaptcha.py:42
+msgid "No captcha token provided."
+msgstr ""
+
+#: collective/volto/formsupport/captcha/norobots.py:16
+msgid "NoRobots ReCaptcha Support"
+msgstr ""
+
+#: collective/volto/formsupport/captcha/hcaptcha.py:55
+#: collective/volto/formsupport/captcha/norobots.py:69
+#: collective/volto/formsupport/captcha/recaptcha.py:54
+msgid "The code you entered was wrong, please enter the new one."
+msgstr ""
+
+#: collective/volto/formsupport/configure.zcml:42
 msgid "Uninstalls the collective.volto.formsupport add-on."
 msgstr "Desinstala o complemento collective.volto.formsupport."
 
-#: collective/volto/formsupport/configure.zcml:29
+#: collective/volto/formsupport/configure.zcml:33
 msgid "Volto: Form support"
 msgstr "Volto: Suporte a formulários"
 
-#: collective/volto/formsupport/configure.zcml:38
+#: collective/volto/formsupport/configure.zcml:42
 msgid "Volto: Form support (uninstall)"
 msgstr "Volto: Suporte a formulários (Desinstalar)"
 
+#. Default: "Attachments too big. You uploaded ${uploaded_str}, but limit is ${max} MB. Try to compress files."
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:152
+msgid "attachments_too_big"
+msgstr ""
+
 #. Default: "Block with @type \"form\" and id \"$block\" not found in this context: $context"
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:54
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:93
 msgid "block_form_not_found_label"
 msgstr "Bloco com @type \"form\" e id \"${block}\" não encontrado no contexto: $context."
 
 #. Default: "Empty form data."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:80
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:119
 msgid "empty_form_data"
 msgstr "Formulário sem dados."
 
+#. Default: "Unable to send confirm email. Please retry later or contact site administator."
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:66
+msgid "mail_send_exception"
+msgstr ""
+
 #. Default: "You need to set at least one form action between \"send\" and \"store\"."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:69
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:108
 msgid "missing_action"
 msgstr "Você deve selecionar pelo menos uma ação entre \"salvar\" e \"enviar\"."
 
 #. Default: "Missing block_id"
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:46
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:86
 msgid "missing_blockid_label"
 msgstr "Campo  block_id não informado"
 
@@ -58,6 +96,6 @@ msgid "send_mail_text"
 msgstr "Um novo formulário foi preenchido em ${url}:"
 
 #. Default: "Missing required field: subject or from."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:104
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:230
 msgid "send_required_field_missing"
 msgstr "Campo obrigatório não presente: Assunto ou remetente."
