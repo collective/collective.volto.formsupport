@@ -80,6 +80,10 @@ class FormDataExportGet(Service):
                 if label not in columns and label not in fixed_columns:
                     columns.append(label)
                 data[label] = json_compatible(value)
+            for k in fixed_columns:
+                # add fixed columns values
+                value = item.attrs.get(k, None)
+                data[k] = json_compatible(value)
             rows.append(data)
         columns.extend(fixed_columns)
         writer = csv.DictWriter(sbuf, fieldnames=columns, quoting=csv.QUOTE_ALL)

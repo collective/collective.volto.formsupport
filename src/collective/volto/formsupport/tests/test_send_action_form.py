@@ -14,6 +14,8 @@ from zope.component import getUtility
 
 import transaction
 import unittest
+import base64
+import os
 
 
 class TestMailSend(unittest.TestCase):
@@ -59,6 +61,9 @@ class TestMailSend(unittest.TestCase):
             "text-id": {"@type": "text"},
             "form-id": {"@type": "form"},
         }
+
+        os.environ["FORM_ATTACHMENTS_LIMIT"] = ""
+
         transaction.commit()
 
     def submit_form(self, data):
@@ -413,3 +418,89 @@ class TestMailSend(unittest.TestCase):
         self.assertNotIn("To: smith@doe.com", msg)
         self.assertNotIn("To: site_addr@plone.com", bcc_msg)
         self.assertIn("To: smith@doe.com", bcc_msg)
+
+    def test_send_attachment(
+        self,
+    ):
+
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {
+                "@type": "form",
+                "default_subject": "block subject",
+                "default_from": "john@doe.com",
+                "send": True,
+                "subblocks": [
+                    {
+                        "field_id": "test",
+                        "field_type": "text",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        filename = os.path.join(os.path.dirname(__file__), "file.pdf")
+        with open(filename, "rb") as f:
+            file_str = f.read()
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {"field_id": "test", "label": "Test", "value": "test text"},
+                ],
+                "block_id": "form-id",
+                "attachments": {"foo": {"data": base64.b64encode(file_str)}},
+            },
+        )
+        transaction.commit()
+
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(len(self.mailhost.messages), 1)
+
+    def test_send_attachment_validate_size(
+        self,
+    ):
+        os.environ["FORM_ATTACHMENTS_LIMIT"] = "1"
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {
+                "@type": "form",
+                "default_subject": "block subject",
+                "default_from": "john@doe.com",
+                "send": True,
+                "subblocks": [
+                    {
+                        "field_id": "test",
+                        "field_type": "text",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        filename = os.path.join(os.path.dirname(__file__), "file.pdf")
+        with open(filename, "rb") as f:
+            file_str = f.read()
+        # increase file dimension
+        file_str = file_str * 100
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {"field_id": "test", "label": "Test", "value": "test text"},
+                ],
+                "block_id": "form-id",
+                "attachments": {"foo": {"data": base64.b64encode(file_str)}},
+            },
+        )
+        transaction.commit()
+        self.assertEqual(response.status_code, 400)
+        self.assertIn(
+            "Attachments too big. You uploaded 7.1 MB, but limit is 1 MB",
+            response.json()["message"],
+        )
+        self.assertEqual(len(self.mailhost.messages), 0)
