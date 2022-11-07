@@ -55,7 +55,6 @@ setup(
         "plone.restapi",
         "plone.app.dexterity",
         "souper.plone",
-        "collective.honeypot>=2.1.1",
     ],
     extras_require={
         "hcaptcha": [
@@ -68,7 +67,7 @@ setup(
             "collective.z3cform.norobots",
         ],
         "honeypot": [
-            "collective.honeypot",
+            "collective.honeypot>=2.1.1",
         ],
         "test": [
             "plone.app.testing",
