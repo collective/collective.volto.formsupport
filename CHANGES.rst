@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.5.1 (unreleased)
+2.6.0 (2022-11-07)
 ------------------
 
 - Add collective.honeypot support.
