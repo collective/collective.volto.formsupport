@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.6.2 (unreleased)
+2.6.2 (2022-11-07)
 ------------------
 
 - Fix collective.honeypot version.
