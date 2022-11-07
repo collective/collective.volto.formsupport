@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.6.1 (unreleased)
+2.6.1 (2022-11-07)
 ------------------
 
 - Fix dependencies.
