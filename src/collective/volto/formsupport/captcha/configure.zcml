@@ -33,6 +33,14 @@
         for="* zope.publisher.interfaces.browser.IBrowserRequest"
         name="norobots-captcha"
         />
+    
+    <adapter
+        zcml:condition="installed collective.honeypot"
+        factory=".honeypot.HoneypotSupport"
+        provides="..interfaces.ICaptchaSupport"
+        for="* zope.publisher.interfaces.browser.IBrowserRequest"
+        name="honeypot"
+        />
 
     <utility
         name="collective.volto.formsupport.captcha.providers"

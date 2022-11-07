@@ -4,7 +4,8 @@ Changelog
 2.5.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add collective.norobots support.
+  [cekk]
 
 
 2.5.0 (2022-10-04)

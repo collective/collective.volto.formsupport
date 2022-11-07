@@ -149,14 +149,33 @@ Captcha support
 ===============
 
 Captcha support requires a specific name adapter that implements ``ICaptchaSupport``.
-This product contains implementations for HCaptcha, Google ReCaptcha and questions and answers
-captcha using plone.formwidget.hcaptcha, plone.formwidget.recaptcha and collective.z3cform.norobots
-respectively, which must be included, installed and configured separately.
+This product contains implementations for:
+
+- HCaptcha (plone.formwidget.hcaptcha)
+- Google ReCaptcha (plone.formwidget.recaptcha)
+- Custom questions and answers (collective.z3cform.norobots)
+- Honeypot (collective.honeypot)
+
+
+Each implementation must be included, installed and configured separately.
+
+To include one implementation, you need to install the egg with the needed extras_require:
+
+- collective.volto.formsupport[recaptcha]
+- collective.volto.formsupport[hcaptcha]
+- collective.volto.formsupport[norobots]
+- collective.volto.formsupport[honeypot]
 
 During the form post, the token captcha will be verified with the defined captcha method.
 
 For captcha support `volto-form-block` version >= 2.4.0 is required.
 
+Honeypot configuration
+----------------------
+
+If honeypot dependency is available in the buildout, the honeypot validation is enabled and selectable in forms.
+
+Default field name is `protected_1` and you can change it with an environment variable. See `collective.honeypot <https://github.com/collective/collective.honeypot#id7>`_ for details.
 
 Attachments upload limits
 =========================
@@ -182,7 +201,6 @@ Examples
 This add-on can be seen in action at the following sites:
 
 - https://www.comune.modena.it/form/contatti
-
 
 
 Translations

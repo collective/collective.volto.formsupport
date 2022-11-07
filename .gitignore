@@ -1,4 +1,4 @@
-.coverage
+.DS_Store
 .python-version
 *.egg-info
 *.log
@@ -10,6 +10,7 @@ bin/
 buildout-cache/
 develop-eggs/
 eggs/
+extras/
 htmlcov/
 include/
 lib/
