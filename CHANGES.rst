@@ -4,8 +4,8 @@ Changelog
 2.6.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Fix dependencies.
+  [cekk]
 
 2.6.0 (2022-11-07)
 ------------------
