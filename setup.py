@@ -67,7 +67,7 @@ setup(
             "collective.z3cform.norobots",
         ],
         "honeypot": [
-            "collective.honeypot>=2.1.1",
+            "collective.honeypot>=2.1",
         ],
         "test": [
             "plone.app.testing",

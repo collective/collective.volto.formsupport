@@ -4,8 +4,8 @@ Changelog
 2.6.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Fix collective.honeypot version.
+  [cekk]
 
 2.6.1 (2022-11-07)
 ------------------
