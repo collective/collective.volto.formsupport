@@ -4,7 +4,7 @@ Changelog
 2.5.1 (unreleased)
 ------------------
 
-- Add collective.norobots support.
+- Add collective.honeypot support.
   [cekk]
 
 
