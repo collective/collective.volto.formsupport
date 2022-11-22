@@ -345,7 +345,7 @@ class SubmitPost(Service):
         xmlRoot = Element("form")
 
         for field in self.filter_parameters():
-            SubElement(xmlRoot, "field", name=field["label"]).text = field["value"]
+            SubElement(xmlRoot, "field", name=field["label"]).text = str(field["value"])
 
         doc = ElementTree(xmlRoot)
         doc.write(output, encoding="utf-8", xml_declaration=True)
