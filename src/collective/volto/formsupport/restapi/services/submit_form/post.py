@@ -326,10 +326,11 @@ class SubmitPost(Service):
                     file_data = file_data.encode("utf-8")
             else:
                 file_data = value
+            maintype, subtype = content_type.split("/")
             msg.add_attachment(
                 file_data,
-                maintype=content_type,
-                subtype=content_type,
+                maintype=maintype,
+                subtype=subtype,
                 filename=filename,
             )
 
