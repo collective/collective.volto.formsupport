@@ -48,14 +48,14 @@ class SubmitPost(Service):
         self.validate_form()
 
         store_action = self.block.get("store", False)
-        send_action = self.block.get("send", False)
+        send_action = self.block.get("send", [])
 
         # Disable CSRF protection
         alsoProvides(self.request, IDisableCSRFProtection)
 
         notify(PostEventService(self.context, self.form_data))
 
-        if send_action:
+        if 'recipient' in send_action:
             try:
                 self.send_data()
             except BadRequest as e:
@@ -102,7 +102,7 @@ class SubmitPost(Service):
                 ),
             )
 
-        if not self.block.get("store", False) and not self.block.get("send", False):
+        if not self.block.get("store", False) and not self.block.get("send", []):
             raise BadRequest(
                 translate(
                     _(
@@ -261,9 +261,18 @@ class SubmitPost(Service):
         self.send_mail(msg=msg, encoding=encoding)
 
         for bcc in self.get_bcc():
-            # send a copy also to the fields with bcc flag
-            msg.replace_header("To", bcc)
-            self.send_mail(msg=msg, encoding=encoding)
+            acknowledgement_message = self.block.get("acknowledgementMessage")
+            if 'acknowledgement' in self.block.get("send", []) and acknowledgement_message:
+                acknowledgement_mail = EmailMessage()
+                acknowledgement_mail['Subject'] = subject
+                acknowledgement_mail['From'] = mfrom
+                acknowledgement_mail['To'] = bcc
+                acknowledgement_mail.set_content(acknowledgement_message.get("data"), subtype="html", charset='utf-8')
+                self.send_mail(msg=acknowledgement_mail, encoding=encoding)
+            else:
+                # send a copy also to the fields with bcc flag
+                msg.replace_header("To", bcc)
+                self.send_mail(msg=msg, encoding=encoding)
 
     def prepare_message(self):
         message_template = api.content.get_view(
