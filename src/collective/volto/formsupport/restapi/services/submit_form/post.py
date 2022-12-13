@@ -55,7 +55,7 @@ class SubmitPost(Service):
 
         notify(PostEventService(self.context, self.form_data))
 
-        if 'recipient' in send_action:
+        if send_action:
             try:
                 self.send_data()
             except BadRequest as e:
@@ -258,16 +258,22 @@ class SubmitPost(Service):
         msg.replace_header("Content-Type", 'text/html; charset="utf-8"')
 
         self.manage_attachments(msg=msg)
-        self.send_mail(msg=msg, encoding=encoding)
+        if "recipient" in self.block.get("send", []):
+            self.send_mail(msg=msg, encoding=encoding)
 
         for bcc in self.get_bcc():
             acknowledgement_message = self.block.get("acknowledgementMessage")
-            if 'acknowledgement' in self.block.get("send", []) and acknowledgement_message:
+            if (
+                "acknowledgement" in self.block.get("send", [])
+                and acknowledgement_message
+            ):
                 acknowledgement_mail = EmailMessage()
-                acknowledgement_mail['Subject'] = subject
-                acknowledgement_mail['From'] = mfrom
-                acknowledgement_mail['To'] = bcc
-                acknowledgement_mail.set_content(acknowledgement_message.get("data"), subtype="html", charset='utf-8')
+                acknowledgement_mail["Subject"] = subject
+                acknowledgement_mail["From"] = mfrom
+                acknowledgement_mail["To"] = bcc
+                acknowledgement_mail.set_content(
+                    acknowledgement_message.get("data"), subtype="html", charset="utf-8"
+                )
                 self.send_mail(msg=acknowledgement_mail, encoding=encoding)
             else:
                 # send a copy also to the fields with bcc flag
