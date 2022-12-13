@@ -85,7 +85,7 @@ class TestCaptcha(unittest.TestCase):
                 "@type": "form",
                 "default_subject": "block subject",
                 "default_from": "john@doe.com",
-                "send": True,
+                "send": ["recipient"],
                 "subblocks": [
                     {
                         "field_id": "contact",
@@ -126,7 +126,7 @@ class TestCaptcha(unittest.TestCase):
                 "@type": "form",
                 "default_subject": "block subject",
                 "default_from": "john@doe.com",
-                "send": True,
+                "send": ["recipient"],
                 "subblocks": [
                     {
                         "field_id": "contact",
@@ -203,7 +203,7 @@ class TestCaptcha(unittest.TestCase):
                 "@type": "form",
                 "default_subject": "block subject",
                 "default_from": "john@doe.com",
-                "send": True,
+                "send": ["recipient"],
                 "subblocks": [
                     {
                         "field_id": "contact",
@@ -324,7 +324,7 @@ class TestCaptcha(unittest.TestCase):
                 "@type": "form",
                 "default_subject": "block subject",
                 "default_from": "john@doe.com",
-                "send": True,
+                "send": ["recipient"],
                 "subblocks": [
                     {
                         "field_id": "contact",
@@ -371,7 +371,7 @@ class TestCaptcha(unittest.TestCase):
                 "@type": "form",
                 "default_subject": "block subject",
                 "default_from": "john@doe.com",
-                "send": True,
+                "send": ["recipient"],
                 "subblocks": [
                     {
                         "field_id": "contact",

@@ -140,7 +140,10 @@ class TestMailSend(unittest.TestCase):
     ):
 
         self.document.blocks = {
-            "form-id": {"@type": "form", "send": True},
+            "form-id": {
+                "@type": "form",
+                "send": ["recipient"],
+            },
         }
         transaction.commit()
 
@@ -164,7 +167,10 @@ class TestMailSend(unittest.TestCase):
     ):
 
         self.document.blocks = {
-            "form-id": {"@type": "form", "send": True},
+            "form-id": {
+                "@type": "form",
+                "send": ["recipient"],
+            },
         }
         transaction.commit()
 
@@ -188,7 +194,10 @@ class TestMailSend(unittest.TestCase):
     ):
 
         self.document.blocks = {
-            "form-id": {"@type": "form", "send": True},
+            "form-id": {
+                "@type": "form",
+                "send": ["recipient"],
+            },
         }
         transaction.commit()
 
@@ -221,7 +230,7 @@ class TestMailSend(unittest.TestCase):
     ):
 
         self.document.blocks = {
-            "form-id": {"@type": "form", "send": True},
+            "form-id": {"@type": "form", "send": ["recipient"],},
         }
         transaction.commit()
 
@@ -259,7 +268,7 @@ class TestMailSend(unittest.TestCase):
             "form-id": {
                 "@type": "form",
                 "default_to": "to@block.com",
-                "send": True,
+                "send": ["recipient"],
             },
         }
         transaction.commit()
@@ -297,7 +306,7 @@ class TestMailSend(unittest.TestCase):
             "form-id": {
                 "@type": "form",
                 "default_subject": "block subject",
-                "send": True,
+                "send": ["recipient"],
             },
         }
         transaction.commit()
@@ -336,7 +345,7 @@ class TestMailSend(unittest.TestCase):
                 "@type": "form",
                 "default_subject": "block subject",
                 "default_from": "john@doe.com",
-                "send": True,
+                "send": ["recipient"],
                 "subblocks": [
                     {
                         "field_id": "contact",
@@ -382,7 +391,7 @@ class TestMailSend(unittest.TestCase):
                 "@type": "form",
                 "default_subject": "block subject",
                 "default_from": "john@doe.com",
-                "send": True,
+                "send": ["recipient"],
                 "subblocks": [
                     {
                         "field_id": "contact",
@@ -429,7 +438,7 @@ class TestMailSend(unittest.TestCase):
                 "@type": "form",
                 "default_subject": "block subject",
                 "default_from": "john@doe.com",
-                "send": True,
+                "send": ["recipient"],
                 "subblocks": [
                     {
                         "field_id": "test",
@@ -470,7 +479,7 @@ class TestMailSend(unittest.TestCase):
                 "@type": "form",
                 "default_subject": "block subject",
                 "default_from": "john@doe.com",
-                "send": True,
+                "send": ["recipient"],
                 "subblocks": [
                     {
                         "field_id": "test",
