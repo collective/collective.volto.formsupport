@@ -230,7 +230,10 @@ class TestMailSend(unittest.TestCase):
     ):
 
         self.document.blocks = {
-            "form-id": {"@type": "form", "send": ["recipient"],},
+            "form-id": {
+                "@type": "form",
+                "send": ["recipient"],
+            },
         }
         transaction.commit()
 
@@ -513,3 +516,117 @@ class TestMailSend(unittest.TestCase):
             response.json()["message"],
         )
         self.assertEqual(len(self.mailhost.messages), 0)
+
+    def test_send_only_acknowledgement(self):
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {
+                "@type": "form",
+                "default_subject": "block subject",
+                "default_from": "john@doe.com",
+                "send": ["acknowledgement"],
+                "acknowledgementFields": "contact",
+                "acknowledgementMessage": {
+                    "data": "<p>This message will be sent to the person filling in the form.</p><p>It is <strong>Rich Text</strong></p>"
+                },
+                "subblocks": [
+                    {
+                        "field_id": "contact",
+                        "field_type": "from",
+                        "use_as_bcc": True,
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {"field_id": "contact", "label": "Email", "value": "smith@doe.com"},
+                ],
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+
+        self.assertEqual(response.status_code, 204)
+        msg = self.mailhost.messages[0]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+        # Remove the soft line breaks for more reliable testing
+        msg = msg.replace("=\n", "")
+        self.assertIn("Subject: block subject", msg)
+        self.assertIn("From: john@doe.com", msg)
+        self.assertIn("To: smith@doe.com", msg)
+        self.assertIn(
+            "<p>This message will be sent to the person filling in the form.</p>", msg
+        )
+        self.assertIn("<p>It is <strong>Rich Text</strong></p>", msg)
+
+    def test_send_recipient_and_acknowledgement(self):
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {
+                "@type": "form",
+                "default_subject": "block subject",
+                "default_from": "john@doe.com",
+                "send": ["recipient", "acknowledgement"],
+                "acknowledgementFields": "contact",
+                "acknowledgementMessage": {
+                    "data": "<p>This message will be sent to the person filling in the form.</p><p>It is <strong>Rich Text</strong></p>"
+                },
+                "subblocks": [
+                    {
+                        "field_id": "contact",
+                        "field_type": "from",
+                        "use_as_bcc": True,
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {"field_id": "contact", "label": "Email", "value": "smith@doe.com"},
+                ],
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+
+        self.assertEqual(response.status_code, 204)
+
+        msg = self.mailhost.messages[0]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+        self.assertIn("Subject: block subject", msg)
+        self.assertIn("From: john@doe.com", msg)
+        self.assertIn("To: site_addr@plone.com", msg)
+        self.assertIn("<strong>Message:</strong> just want to say hi", msg)
+        self.assertIn("<strong>Name:</strong> Smith", msg)
+
+        acknowledgement_message = self.mailhost.messages[1]
+        if isinstance(acknowledgement_message, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            acknowledgement_message = acknowledgement_message.decode("utf-8")
+        # Remove the soft line breaks for more reliable testing
+        acknowledgement_message = acknowledgement_message.replace("=\n", "")
+        self.assertIn("Subject: block subject", acknowledgement_message)
+        self.assertIn("From: john@doe.com", acknowledgement_message)
+        self.assertIn("To: smith@doe.com", acknowledgement_message)
+        self.assertIn(
+            "<p>This message will be sent to the person filling in the form.</p>",
+            acknowledgement_message,
+        )
+        self.assertIn(
+            "<p>It is <strong>Rich Text</strong></p>", acknowledgement_message
+        )
