@@ -263,10 +263,7 @@ class SubmitPost(Service):
 
         for bcc in self.get_bcc():
             acknowledgement_message = self.block.get("acknowledgementMessage")
-            if (
-                "acknowledgement" in self.block.get("send", [])
-                and acknowledgement_message
-            ):
+            if "acknowledgement" in self.block.get("send", []) and acknowledgement_message:
                 acknowledgement_mail = EmailMessage()
                 acknowledgement_mail["Subject"] = subject
                 acknowledgement_mail["From"] = mfrom
