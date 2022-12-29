@@ -257,13 +257,20 @@ class SubmitPost(Service):
 
         msg.replace_header("Content-Type", 'text/html; charset="utf-8"')
 
+        should_send = self.block.get("send", [])
+
         self.manage_attachments(msg=msg)
-        if "recipient" in self.block.get("send", []):
-            self.send_mail(msg=msg, encoding=encoding)
+        if should_send:
+            if isinstance(should_send, list) and "recipient" in self.block.get("send", []):
+                self.send_mail(msg=msg, encoding=encoding)
+            # Backwards compatibility for forms before 'acknowledgement' sending
+            else:
+                self.send_mail(msg=msg, encoding=encoding)
+
 
         for bcc in self.get_bcc():
             acknowledgement_message = self.block.get("acknowledgementMessage")
-            if "acknowledgement" in self.block.get("send", []) and acknowledgement_message:
+            if acknowledgement_message and "acknowledgement" in self.block.get("send", []):
                 acknowledgement_mail = EmailMessage()
                 acknowledgement_mail["Subject"] = subject
                 acknowledgement_mail["From"] = mfrom
