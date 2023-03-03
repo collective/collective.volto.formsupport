@@ -4,7 +4,7 @@ Changelog
 2.3.1 (unreleased)
 ------------------
 
-- Set message body using the set_payload method.
+- Set message body using the set_payload method in the view form_submit. It will solve the problems of compatibility with Exchange smtp server.
   [foxtrot-dfm1]
 
 
