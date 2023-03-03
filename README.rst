@@ -6,7 +6,9 @@
     :target: https://pypi.python.org/pypi/collective.volto.formsupport
     :alt: Egg Status
 
-.. image:: https://img.shields.io/pypi/pyversions/collective.volto.formsupport.svg?style=plastic   :alt: Supported - Python Versions
+.. image:: https://img.shields.io/pypi/pyversions/collective.volto.formsupport.svg?style=plastic   
+    :target: https://pypi.python.org/pypi/collective.volto.formsupport/
+    :alt: Supported - Python Versions
 
 .. image:: https://img.shields.io/pypi/l/collective.volto.formsupport.svg
     :target: https://pypi.python.org/pypi/collective.volto.formsupport/
