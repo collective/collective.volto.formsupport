@@ -199,7 +199,7 @@ class SubmitPost(Service):
         message = self.prepare_message()
 
         msg = EmailMessage()
-        msg.set_content(message)
+        msg.set_content(message.encode(encoding))
         msg["Subject"] = subject
         msg["From"] = mfrom
         msg["To"] = mto
