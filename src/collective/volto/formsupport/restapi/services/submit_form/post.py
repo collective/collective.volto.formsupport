@@ -199,13 +199,15 @@ class SubmitPost(Service):
         message = self.prepare_message()
 
         msg = EmailMessage()
-        msg.set_content(message.encode(encoding))
+        msg.set_content(message)
         msg["Subject"] = subject
         msg["From"] = mfrom
         msg["To"] = mto
         msg["Reply-To"] = mreply_to
 
         msg.replace_header("Content-Type", 'text/html; charset="utf-8"')
+        
+        msg.set_payload(message.encode(encoding))
 
         self.manage_attachments(msg=msg)
 
