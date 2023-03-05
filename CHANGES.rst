@@ -4,7 +4,8 @@ Changelog
 2.6.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Override content-transfer-encoding using `MAIL_CONTENT_TRANSFER_ENCODING` env
+  [mamico]
 
 
 2.6.2 (2022-11-07)
