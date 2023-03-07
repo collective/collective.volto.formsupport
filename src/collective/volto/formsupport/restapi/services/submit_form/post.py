@@ -257,6 +257,12 @@ class SubmitPost(Service):
 
         msg.replace_header("Content-Type", 'text/html; charset="utf-8"')
 
+        headers_to_forward = self.block.get("httpHeaders", [])
+        for header in headers_to_forward:
+            header_value = self.request.get(header)
+            if header_value:
+                msg[header] = header_value
+
         self.manage_attachments(msg=msg)
         self.send_mail(msg=msg, encoding=encoding)
 
