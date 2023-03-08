@@ -19,12 +19,14 @@ from zope.interface import alsoProvides
 from zope.interface import implementer
 
 import codecs
-import six
-import os
 import logging
 import math
+import os
+import six
+
 
 logger = logging.getLogger(__name__)
+CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
 
 
 @implementer(IPostEvent)
@@ -245,11 +247,11 @@ class SubmitPost(Service):
         registry = getUtility(IRegistry)
         mail_settings = registry.forInterface(IMailSchema, prefix="plone")
         mto = self.block.get("default_to", mail_settings.email_from_address)
-        encoding = registry.get("plone.email_charset", "utf-8")
+        charset = registry.get("plone.email_charset", "utf-8")
         message = self.prepare_message()
 
         msg = EmailMessage()
-        msg.set_content(message)
+        msg.set_content(message, charset=charset, subtype="html", cte=CTE)
         msg["Subject"] = subject
         msg["From"] = mfrom
         msg["To"] = mto
@@ -264,12 +266,12 @@ class SubmitPost(Service):
                 msg[header] = header_value
 
         self.manage_attachments(msg=msg)
-        self.send_mail(msg=msg, encoding=encoding)
+        self.send_mail(msg=msg, charset=charset)
 
         for bcc in self.get_bcc():
             # send a copy also to the fields with bcc flag
             msg.replace_header("To", bcc)
-            self.send_mail(msg=msg, encoding=encoding)
+            self.send_mail(msg=msg, charset=charset)
 
     def prepare_message(self):
         message_template = api.content.get_view(
@@ -299,11 +301,11 @@ class SubmitPost(Service):
             if x.get("field_id", "") not in skip_fields
         ]
 
-    def send_mail(self, msg, encoding):
+    def send_mail(self, msg, charset):
         host = api.portal.get_tool(name="MailHost")
         # we set immediate=True because we need to catch exceptions.
         # by default (False) exceptions are handled by MailHost and we can't catch them.
-        host.send(msg, charset=encoding, immediate=True)
+        host.send(msg, charset=charset, immediate=True)
 
     def manage_attachments(self, msg):
         attachments = self.form_data.get("attachments", {})
