@@ -6,6 +6,9 @@ Changelog
 
 - Override content-transfer-encoding using `MAIL_CONTENT_TRANSFER_ENCODING` env
   [mamico]
+- The form block can now be stored in a Volto block container (columns,
+  accordion, tabs, etc)
+  [tiberiuichim]
 
 
 2.6.2 (2022-11-07)
