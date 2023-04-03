@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+
 from collective.volto.formsupport import _
 from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.interfaces import IPostEvent
+from collective.volto.formsupport.utils import get_blocks
 from email.message import EmailMessage
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
@@ -165,7 +167,7 @@ class SubmitPost(Service):
             )
 
     def get_block_data(self, block_id):
-        blocks = getattr(self.context, "blocks", {})
+        blocks = get_blocks(self.context)
         if not blocks:
             return {}
         for id, block in blocks.items():

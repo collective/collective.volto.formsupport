@@ -33,3 +33,4 @@ report.html
 reports/
 pyvenv.cfg
 # excludes
+*~
