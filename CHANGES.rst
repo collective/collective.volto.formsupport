@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.6.3 (unreleased)
+2.7.0 (2023-04-03)
 ------------------
 
 - Override content-transfer-encoding using `MAIL_CONTENT_TRANSFER_ENCODING` env
