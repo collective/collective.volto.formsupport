@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+
 from collective.volto.formsupport import _
 from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.interfaces import IPostEvent
+from collective.volto.formsupport.utils import get_blocks
 from email.message import EmailMessage
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
@@ -19,12 +21,14 @@ from zope.interface import alsoProvides
 from zope.interface import implementer
 
 import codecs
-import six
-import os
 import logging
 import math
+import os
+import six
+
 
 logger = logging.getLogger(__name__)
+CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
 
 
 @implementer(IPostEvent)
@@ -163,7 +167,7 @@ class SubmitPost(Service):
             )
 
     def get_block_data(self, block_id):
-        blocks = getattr(self.context, "blocks", {})
+        blocks = get_blocks(self.context)
         if not blocks:
             return {}
         for id, block in blocks.items():
@@ -245,11 +249,11 @@ class SubmitPost(Service):
         registry = getUtility(IRegistry)
         mail_settings = registry.forInterface(IMailSchema, prefix="plone")
         mto = self.block.get("default_to", mail_settings.email_from_address)
-        encoding = registry.get("plone.email_charset", "utf-8")
+        charset = registry.get("plone.email_charset", "utf-8")
         message = self.prepare_message()
 
         msg = EmailMessage()
-        msg.set_content(message)
+        msg.set_content(message, charset=charset, subtype="html", cte=CTE)
         msg["Subject"] = subject
         msg["From"] = mfrom
         msg["To"] = mto
@@ -261,16 +265,19 @@ class SubmitPost(Service):
 
         self.manage_attachments(msg=msg)
         if should_send:
-            if isinstance(should_send, list) and "recipient" in self.block.get("send", []):
-                self.send_mail(msg=msg, encoding=encoding)
+            if isinstance(should_send, list) and "recipient" in self.block.get(
+                "send", []
+            ):
+                self.send_mail(msg=msg, charset=charset)
             # Backwards compatibility for forms before 'acknowledgement' sending
             else:
-                self.send_mail(msg=msg, encoding=encoding)
-
+                self.send_mail(msg=msg, charset=charset)
 
         for bcc in self.get_bcc():
             acknowledgement_message = self.block.get("acknowledgementMessage")
-            if acknowledgement_message and "acknowledgement" in self.block.get("send", []):
+            if acknowledgement_message and "acknowledgement" in self.block.get(
+                "send", []
+            ):
                 acknowledgement_mail = EmailMessage()
                 acknowledgement_mail["Subject"] = subject
                 acknowledgement_mail["From"] = mfrom
@@ -278,11 +285,11 @@ class SubmitPost(Service):
                 acknowledgement_mail.set_content(
                     acknowledgement_message.get("data"), subtype="html", charset="utf-8"
                 )
-                self.send_mail(msg=acknowledgement_mail, encoding=encoding)
+                self.send_mail(msg=acknowledgement_mail, charset=charset)
             else:
                 # send a copy also to the fields with bcc flag
                 msg.replace_header("To", bcc)
-                self.send_mail(msg=msg, encoding=encoding)
+                self.send_mail(msg=msg, charset=charset)
 
     def prepare_message(self):
         message_template = api.content.get_view(
@@ -312,11 +319,11 @@ class SubmitPost(Service):
             if x.get("field_id", "") not in skip_fields
         ]
 
-    def send_mail(self, msg, encoding):
+    def send_mail(self, msg, charset):
         host = api.portal.get_tool(name="MailHost")
         # we set immediate=True because we need to catch exceptions.
         # by default (False) exceptions are handled by MailHost and we can't catch them.
-        host.send(msg, charset=encoding, immediate=True)
+        host.send(msg, charset=charset, immediate=True)
 
     def manage_attachments(self, msg):
         attachments = self.form_data.get("attachments", {})

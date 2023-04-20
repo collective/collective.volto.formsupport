@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+
 from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.utils import get_blocks
 from plone import api
 from plone.memoize import view
 from plone.restapi.interfaces import IExpandableElement
@@ -46,7 +48,8 @@ class FormData(object):
     @property
     @view.memoize
     def form_block(self):
-        blocks = getattr(self.context, "blocks", {})
+        blocks = get_blocks(self.context)
+
         if isinstance(blocks, six.text_type):
             blocks = json.loads(blocks)
         if not blocks:
