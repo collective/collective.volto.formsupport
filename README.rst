@@ -6,7 +6,9 @@
     :target: https://pypi.python.org/pypi/collective.volto.formsupport
     :alt: Egg Status
 
-.. image:: https://img.shields.io/pypi/pyversions/collective.volto.formsupport.svg?style=plastic   :alt: Supported - Python Versions
+.. image:: https://img.shields.io/pypi/pyversions/collective.volto.formsupport.svg?style=plastic   
+    :target: https://pypi.python.org/pypi/collective.volto.formsupport/
+    :alt: Supported - Python Versions
 
 .. image:: https://img.shields.io/pypi/l/collective.volto.formsupport.svg
     :target: https://pypi.python.org/pypi/collective.volto.formsupport/
@@ -194,6 +196,21 @@ There is an environment variable that you can use to set that limit (in MB)::
 By default this is not set.
 
 The upload limit is also passed to the frontend in the form data with the `attachments_limit` key.
+
+Content-transfer-encoding
+=========================
+
+It is possible to set the content-transfer-encoding for the email body, settings the environment
+variable `MAIL_CONTENT_TRANSFER_ENCODING`::
+
+    [instance]
+    environment-vars =
+        MAIL_CONTENT_TRANSFER_ENCODING base64
+
+This is useful for some SMTP servers that have problems with `quoted-printable` encoding.
+
+By default the content-transfer-encoding is `quoted-printable` as overrided in
+https://github.com/zopefoundation/Products.MailHost/blob/master/src/Products/MailHost/MailHost.py#L65
 
 Examples
 ========

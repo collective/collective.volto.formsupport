@@ -1,10 +1,20 @@
 Changelog
 =========
 
-2.6.3 (unreleased)
+2.7.1 (unreleased)
 ------------------
 
 - Nothing changed yet.
+
+
+2.7.0 (2023-04-03)
+------------------
+
+- Override content-transfer-encoding using `MAIL_CONTENT_TRANSFER_ENCODING` env
+  [mamico]
+- The form block can now be stored in a Volto block container (columns,
+  accordion, tabs, etc)
+  [tiberiuichim]
 
 
 2.6.2 (2022-11-07)

@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
+
 from collective.volto.formsupport import logger
 from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.utils import get_blocks
 from copy import deepcopy
 from datetime import datetime
 from plone.dexterity.interfaces import IDexterityContent
@@ -45,7 +47,8 @@ class FormDataStore(object):
         return data.get("block_id", "")
 
     def get_form_fields(self):
-        blocks = getattr(self.context, "blocks", {})
+        blocks = get_blocks(self.context)
+
         if not blocks:
             return {}
         form_block = {}
