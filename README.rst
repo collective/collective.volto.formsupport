@@ -212,6 +212,20 @@ This is useful for some SMTP servers that have problems with `quoted-printable` 
 By default the content-transfer-encoding is `quoted-printable` as overrided in
 https://github.com/zopefoundation/Products.MailHost/blob/master/src/Products/MailHost/MailHost.py#L65
 
+Header forwarding
+=========================
+
+It is possible to configure some headers from the form POST request to be included in the email's headers by configuring the `httpHeaders` field in your volto block.
+
+[volto-formblock](https://github.com/collective/volto-form-block) allows the following headers to be forwarded:
+
+- `HTTP_X_FORWARDED_FOR`
+- `HTTP_X_FORWARDED_PORT`
+- `REMOTE_ADDR`
+- `PATH_INFO`
+- `HTTP_USER_AGENT`
+- `HTTP_REFERER`
+
 Examples
 ========
 

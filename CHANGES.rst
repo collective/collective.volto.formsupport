@@ -4,7 +4,8 @@ Changelog
 2.7.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Allow forwarding request headers in the sent emails #27
+  [JeffersonBledsoe]
 
 
 2.7.0 (2023-04-03)
