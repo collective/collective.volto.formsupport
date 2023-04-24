@@ -633,3 +633,9 @@ class TestMailSend(unittest.TestCase):
             msg,
         )
         self.assertIn(f"<td>{message}</td>", msg)
+
+    def test_email_body_formated_as_list(
+        self,
+    ):
+        # TODO: unit test for using 'list' explicitly as an email format
+        pass
