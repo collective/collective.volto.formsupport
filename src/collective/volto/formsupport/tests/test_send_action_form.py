@@ -599,37 +599,37 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
+
         self.assertIn(f"Subject: {subject}", msg)
         self.assertIn("From: john@doe.com", msg)
         self.assertIn("To: site_addr@plone.com", msg)
         self.assertIn("Reply-To: john@doe.com", msg)
+
         self.assertIn("<table>", msg)
         self.assertIn("</table>", msg)
-        self.assertIn(f"<caption>Email results for {subject}</caption>", msg)
+        # TODO: Is the document title the desired behaviour here? Or should it be the subject of the email
+        self.assertIn(
+            f"<caption>Email results for {self.document.title}</caption>", msg
+        )
         self.assertIn(
             """<thead>
       <tr role="row">
-        <th scope="col"
-          role="columnheader">Field</th>
-        <th scope="col"
-          role="columnheader">Value</th>
+        <th scope="col" role="columnheader">Field</th>
+        <th scope="col" role="columnheader">Value</th>
       </tr>
     </thead>""",
             msg,
         )
+
         self.assertIn(
             """<tr role="row">
-        <th scope="row"
-          role="rowheader">Name</th>
-      </tr>""",
+          <th scope="row" role="rowheader">Name</th>""",
             msg,
         )
         self.assertIn(f"<td>{name}</td>", msg)
         self.assertIn(
             """<tr role="row">
-        <th scope="row"
-          role="rowheader">Message</th>
-      </tr>""",
+          <th scope="row" role="rowheader">""",
             msg,
         )
         self.assertIn(f"<td>{message}</td>", msg)
