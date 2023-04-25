@@ -637,5 +637,31 @@ class TestMailSend(unittest.TestCase):
     def test_email_body_formated_as_list(
         self,
     ):
-        # TODO: unit test for using 'list' explicitly as an email format
-        pass
+        self.document.blocks = {
+            "form-id": {"@type": "form", "send": True, "email_format": "list"},
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "John"},
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+        self.assertEqual(response.status_code, 204)
+        msg = self.mailhost.messages[0]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+        self.assertIn("Subject: test subject", msg)
+        self.assertIn("From: john@doe.com", msg)
+        self.assertIn("To: site_addr@plone.com", msg)
+        self.assertIn("Reply-To: john@doe.com", msg)
+        self.assertIn("<strong>Message:</strong> just want to say hi", msg)
+        self.assertIn("<strong>Name:</strong> John", msg)
