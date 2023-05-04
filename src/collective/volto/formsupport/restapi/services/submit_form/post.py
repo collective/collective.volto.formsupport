@@ -220,6 +220,14 @@ class SubmitPost(Service):
                 bcc.append(data["value"])
         return bcc
 
+    def get_acknowledgement_field_value(self):
+        acknowledgementField = self.block["acknowledgementFields"]
+        for field in self.block.get("subblocks", []):
+            if field.get("field_id") == acknowledgementField:
+                for data in self.form_data.get("data", []):
+                    if data.get("field_id", "") == field.get("field_id"):
+                        return data.get("value")
+
     def send_data(self):
         subject = self.form_data.get("subject", "") or self.block.get(
             "default_subject", ""
@@ -273,23 +281,23 @@ class SubmitPost(Service):
             else:
                 self.send_mail(msg=msg, charset=charset)
 
-        for bcc in self.get_bcc():
-            acknowledgement_message = self.block.get("acknowledgementMessage")
-            if acknowledgement_message and "acknowledgement" in self.block.get(
-                "send", []
-            ):
+        acknowledgement_message = self.block.get("acknowledgementMessage")
+        if acknowledgement_message and "acknowledgement" in self.block.get("send", []):
+            acknowledgement_address = self.get_acknowledgement_field_value()
+            if acknowledgement_address:
                 acknowledgement_mail = EmailMessage()
                 acknowledgement_mail["Subject"] = subject
                 acknowledgement_mail["From"] = mfrom
-                acknowledgement_mail["To"] = bcc
+                acknowledgement_mail["To"] = acknowledgement_address
                 acknowledgement_mail.set_content(
                     acknowledgement_message.get("data"), subtype="html", charset="utf-8"
                 )
                 self.send_mail(msg=acknowledgement_mail, charset=charset)
-            else:
-                # send a copy also to the fields with bcc flag
-                msg.replace_header("To", bcc)
-                self.send_mail(msg=msg, charset=charset)
+
+        for bcc in self.get_bcc():
+            # send a copy also to the fields with bcc flag
+            msg.replace_header("To", bcc)
+            self.send_mail(msg=msg, charset=charset)
 
     def prepare_message(self):
         message_template = api.content.get_view(
