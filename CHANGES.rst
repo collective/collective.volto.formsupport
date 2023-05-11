@@ -4,6 +4,9 @@ Changelog
 2.7.1 (unreleased)
 ------------------
 
+- Add Spanish translation.
+  [macagua]
+
 - Allow forwarding request headers in the sent emails #27
   [JeffersonBledsoe]
 
