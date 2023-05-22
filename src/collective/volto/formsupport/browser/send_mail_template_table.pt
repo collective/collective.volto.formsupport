@@ -4,8 +4,7 @@
             url python:options.get('url', '');
             title python:options.get('title', '');">
   <table>
-    <caption i18n:translate="send_mail_text">Email results for ${title}</caption>
-    <!-- TODO:i18n attributes -->
+    <caption i18n:translate="send_mail_text_table">Form submission data for ${title}</caption>
     <thead>
       <tr role="row">
         <th scope="col"

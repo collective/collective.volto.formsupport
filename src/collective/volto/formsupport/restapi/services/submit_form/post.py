@@ -282,9 +282,8 @@ class SubmitPost(Service):
             self.send_mail(msg=msg, charset=charset)
 
     def prepare_message(self):
-        template_name = self.email_format_page_template_mapping[
-            self.block.get("email_format", "")
-        ]
+        email_format = self.block.get("email_format", "")
+        template_name = self.email_format_page_template_mapping.get(email_format, "send_mail_template")
 
         if not template_name:
             # TODO: Actual i18n instead of placeholders here
