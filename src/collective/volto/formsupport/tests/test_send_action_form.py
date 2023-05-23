@@ -2,6 +2,7 @@
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
+from email.parser import Parser
 from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import SITE_OWNER_NAME
@@ -10,6 +11,7 @@ from plone.app.testing import TEST_USER_ID
 from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
+from six import StringIO
 from zope.component import getUtility
 
 import transaction
@@ -557,15 +559,16 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
-        # Remove the soft line breaks for more reliable testing
-        msg = msg.replace("=\n", "")
-        self.assertIn("Subject: block subject", msg)
-        self.assertIn("From: john@doe.com", msg)
-        self.assertIn("To: smith@doe.com", msg)
+
+        parsed_msg = Parser().parse(StringIO(msg))
+        self.assertEqual(parsed_msg.get("from"), "john@doe.com")
+        self.assertEqual(parsed_msg.get("to"), "smith@doe.com")
+        self.assertEqual(parsed_msg.get("subject"), "block subject")
+        msg_body = parsed_msg.get_payload(decode=True).decode()
         self.assertIn(
-            "<p>This message will be sent to the person filling in the form.</p>", msg
+            "<p>This message will be sent to the person filling in the form.</p>", msg_body
         )
-        self.assertIn("<p>It is <strong>Rich Text</strong></p>", msg)
+        self.assertIn("<p>It is <strong>Rich Text</strong></p>", msg_body)
 
     def test_send_recipient_and_acknowledgement(self):
         self.document.blocks = {
@@ -608,25 +611,28 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
-        self.assertIn("Subject: block subject", msg)
-        self.assertIn("From: john@doe.com", msg)
-        self.assertIn("To: site_addr@plone.com", msg)
-        self.assertIn("<strong>Message:</strong> just want to say hi", msg)
-        self.assertIn("<strong>Name:</strong> Smith", msg)
+        parsed_msg = Parser().parse(StringIO(msg))
+        self.assertEqual(parsed_msg.get("from"), "john@doe.com")
+        self.assertEqual(parsed_msg.get("to"), "site_addr@plone.com")
+        self.assertEqual(parsed_msg.get("subject"), "block subject")
+        msg_body = parsed_msg.get_payload(decode=True).decode()
+        self.assertIn("<strong>Message:</strong> just want to say hi", msg_body)
+        self.assertIn("<strong>Name:</strong> Smith", msg_body)
 
         acknowledgement_message = self.mailhost.messages[1]
         if isinstance(acknowledgement_message, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             acknowledgement_message = acknowledgement_message.decode("utf-8")
-        # Remove the soft line breaks for more reliable testing
-        acknowledgement_message = acknowledgement_message.replace("=\n", "")
-        self.assertIn("Subject: block subject", acknowledgement_message)
-        self.assertIn("From: john@doe.com", acknowledgement_message)
-        self.assertIn("To: smith@doe.com", acknowledgement_message)
+
+        parsed_ack_msg = Parser().parse(StringIO(acknowledgement_message))
+        self.assertEqual(parsed_ack_msg.get("from"), "john@doe.com")
+        self.assertEqual(parsed_ack_msg.get("to"), "smith@doe.com")
+        self.assertEqual(parsed_ack_msg.get("subject"), "block subject")
+        ack_msg_body = parsed_ack_msg.get_payload(decode=True).decode()
         self.assertIn(
             "<p>This message will be sent to the person filling in the form.</p>",
-            acknowledgement_message,
+            ack_msg_body,
         )
         self.assertIn(
-            "<p>It is <strong>Rich Text</strong></p>", acknowledgement_message
+            "<p>It is <strong>Rich Text</strong></p>", ack_msg_body
         )
