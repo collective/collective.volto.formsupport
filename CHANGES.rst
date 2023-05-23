@@ -8,6 +8,9 @@ Changelog
   [JeffersonBledsoe]
 - Allow the IDs of fields to be customised for CSV download and XML attaachments #22
   [JeffersonBledsoe]
+- Add Spanish translation.
+  [macagua]
+
 - Allow forwarding request headers in the sent emails #27
   [JeffersonBledsoe]
 
