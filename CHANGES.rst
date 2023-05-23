@@ -4,6 +4,10 @@ Changelog
 2.7.1 (unreleased)
 ------------------
 
+- Allow attaching an XML version of the form data to the sent email #22
+  [JeffersonBledsoe]
+- Allow the IDs of fields to be customised for CSV download and XML attaachments #22
+  [JeffersonBledsoe]
 - Add Spanish translation.
   [macagua]
 

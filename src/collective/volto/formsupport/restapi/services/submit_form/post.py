@@ -5,6 +5,7 @@ from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.interfaces import IPostEvent
 from collective.volto.formsupport.utils import get_blocks
+from datetime import datetime
 from email.message import EmailMessage
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
@@ -12,6 +13,7 @@ from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
+from xml.etree.ElementTree import ElementTree, Element, SubElement
 from zExceptions import BadRequest
 from zope.component import getMultiAdapter
 from zope.component import getUtility
@@ -311,6 +313,10 @@ class SubmitPost(Service):
 
     def manage_attachments(self, msg):
         attachments = self.form_data.get("attachments", {})
+
+        if self.block.get("attachXml", False):
+            self.attach_xml(msg=msg)
+
         if not attachments:
             return []
         for key, value in attachments.items():
@@ -330,12 +336,39 @@ class SubmitPost(Service):
                     file_data = file_data.encode("utf-8")
             else:
                 file_data = value
+            maintype, subtype = content_type.split("/")
             msg.add_attachment(
                 file_data,
-                maintype=content_type,
-                subtype=content_type,
+                maintype=maintype,
+                subtype=subtype,
                 filename=filename,
             )
+
+    def attach_xml(self, msg):
+        now = (
+            datetime.now()
+            .isoformat(timespec="seconds")
+            .replace(" ", "-")
+            .replace(":", "")
+        )
+        filename = f"formdata_{now}.xml"
+        output = six.BytesIO()
+        xmlRoot = Element("form")
+
+        for field in self.filter_parameters():
+            SubElement(
+                xmlRoot, "field", name=field.get("custom_field_id", field["label"])
+            ).text = str(field["value"])
+
+        doc = ElementTree(xmlRoot)
+        doc.write(output, encoding="utf-8", xml_declaration=True)
+        xmlstr = output.getvalue()
+        msg.add_attachment(
+            xmlstr,
+            maintype="application",
+            subtype="xml",
+            filename=filename,
+        )
 
     def store_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
