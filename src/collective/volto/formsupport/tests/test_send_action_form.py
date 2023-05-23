@@ -609,7 +609,7 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("</table>", msg)
         # TODO: Is the document title the desired behaviour here? Or should it be the subject of the email
         self.assertIn(
-            f"<caption>Email results for {self.document.title}</caption>", msg
+            f"<caption>Form submission data for {self.document.title}</caption>", msg
         )
         self.assertIn(
             """<thead>
