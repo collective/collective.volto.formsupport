@@ -273,11 +273,12 @@ class SubmitPost(Service):
 
         self.manage_attachments(msg=msg)
         if should_send:
-            if isinstance(should_send, list) and "recipient" in self.block.get(
-                "send", []
-            ):
-                self.send_mail(msg=msg, charset=charset)
-            # Backwards compatibility for forms before 'acknowledgement' sending
+            if isinstance(should_send, list):
+                if "recipient" in self.block.get(
+                    "send", []
+                ):
+                    self.send_mail(msg=msg, charset=charset)
+                # Backwards compatibility for forms before 'acknowledgement' sending
             else:
                 self.send_mail(msg=msg, charset=charset)
 
