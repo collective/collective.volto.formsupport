@@ -6,7 +6,7 @@
     :target: https://pypi.python.org/pypi/collective.volto.formsupport
     :alt: Egg Status
 
-.. image:: https://img.shields.io/pypi/pyversions/collective.volto.formsupport.svg?style=plastic   
+.. image:: https://img.shields.io/pypi/pyversions/collective.volto.formsupport.svg?style=plastic
     :target: https://pypi.python.org/pypi/collective.volto.formsupport/
     :alt: Supported - Python Versions
 
@@ -104,7 +104,20 @@ Send
 
 If block is set to send data, an email with form data will be sent to the recipient set in block settings or (if not set) to the site address.
 
-If ther is an ``attachments`` field in the POST data, these files will be attached to the emal sent.
+If there is an ``attachments`` field in the POST data, these files will be attached to the email sent.
+
+XML attachments
+^^^^^^^^^^^^^^^
+
+An XML copy of the data can be optionally attached to the sent email by configuring the volto block's `attachXml` option.
+
+The sent XML follows the same format as the feature in [collective.easyform](https://github.com/collective/collective.easyform). An example is shown below:
+
+```xml
+<?xml version='1.0' encoding='utf-8'?><form><field name="Custom field label">My value</field></form>
+```
+
+The field names in the XML will utilise the Data ID Mapping feature if it is used. Read more about this feature in the following Store section of the documentation.
 
 Store
 -----
@@ -121,6 +134,11 @@ Each Record stores also two *service* attributes:
 - **fields_order**: sorted list of field ids. This can be used in csv export to keep the order of fields.
 
 We store these attributes because the form can change over time and we want to have a snapshot of the fields in the Record.
+
+Data ID Mapping
+^^^^^^^^^^^^^^^
+
+The exported CSV file may need to be used by further processes which require specific values for the columns of the CSV. In such a case, the `Data ID Mapping` feature can be used to change the column name to custom text for each field.
 
 Block serializer
 ================
@@ -211,6 +229,20 @@ This is useful for some SMTP servers that have problems with `quoted-printable` 
 
 By default the content-transfer-encoding is `quoted-printable` as overrided in
 https://github.com/zopefoundation/Products.MailHost/blob/master/src/Products/MailHost/MailHost.py#L65
+
+Header forwarding
+=========================
+
+It is possible to configure some headers from the form POST request to be included in the email's headers by configuring the `httpHeaders` field in your volto block.
+
+[volto-formblock](https://github.com/collective/volto-form-block) allows the following headers to be forwarded:
+
+- `HTTP_X_FORWARDED_FOR`
+- `HTTP_X_FORWARDED_PORT`
+- `REMOTE_ADDR`
+- `PATH_INFO`
+- `HTTP_USER_AGENT`
+- `HTTP_REFERER`
 
 Examples
 ========

@@ -12,6 +12,7 @@ from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
 from six import StringIO
+import xml.etree.ElementTree as ET
 from zope.component import getUtility
 
 import transaction
@@ -636,3 +637,37 @@ class TestMailSend(unittest.TestCase):
         self.assertIn(
             "<p>It is <strong>Rich Text</strong></p>", ack_msg_body
         )
+
+    def test_send_xml(self):
+        self.document.blocks = {
+            "form-id": {"@type": "form", "send": True, "attachXml": True},
+        }
+        transaction.commit()
+
+        form_data = [
+            {"label": "Message", "value": "just want to say hi"},
+            {"label": "Name", "value": "John"},
+        ]
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": form_data,
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+        self.assertEqual(response.status_code, 204)
+        msg = self.mailhost.messages[0]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+
+        parsed_msgs = Parser().parse(StringIO(msg))
+        # 1st index is the XML attachment
+        msg_contents = parsed_msgs.get_payload()[1].get_payload(decode=True)
+        xml_tree = ET.fromstring(msg_contents)
+        for index, field in enumerate(xml_tree):
+            self.assertEqual(field.get("name"), form_data[index]['label'])
+            self.assertEqual(field.text, form_data[index]['value'])
