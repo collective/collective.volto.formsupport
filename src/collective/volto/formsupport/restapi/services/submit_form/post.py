@@ -283,8 +283,10 @@ class SubmitPost(Service):
             "table": "send_mail_template_table",
         }
         email_format = self.block.get("email_format", "")
-        template_name = email_format_page_template_mapping.get(email_format, 'send_mail_template')
- 
+        template_name = email_format_page_template_mapping.get(
+            email_format, "send_mail_template"
+        )
+
         message_template = api.content.get_view(
             name=template_name,
             context=self.context,

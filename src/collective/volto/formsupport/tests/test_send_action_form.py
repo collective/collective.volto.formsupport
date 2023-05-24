@@ -2,6 +2,7 @@
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
+from email.parser import Parser
 from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import SITE_OWNER_NAME
@@ -10,6 +11,8 @@ from plone.app.testing import TEST_USER_ID
 from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
+from six import StringIO
+import xml.etree.ElementTree as ET
 from zope.component import getUtility
 
 import transaction
@@ -697,5 +700,5 @@ class TestMailSend(unittest.TestCase):
         msg_contents = parsed_msgs.get_payload()[1].get_payload(decode=True)
         xml_tree = ET.fromstring(msg_contents)
         for index, field in enumerate(xml_tree):
-            self.assertEqual(field.get("name"), form_data[index]['label'])
-            self.assertEqual(field.text, form_data[index]['value'])
+            self.assertEqual(field.get("name"), form_data[index]["label"])
+            self.assertEqual(field.text, form_data[index]["value"])
