@@ -24,4 +24,10 @@
         template="send_mail_template.pt"
         permission="zope2.View"
         />
+    <browser:page
+        for="*"
+        name="send_mail_template_table"
+        template="send_mail_template_table.pt"
+        permission="zope2.View"
+        />
 </configure>

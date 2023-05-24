@@ -278,8 +278,17 @@ class SubmitPost(Service):
             self.send_mail(msg=msg, charset=charset)
 
     def prepare_message(self):
+        email_format_page_template_mapping = {
+            "list": "send_mail_template",
+            "table": "send_mail_template_table",
+        }
+        email_format = self.block.get("email_format", "")
+        template_name = email_format_page_template_mapping.get(
+            email_format, "send_mail_template"
+        )
+
         message_template = api.content.get_view(
-            name="send_mail_template",
+            name=template_name,
             context=self.context,
             request=self.request,
         )

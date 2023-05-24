@@ -22,7 +22,6 @@ import os
 
 
 class TestMailSend(unittest.TestCase):
-
     layer = VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING
 
     def setUp(self):
@@ -126,7 +125,6 @@ class TestMailSend(unittest.TestCase):
         )
 
     def test_email_not_send_if_no_action_set(self):
-
         response = self.submit_form(
             data={"from": "john@doe.com", "block_id": "form-id"},
         )
@@ -141,7 +139,6 @@ class TestMailSend(unittest.TestCase):
     def test_email_not_send_if_block_id_is_correct_but_form_data_missing(
         self,
     ):
-
         self.document.blocks = {
             "form-id": {"@type": "form", "send": True},
         }
@@ -165,7 +162,6 @@ class TestMailSend(unittest.TestCase):
     def test_email_not_send_if_block_id_is_correct_but_required_fields_missing(
         self,
     ):
-
         self.document.blocks = {
             "form-id": {"@type": "form", "send": True},
         }
@@ -189,7 +185,6 @@ class TestMailSend(unittest.TestCase):
     def test_email_sent_with_site_recipient(
         self,
     ):
-
         self.document.blocks = {
             "form-id": {"@type": "form", "send": True},
         }
@@ -331,7 +326,6 @@ class TestMailSend(unittest.TestCase):
     def test_email_sent_with_block_recipient_if_set(
         self,
     ):
-
         self.document.blocks = {
             "text-id": {"@type": "text"},
             "form-id": {
@@ -369,7 +363,6 @@ class TestMailSend(unittest.TestCase):
     def test_email_sent_with_block_subject_if_set_and_not_passed(
         self,
     ):
-
         self.document.blocks = {
             "text-id": {"@type": "text"},
             "form-id": {
@@ -407,7 +400,6 @@ class TestMailSend(unittest.TestCase):
     def test_email_with_use_as_reply_to(
         self,
     ):
-
         self.document.blocks = {
             "text-id": {"@type": "text"},
             "form-id": {
@@ -453,7 +445,6 @@ class TestMailSend(unittest.TestCase):
     def test_email_field_used_as_bcc(
         self,
     ):
-
         self.document.blocks = {
             "text-id": {"@type": "text"},
             "form-id": {
@@ -500,7 +491,6 @@ class TestMailSend(unittest.TestCase):
     def test_send_attachment(
         self,
     ):
-
         self.document.blocks = {
             "text-id": {"@type": "text"},
             "form-id": {
@@ -583,6 +573,102 @@ class TestMailSend(unittest.TestCase):
         )
         self.assertEqual(len(self.mailhost.messages), 0)
 
+    def test_email_body_formated_as_table(
+        self,
+    ):
+        self.document.blocks = {
+            "form-id": {"@type": "form", "send": True, "email_format": "table"},
+        }
+        transaction.commit()
+
+        subject = "test subject"
+        name = "John"
+        message = "just want to say hi"
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": [
+                    {"label": "Message", "value": message},
+                    {"label": "Name", "value": name},
+                ],
+                "subject": subject,
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+        self.assertEqual(response.status_code, 204)
+        msg = self.mailhost.messages[0]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+
+        self.assertIn(f"Subject: {subject}", msg)
+        self.assertIn("From: john@doe.com", msg)
+        self.assertIn("To: site_addr@plone.com", msg)
+        self.assertIn("Reply-To: john@doe.com", msg)
+
+        self.assertIn("<table>", msg)
+        self.assertIn("</table>", msg)
+        # TODO: Is the document title the desired behaviour here? Or should it be the subject of the email
+        self.assertIn(
+            f"<caption>Form submission data for {self.document.title}</caption>", msg
+        )
+        self.assertIn(
+            """<thead>
+      <tr role="row">
+        <th scope="col" role="columnheader">Field</th>
+        <th scope="col" role="columnheader">Value</th>
+      </tr>
+    </thead>""",
+            msg,
+        )
+
+        self.assertIn(
+            """<tr role="row">
+          <th scope="row" role="rowheader">Name</th>""",
+            msg,
+        )
+        self.assertIn(f"<td>{name}</td>", msg)
+        self.assertIn(
+            """<tr role="row">
+          <th scope="row" role="rowheader">""",
+            msg,
+        )
+        self.assertIn(f"<td>{message}</td>", msg)
+
+    def test_email_body_formated_as_list(
+        self,
+    ):
+        self.document.blocks = {
+            "form-id": {"@type": "form", "send": True, "email_format": "list"},
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "John"},
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+        self.assertEqual(response.status_code, 204)
+        msg = self.mailhost.messages[0]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+        self.assertIn("Subject: test subject", msg)
+        self.assertIn("From: john@doe.com", msg)
+        self.assertIn("To: site_addr@plone.com", msg)
+        self.assertIn("Reply-To: john@doe.com", msg)
+        self.assertIn("<strong>Message:</strong> just want to say hi", msg)
+        self.assertIn("<strong>Name:</strong> John", msg)
+
     def test_send_xml(self):
         self.document.blocks = {
             "form-id": {"@type": "form", "send": True, "attachXml": True},
@@ -614,5 +700,5 @@ class TestMailSend(unittest.TestCase):
         msg_contents = parsed_msgs.get_payload()[1].get_payload(decode=True)
         xml_tree = ET.fromstring(msg_contents)
         for index, field in enumerate(xml_tree):
-            self.assertEqual(field.get("name"), form_data[index]['label'])
-            self.assertEqual(field.text, form_data[index]['value'])
+            self.assertEqual(field.get("name"), form_data[index]["label"])
+            self.assertEqual(field.text, form_data[index]["value"])
