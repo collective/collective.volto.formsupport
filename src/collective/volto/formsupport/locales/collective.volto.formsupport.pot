@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2022-09-20 08:23+0000\n"
+"POT-Creation-Date: 2023-05-24 00:33+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,6 +27,10 @@ msgstr ""
 
 #: collective/volto/formsupport/captcha/hcaptcha.py:62
 msgid "HCaptcha Invisible"
+msgstr ""
+
+#: collective/volto/formsupport/captcha/honeypot.py:11
+msgid "Honeypot Support"
 msgstr ""
 
 #: collective/volto/formsupport/configure.zcml:33
@@ -62,32 +66,37 @@ msgid "Volto: Form support (uninstall)"
 msgstr ""
 
 #. Default: "Attachments too big. You uploaded ${uploaded_str}, but limit is ${max} MB. Try to compress files."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:152
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:158
 msgid "attachments_too_big"
 msgstr ""
 
 #. Default: "Block with @type \"form\" and id \"$block\" not found in this context: $context"
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:93
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:99
 msgid "block_form_not_found_label"
 msgstr ""
 
 #. Default: "Empty form data."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:119
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:125
 msgid "empty_form_data"
 msgstr ""
 
+#. Default: "Error submitting form."
+#: collective/volto/formsupport/captcha/honeypot.py:28
+msgid "honeypot_error"
+msgstr ""
+
 #. Default: "Unable to send confirm email. Please retry later or contact site administator."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:66
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:72
 msgid "mail_send_exception"
 msgstr ""
 
 #. Default: "You need to set at least one form action between \"send\" and \"store\"."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:108
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:114
 msgid "missing_action"
 msgstr ""
 
 #. Default: "Missing block_id"
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:86
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:92
 msgid "missing_blockid_label"
 msgstr ""
 
@@ -96,7 +105,12 @@ msgstr ""
 msgid "send_mail_text"
 msgstr ""
 
+#. Default: "Form submission data for ${title}"
+#: collective/volto/formsupport/browser/send_mail_template_table.pt:7
+msgid "send_mail_text_table"
+msgstr ""
+
 #. Default: "Missing required field: subject or from."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:230
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:236
 msgid "send_required_field_missing"
 msgstr ""
