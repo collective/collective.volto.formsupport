@@ -228,10 +228,85 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> John", msg)
 
+    def test_email_sent_with_forwarded_headers(
+        self,
+    ):
+        self.document.blocks = {
+            "form-id": {
+                "@type": "form",
+                "send": True,
+                "httpHeaders": [],
+            },
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "John"},
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+        self.assertEqual(response.status_code, 204)
+        msg = self.mailhost.messages[0]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+        self.assertIn("Subject: test subject", msg)
+        self.assertIn("From: john@doe.com", msg)
+        self.assertIn("To: site_addr@plone.com", msg)
+        self.assertIn("Reply-To: john@doe.com", msg)
+        self.assertIn("<strong>Message:</strong> just want to say hi", msg)
+        self.assertIn("<strong>Name:</strong> John", msg)
+        self.assertNotIn("REMOTE_ADDR", msg)
+
+        self.document.blocks = {
+            "form-id": {
+                "@type": "form",
+                "send": True,
+                "httpHeaders": [
+                    "REMOTE_ADDR",
+                    "PATH_INFO",
+                ],
+            },
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "John"},
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+        self.assertEqual(response.status_code, 204)
+
+        msg = self.mailhost.messages[1]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+        self.assertIn("Subject: test subject", msg)
+        self.assertIn("From: john@doe.com", msg)
+        self.assertIn("To: site_addr@plone.com", msg)
+        self.assertIn("Reply-To: john@doe.com", msg)
+        self.assertIn("<strong>Message:</strong> just want to say hi", msg)
+        self.assertIn("<strong>Name:</strong> John", msg)
+        self.assertIn("REMOTE_ADDR", msg)
+        self.assertIn("PATH_INFO", msg)
+
     def test_email_sent_ignore_passed_recipient(
         self,
     ):
-
         self.document.blocks = {
             "form-id": {
                 "@type": "form",
