@@ -41,12 +41,6 @@ class PostEventService(object):
 
 
 class SubmitPost(Service):
-    email_format_page_template_mapping = {
-        "": "send_mail_template",
-        "list": "send_mail_template",
-        "table": "send_mail_template_table",
-    }
-
     def __init__(self, context, request):
         super(SubmitPost, self).__init__(context, request)
 
@@ -284,22 +278,13 @@ class SubmitPost(Service):
             self.send_mail(msg=msg, charset=charset)
 
     def prepare_message(self):
+        email_format_page_template_mapping = {
+            "list": "send_mail_template",
+            "table": "send_mail_template_table",
+        }
         email_format = self.block.get("email_format", "")
-        template_name = self.email_format_page_template_mapping.get(email_format, "send_mail_template")
-
-        if not template_name:
-            # TODO: Actual i18n instead of placeholders here
-            # TODO: Display what format is currently selected
-            raise BadRequest(
-                translate(
-                    _(
-                        "missing_template_for_email_format",
-                        default="Missing email template for selected format",
-                    ),
-                    context=self.request,
-                )
-            )
-
+        template_name = email_format_page_template_mapping.get(email_format, 'send_mail_template')
+ 
         message_template = api.content.get_view(
             name=template_name,
             context=self.context,
