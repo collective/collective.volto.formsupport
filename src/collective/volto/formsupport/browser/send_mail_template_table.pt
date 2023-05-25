@@ -3,7 +3,7 @@
   define="parameters python:options.get('parameters', {});
             url python:options.get('url', '');
             title python:options.get('title', '');">
-  <table>
+  <table border="1">
     <caption i18n:translate="send_mail_text_table">Form submission data for ${title}</caption>
     <thead>
       <tr role="row">
