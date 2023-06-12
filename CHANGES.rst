@@ -10,7 +10,8 @@ Changelog
   [JeffersonBledsoe]
 - Add Spanish translation.
   [macagua]
-
+- Add German translation.
+  [mbarde]
 - Allow forwarding request headers in the sent emails #27
   [JeffersonBledsoe]
 - Added support for sending emails as a table #31
