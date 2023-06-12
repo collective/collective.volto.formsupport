@@ -6,6 +6,7 @@ Changelog
 
 - Allow forwarding request headers in the sent emails #27
   [JeffersonBledsoe]
+- Add German translation. [mbarde]
 
 
 2.7.0 (2023-04-03)
