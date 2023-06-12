@@ -60,7 +60,15 @@ class FormDataStore(object):
                 form_block = deepcopy(block)
         if not form_block:
             return {}
-        return form_block.get("subblocks", [])
+
+        subblocks = form_block.get("subblocks", [])
+
+        # Add the 'custom_field_id' field back in as this isn't stored with each subblock
+        for index, field in enumerate(subblocks):
+            if form_block.get(field["field_id"]):
+                subblocks[index]["custom_field_id"] = form_block.get(field["field_id"])
+
+        return subblocks
 
     def add(self, data):
         form_fields = self.get_form_fields()
@@ -72,7 +80,10 @@ class FormDataStore(object):
             )
             return None
 
-        fields = {x["field_id"]: x.get("label", x["field_id"]) for x in form_fields}
+        fields = {
+            x["field_id"]: x.get("custom_field_id", x.get("label", x["field_id"]))
+            for x in form_fields
+        }
         record = Record()
         fields_labels = {}
         fields_order = []
