@@ -293,7 +293,7 @@ class SubmitPost(Service):
             request=self.request,
         )
         parameters = {
-            "parameters": self.filter_parameters(),
+            "parameters": self.format_fields(self.filter_parameters()),
             "url": self.context.absolute_url(),
             "title": self.context.Title(),
         }
@@ -313,6 +313,20 @@ class SubmitPost(Service):
             for x in self.form_data.get("data", [])
             if x.get("field_id", "") not in skip_fields
         ]
+
+    def format_fields(self, fields):
+        formatted_fields = []
+        field_ids = [field.get("field_id") for field in self.block.get("subblocks", [])]
+        for field in fields:
+            field_id = field.get("field_id", "")
+            field_index = field_ids.index(field_id)
+            if self.block["subblocks"][field_index].get("field_type") == "date":
+                field["value"] = api.portal.get_localized_time(field["value"])
+            import pdb
+
+            pdb.set_trace()
+            formatted_fields.append(field)
+        return formatted_fields
 
     def send_mail(self, msg, charset):
         host = api.portal.get_tool(name="MailHost")
