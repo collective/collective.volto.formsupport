@@ -322,9 +322,6 @@ class SubmitPost(Service):
             field_index = field_ids.index(field_id)
             if self.block["subblocks"][field_index].get("field_type") == "date":
                 field["value"] = api.portal.get_localized_time(field["value"])
-            import pdb
-
-            pdb.set_trace()
             formatted_fields.append(field)
         return formatted_fields
 
