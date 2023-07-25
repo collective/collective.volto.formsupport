@@ -737,7 +737,7 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("To: site_addr@plone.com", msg)
         self.assertIn("Reply-To: john@doe.com", msg)
 
-        self.assertIn("<table>", msg)
+        self.assertIn("""<table border="1">""", msg)
         self.assertIn("</table>", msg)
         self.assertIn(
             f"<caption>Form submission data for {self.document.title}</caption>", msg
