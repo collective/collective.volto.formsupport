@@ -4,6 +4,9 @@ from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
 from six import StringIO
 from zope.component import getMultiAdapter
+from zope.component import getUtility
+from plone.i18n.normalizer.interfaces import IIDNormalizer
+from datetime import datetime
 
 import csv
 import six
@@ -30,6 +33,17 @@ class FormDataExportGet(Service):
                 field_id = field["field_id"]
                 self.form_fields_order.append(field_id)
 
+    def get_export_filename(self):
+        title = self.form_block.get("title", "")
+        filename = ""
+        if not title:
+            filename = "export-form"
+        else:
+            normalizer = getUtility(IIDNormalizer)
+            filename = normalizer.normalize(title)
+        now = datetime.now().strftime("%Y%m%dT%H%M")
+        return f"{filename}-{now}.csv"
+
     def get_ordered_keys(self, record):
         """
         We need this method because we want to maintain the fields order set in the form.
@@ -51,10 +65,9 @@ class FormDataExportGet(Service):
 
     def render(self):
         self.check_permission()
-
         self.request.response.setHeader(
             "Content-Disposition",
-            'attachment; filename="{0}.csv"'.format(self.__name__),
+            f'attachment; filename="{self.get_export_filename()}"',
         )
         self.request.response.setHeader("Content-Type", "text/comma-separated-values")
         data = self.get_data()
