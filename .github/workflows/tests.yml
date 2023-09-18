@@ -9,7 +9,7 @@ jobs:
       max-parallel: 4
       matrix:
         python: ["3.8", "3.9", "3.10", "3.11"]
-        plone: ["52", "60]
+        plone: ["52", "60"]
         exclude:
            - python: "3.9"
              plone: "52"
