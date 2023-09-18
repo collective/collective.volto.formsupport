@@ -51,7 +51,6 @@ class TestSetup(unittest.TestCase):
 
 
 class TestUninstall(unittest.TestCase):
-
     layer = VOLTO_FORMSUPPORT_INTEGRATION_TESTING
 
     def setUp(self):
