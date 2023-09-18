@@ -19,7 +19,6 @@ import os
 
 
 class TestBlockSerialization(unittest.TestCase):
-
     layer = VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING
 
     def setUp(self):
@@ -74,7 +73,6 @@ class TestBlockSerialization(unittest.TestCase):
 
 
 class TestBlockSerializationRecaptcha(unittest.TestCase):
-
     layer = VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING
 
     def setUp(self):
@@ -131,7 +129,6 @@ class TestBlockSerializationRecaptcha(unittest.TestCase):
 
 
 class TestBlockSerializationHCaptcha(unittest.TestCase):
-
     layer = VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING
 
     def setUp(self):
@@ -188,7 +185,6 @@ class TestBlockSerializationHCaptcha(unittest.TestCase):
 
 
 class TestBlockSerializationAttachmentsLimit(unittest.TestCase):
-
     layer = VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING
 
     def setUp(self):
