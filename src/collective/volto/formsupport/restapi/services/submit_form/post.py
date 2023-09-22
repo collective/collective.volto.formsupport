@@ -308,18 +308,6 @@ class SubmitPost(Service):
             for x in self.block.get("subblocks", [])
             if x.get("field_type", "") == "attachment"
         ]
-
-        for field in self.form_data.get("data"):
-            for block_field in self.block.get("subblocks", []):
-                if block_field["field_id"] == field["field_id"] and block_field.get(
-                    "internal_value"
-                ):
-                    field["label"] = [
-                        k
-                        for k, v in block_field.get("internal_value").items()
-                        if v == field["value"]
-                    ][0]
-
         return [
             x
             for x in self.form_data.get("data", [])
