@@ -31,7 +31,7 @@ class YesNoField(Field):
             if self.submitted_value is True:
                 return self.internal_value.get("yes")
             elif self.submitted_value is False:
-                return self.internal_value.get("yes")
+                return self.internal_value.get("no")
         return self.submitted_value
 
     @property
