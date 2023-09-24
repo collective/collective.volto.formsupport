@@ -8,11 +8,11 @@ class Field:
     field_type: str
     id: str
     label: str
-    required: str
     show_when_when: str
     submitted_value: Any
     input_values: Optional[List[dict]] = None
     internal_value: Optional[dict] = None
+    required: Optional[str] = None
     widget: Optional[str] = None
 
     def get_display_value(self):
