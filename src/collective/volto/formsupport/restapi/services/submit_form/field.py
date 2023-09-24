@@ -9,7 +9,7 @@ class Field:
     id: str
     label: str
     show_when_when: str
-    submitted_value: Any
+    value: Any
     input_values: Optional[List[dict]] = None
     internal_value: Optional[dict] = None
     required: Optional[str] = None
@@ -17,8 +17,8 @@ class Field:
 
     def get_display_value(self):
         if self.internal_value:
-            return self.internal_value.get(self.submitted_value, self.submitted_value)
-        return self.submitted_value
+            return self.internal_value.get(self.value, self.value)
+        return self.value
 
     @property
     def send_in_email(self):
@@ -28,11 +28,11 @@ class Field:
 class YesNoField(Field):
     def get_display_value(self):
         if self.internal_value:
-            if self.submitted_value is True:
+            if self.value is True:
                 return self.internal_value.get("yes")
-            elif self.submitted_value is False:
+            elif self.value is False:
                 return self.internal_value.get("no")
-        return self.submitted_value
+        return self.value
 
     @property
     def send_in_email(self):
