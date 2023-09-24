@@ -147,9 +147,7 @@ class SubmitPost(Service):
         for field in self.block.get("subblocks", []):
             for submitted_field in self.form_data.get("data", []):
                 if field.get("id") == submitted_field.get("field_id"):
-                    fields_data.append(
-                        {**field, "value": submitted_field.get("value")}
-                    )
+                    fields_data.append({**field, "value": submitted_field.get("value")})
 
         self.fields = construct_fields(fields_data)
 
@@ -318,9 +316,6 @@ class SubmitPost(Service):
         """
         do not send attachments fields.
         """
-        for field in self.fields:
-            field.value = field.get_display_value()
-
         return [field for field in self.fields if field.send_in_email]
 
     def send_mail(self, msg, charset):

@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, InitVar
 from typing import List, Optional, Any
 
 
@@ -9,16 +9,25 @@ class Field:
     id: str
     label: str
     show_when_when: str
-    value: Any
+    value: InitVar[Any]
+    _value: Any = None
     input_values: Optional[List[dict]] = None
     internal_value: Optional[dict] = None
     required: Optional[str] = None
     widget: Optional[str] = None
 
-    def get_display_value(self):
+    def __post_init__(self, value):
+        self._value = value
+
+    @property
+    def value(self):
         if self.internal_value:
-            return self.internal_value.get(self.value, self.value)
-        return self.value
+            return self.internal_value.get(self._value, self._value)
+        return self._value
+
+    @value.setter
+    def value(self, value):
+        self._value = value
 
     @property
     def send_in_email(self):
@@ -26,13 +35,14 @@ class Field:
 
 
 class YesNoField(Field):
-    def get_display_value(self):
+    @property
+    def value(self):
         if self.internal_value:
-            if self.value is True:
+            if self._value is True:
                 return self.internal_value.get("yes")
-            elif self.value is False:
+            elif self._value is False:
                 return self.internal_value.get("no")
-        return self.value
+        return self._value
 
     @property
     def send_in_email(self):
