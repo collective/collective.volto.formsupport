@@ -24,7 +24,6 @@ def event_handler(event):
 
 
 class TestEvent(unittest.TestCase):
-
     layer = VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING
 
     def setUp(self):
@@ -91,7 +90,6 @@ class TestEvent(unittest.TestCase):
     def test_trigger_event(
         self,
     ):
-
         self.document.blocks = {
             "text-id": {"@type": "text"},
             "form-id": {

@@ -15,7 +15,6 @@ import plone.restapi
 
 
 class VoltoFormsupportLayer(PloneSandboxLayer):
-
     defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
@@ -48,7 +47,6 @@ VOLTO_FORMSUPPORT_FUNCTIONAL_TESTING = FunctionalTesting(
 
 
 class VoltoFormsupportRestApiLayer(PloneRestApiDXLayer):
-
     defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
