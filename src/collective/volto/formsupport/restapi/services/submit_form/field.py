@@ -6,27 +6,38 @@ class Field:
         _attribute("field_id")
         _attribute("field_type")
         _attribute("id")
-        _attribute("label")
         _attribute("show_when_when")
         _attribute("show_when_is")
         _attribute("show_when_to")
         _attribute("input_values")
-        _attribute("dislpay_value_mapping")
         _attribute("required")
         _attribute("widget")
         _attribute("use_as_reply_to")
         _attribute("use_as_reply_bcc")
+        self._dislpay_value_mapping = field_data.get("dislpay_value_mapping")
         self._value = field_data.get("value")
+        self._custom_field_id = field_data.get("custom_field_id")
+        self._label = field_data.get("label")
 
     @property
     def value(self):
-        if self.dislpay_value_mapping:
-            return self.dislpay_value_mapping.get(self._value, self._value)
+        if self._dislpay_value_mapping:
+            return self._dislpay_value_mapping.get(self._value, self._value)
         return self._value
 
     @value.setter
     def value(self, value):
         self._value = value
+
+    @property
+    def label(self):
+        if self._custom_field_id:
+            return self._custom_field_id
+        return self._label
+
+    @label.setter
+    def label(self, label):
+        self._label = label
 
     @property
     def send_in_email(self):
@@ -36,11 +47,11 @@ class Field:
 class YesNoField(Field):
     @property
     def value(self):
-        if self.dislpay_value_mapping:
+        if self._dislpay_value_mapping:
             if self._value is True:
-                return self.dislpay_value_mapping.get("yes")
+                return self._dislpay_value_mapping.get("yes")
             elif self._value is False:
-                return self.dislpay_value_mapping.get("no")
+                return self._dislpay_value_mapping.get("no")
         return self._value
 
     @property
