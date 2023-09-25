@@ -677,6 +677,7 @@ class TestMailSend(unittest.TestCase):
         form_data = [
             {"label": "Message", "value": "just want to say hi"},
             {"label": "Name", "value": "John"},
+            {"label": "Name", "value": "Test", "custom_field_id": "My custom field id"},
         ]
 
         response = self.submit_form(
@@ -699,5 +700,9 @@ class TestMailSend(unittest.TestCase):
         msg_contents = parsed_msgs.get_payload()[1].get_payload(decode=True)
         xml_tree = ET.fromstring(msg_contents)
         for index, field in enumerate(xml_tree):
-            self.assertEqual(field.get("name"), form_data[index]["label"])
+            custom_field_id = form_data[index].get("custom_field_id")
+            self.assertEqual(
+                field.get("name"),
+                custom_field_id if custom_field_id else form_data[index]["label"],
+            )
             self.assertEqual(field.text, form_data[index]["value"])
