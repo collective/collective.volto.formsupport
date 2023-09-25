@@ -1,28 +1,27 @@
-from dataclasses import dataclass, InitVar
-from typing import List, Optional, Any
-
-
-@dataclass
 class Field:
-    field_id: str
-    field_type: str
-    id: str
-    label: str
-    show_when_when: str
-    value: InitVar[Any]
-    _value: Any = None
-    input_values: Optional[List[dict]] = None
-    internal_value: Optional[dict] = None
-    required: Optional[str] = None
-    widget: Optional[str] = None
+    def __init__(self, field_data):
+        def _attribute(attribute_name):
+            setattr(self, attribute_name, field_data.get(attribute_name))
 
-    def __post_init__(self, value):
-        self._value = value
+        _attribute("field_id")
+        _attribute("field_type")
+        _attribute("id")
+        _attribute("label")
+        _attribute("show_when_when")
+        _attribute("show_when_is")
+        _attribute("show_when_to")
+        _attribute("input_values")
+        _attribute("dislpay_value_mapping")
+        _attribute("required")
+        _attribute("widget")
+        _attribute("use_as_reply_to")
+        _attribute("use_as_reply_bcc")
+        self._value = field_data.get("value")
 
     @property
     def value(self):
-        if self.internal_value:
-            return self.internal_value.get(self._value, self._value)
+        if self.dislpay_value_mapping:
+            return self.dislpay_value_mapping.get(self._value, self._value)
         return self._value
 
     @value.setter
@@ -37,11 +36,11 @@ class Field:
 class YesNoField(Field):
     @property
     def value(self):
-        if self.internal_value:
+        if self.dislpay_value_mapping:
             if self._value is True:
-                return self.internal_value.get("yes")
+                return self.dislpay_value_mapping.get("yes")
             elif self._value is False:
-                return self.internal_value.get("no")
+                return self.dislpay_value_mapping.get("no")
         return self._value
 
     @property
@@ -57,11 +56,11 @@ class AttachmentField(Field):
 
 def construct_field(field_data):
     if field_data.get("widget") == "single_choice":
-        return YesNoField(**field_data)
+        return YesNoField(field_data)
     elif field_data.get("field_type") == "attachment":
-        return AttachmentField(**field_data)
+        return AttachmentField(field_data)
 
-    return Field(**field_data)
+    return Field(field_data)
 
 
 def construct_fields(fields):

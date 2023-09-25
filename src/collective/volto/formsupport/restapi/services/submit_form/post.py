@@ -66,6 +66,32 @@ class SubmitPost(Service):
 
         notify(PostEventService(self.context, self.form_data))
 
+        # Construct self.fieldss
+        fields_data = []
+        for submitted_field in self.form_data.get("data", []):
+            # TODO: Review if fields submitted without a field_id should be included. Is breaking change if we remove it
+            if submitted_field.get("field_id") is None:
+                fields_data.append(
+                    {
+                        "value": submitted_field.get("value"),
+                        "label": submitted_field.get("label"),
+                    }
+                )
+                continue
+            for field in self.block.get("subblocks", []):
+                if field.get("id") == submitted_field.get("field_id"):
+                    fields_data.append(
+                        {
+                            **field,
+                            "value": submitted_field.get("value"),
+                            "label": submitted_field.get("label", field.get("label")),
+                            "dislpay_value_mapping": field.get(
+                                "internal_value"  # TODO: Rename frontend property passed in, internal_value doens't make sense
+                            ),
+                        }
+                    )
+        self.fields = construct_fields(fields_data)
+
         if send_action:
             try:
                 self.send_data()
@@ -142,14 +168,6 @@ class SubmitPost(Service):
                 ICaptchaSupport,
                 name=self.block["captcha"],
             ).verify(self.form_data.get("captcha"))
-
-        fields_data = []
-        for field in self.block.get("subblocks", []):
-            for submitted_field in self.form_data.get("data", []):
-                if field.get("id") == submitted_field.get("field_id"):
-                    fields_data.append({**field, "value": submitted_field.get("value")})
-
-        self.fields = construct_fields(fields_data)
 
     def validate_attachments(self):
         attachments_limit = os.environ.get("FORM_ATTACHMENTS_LIMIT", "")
