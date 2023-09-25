@@ -18,9 +18,7 @@ class NoRobotsSupport(CaptchaSupport):
     def __init__(self, context, request):
         super().__init__(context, request)
         registry = queryUtility(IRegistry)
-        self.settings = registry.forInterface(
-            INorobotsWidgetSettings, check=False
-        )
+        self.settings = registry.forInterface(INorobotsWidgetSettings, check=False)
 
     def isEnabled(self):
         return self.settings and self.settings.questions
@@ -66,9 +64,7 @@ class NoRobotsSupport(CaptchaSupport):
         if not view.verify(input=value, question_id=id, id_check=id_check):
             raise BadRequest(
                 translate(
-                    _(
-                        "The code you entered was wrong, please enter the new one."
-                    ),
+                    _("The code you entered was wrong, please enter the new one."),
                     context=self.request,
                 )
             )

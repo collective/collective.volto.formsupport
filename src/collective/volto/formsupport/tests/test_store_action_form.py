@@ -19,7 +19,6 @@ import unittest
 
 
 class TestMailSend(unittest.TestCase):
-
     layer = VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING
 
     def setUp(self):
