@@ -80,16 +80,13 @@ class FormDataStore(object):
             )
             return None
 
-        fields = {
-            x["field_id"]: x.get("custom_field_id", x.get("label", x["field_id"]))
-            for x in form_fields
-        }
+        fields = {x["field_id"]: x["label"] for x in form_fields}
         record = Record()
         fields_labels = {}
         fields_order = []
         for field_data in data:
-            field_id = field_data.get("field_id", "")
-            value = field_data.get("value", "")
+            field_id = field_data.field_id
+            value = field_data.value
             if field_id in fields:
                 record.attrs[field_id] = value
                 fields_labels[field_id] = fields[field_id]
