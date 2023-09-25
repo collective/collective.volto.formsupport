@@ -27,6 +27,7 @@ lib64
 log.html
 output.xml
 pip-selfcheck.json
+.coverage
 report.html
 .vscode/
 .tox/

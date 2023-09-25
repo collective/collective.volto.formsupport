@@ -8,11 +8,15 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python: ["3.9"]
-        plone: ["52"]
-        # exclude:
-        #   - python: "3.7"
-        #     plone: "51"
+        python: ["3.8", "3.9", "3.10", "3.11"]
+        plone: ["52", "60"]
+        exclude:
+           - python: "3.9"
+             plone: "52"
+           - python: "3.10"
+             plone: "52"
+           - python: "3.11"
+             plone: "52"
     steps:
       - uses: actions/checkout@v3
       - name: Cache eggs
@@ -36,8 +40,7 @@ jobs:
           bin/code-analysis
       - name: Run tests
         run: |
-          bin/test
-          # bin/test-coverage
+            bin/test-coverage
       - name: createcoverage
         run: |
             bin/createcoverage -t '--all'

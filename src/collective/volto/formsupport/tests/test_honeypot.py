@@ -18,7 +18,6 @@ import json
 
 
 class TestHoneypot(unittest.TestCase):
-
     layer = VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING
 
     def setUp(self):
@@ -72,7 +71,6 @@ class TestHoneypot(unittest.TestCase):
         return response
 
     def test_honeypot_installed_but_field_not_in_form(self):
-
         self.document.blocks = {
             "text-id": {"@type": "text"},
             "form-id": {
@@ -107,7 +105,6 @@ class TestHoneypot(unittest.TestCase):
         )
 
     def test_honeypot_field_in_form_empty_pass_validation(self):
-
         self.document.blocks = {
             "text-id": {"@type": "text"},
             "form-id": {
@@ -138,7 +135,6 @@ class TestHoneypot(unittest.TestCase):
         self.assertEqual(response.status_code, 204)
 
     def test_honeypot_field_in_form_compiled_fail_validation(self):
-
         self.document.blocks = {
             "text-id": {"@type": "text"},
             "form-id": {
