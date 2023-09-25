@@ -33,7 +33,7 @@ class Field:
     def label(self):
         if self._custom_field_id:
             return self._custom_field_id
-        return self._label
+        return self._label if self._label else self.field_id
 
     @label.setter
     def label(self, label):
