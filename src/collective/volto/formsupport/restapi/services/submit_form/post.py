@@ -74,7 +74,9 @@ class SubmitPost(Service):
                 fields_data.append(submitted_field)
                 continue
             for field in self.block.get("subblocks", []):
-                if field.get("id") == submitted_field.get("field_id"):
+                if field.get("id", field.get("field_id")) == submitted_field.get(
+                    "field_id"
+                ):
                     fields_data.append(
                         {
                             **field,
