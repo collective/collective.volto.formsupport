@@ -122,6 +122,7 @@ class TestMailSend(unittest.TestCase):
                         "label": "Name",
                         "field_id": "name",
                         "field_type": "text",
+                        "internal_value": "Custom name",
                     },
                 ],
             },
@@ -267,6 +268,67 @@ class TestMailSend(unittest.TestCase):
                         "field_id": "test-field",
                         "label": "Test field",
                         "field_type": "text",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": [
+                    {"field_id": "message", "value": "just want to say hi"},
+                    {"field_id": "test-field", "value": "John"},
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+
+        response = self.submit_form(
+            data={
+                "from": "sally@doe.com",
+                "data": [
+                    {"field_id": "message", "value": "bye"},
+                    {"field_id": "test-field", "value": "Sally"},
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+
+        self.assertEqual(response.status_code, 204)
+        response = self.export_csv()
+        data = [*csv.reader(StringIO(response.text), delimiter=",")]
+        self.assertEqual(len(data), 3)
+        # Check that 'test-field' got renamed
+        self.assertEqual(data[0], ["Message", "renamed-field", "date"])
+        sorted_data = sorted(data[1:])
+        self.assertEqual(sorted_data[0][:-1], ["bye", "Sally"])
+        self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John"])
+
+        # check date column. Skip seconds because can change during test
+        now = datetime.utcnow().strftime("%Y-%m-%dT%H:%M")
+        self.assertTrue(sorted_data[0][-1].startswith(now))
+        self.assertTrue(sorted_data[1][-1].startswith(now))
+
+    def test_display_values(self):
+        self.document.blocks = {
+            "form-id": {
+                "@type": "form",
+                "store": True,
+                "test-field": "renamed-field",
+                "subblocks": [
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "field_type": "text",
+                    },
+                    {
+                        "field_id": "test-field",
+                        "label": "Test field",
+                        "field_type": "text",
+                        "internal_value": {"John": "Paul", "Sally": "Jack"},
                     },
                 ],
             },
