@@ -82,7 +82,7 @@ class SubmitPost(Service):
                             **field,
                             **submitted_field,
                             "dislpay_value_mapping": field.get(
-                                "internal_value"  # TODO: Rename frontend property passed in, internal_value doens't make sense
+                                "display_values"
                             ),
                         }
                     )
