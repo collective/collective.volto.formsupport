@@ -679,7 +679,7 @@ class TestMailSend(unittest.TestCase):
                 "subblocks": [
                     {
                         "field_id": "12345678",
-                        "internal_value": {"John": "Paul"},
+                        "display_values": {"John": "Paul"},
                     },
                 ],
             }
