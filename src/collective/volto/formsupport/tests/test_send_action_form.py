@@ -12,19 +12,22 @@ from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
 from six import StringIO
-import xml.etree.ElementTree as ET
 from zope.component import getUtility
 
-import transaction
-import unittest
 import base64
 import os
+import transaction
+import unittest
+import xml.etree.ElementTree as ET
 
 
 class TestMailSend(unittest.TestCase):
     layer = VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING
 
     def setUp(self):
+        import ZPublisher.HTTPRequest
+        ZPublisher.HTTPRequest.FORM_MEMORY_LIMIT = 2 ** 40
+
         self.app = self.layer["app"]
         self.portal = self.layer["portal"]
         self.portal_url = self.portal.absolute_url()
@@ -65,6 +68,9 @@ class TestMailSend(unittest.TestCase):
         }
 
         os.environ["FORM_ATTACHMENTS_LIMIT"] = ""
+
+        import ZPublisher.HTTPRequest
+        ZPublisher.HTTPRequest.FORM_MEMORY_LIMIT = 2 ** 20
 
         transaction.commit()
 
@@ -531,6 +537,7 @@ class TestMailSend(unittest.TestCase):
     def test_send_attachment_validate_size(
         self,
     ):
+
         os.environ["FORM_ATTACHMENTS_LIMIT"] = "1"
         self.document.blocks = {
             "text-id": {"@type": "text"},
