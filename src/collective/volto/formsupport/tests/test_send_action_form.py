@@ -25,8 +25,8 @@ class TestMailSend(unittest.TestCase):
     layer = VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING
 
     def setUp(self):
-        import ZPublisher.HTTPRequest
-        ZPublisher.HTTPRequest.FORM_MEMORY_LIMIT = 2 ** 40
+        # import ZPublisher.HTTPRequest
+        # ZPublisher.HTTPRequest.FORM_MEMORY_LIMIT = 2 ** 40
 
         self.app = self.layer["app"]
         self.portal = self.layer["portal"]
@@ -69,8 +69,8 @@ class TestMailSend(unittest.TestCase):
 
         os.environ["FORM_ATTACHMENTS_LIMIT"] = ""
 
-        import ZPublisher.HTTPRequest
-        ZPublisher.HTTPRequest.FORM_MEMORY_LIMIT = 2 ** 20
+        # import ZPublisher.HTTPRequest
+        # ZPublisher.HTTPRequest.FORM_MEMORY_LIMIT = 2 ** 20
 
         transaction.commit()
 
