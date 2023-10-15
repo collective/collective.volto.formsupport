@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from collective.volto.formsupport import logger
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.utils import get_blocks
 from copy import deepcopy
@@ -12,14 +13,12 @@ from Products.CMFPlone.interfaces.siteroot import IPloneSiteRoot
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.indexes.field import CatalogFieldIndex
 from souper.interfaces import ICatalogFactory
-from souper.soup import get_soup, NodeAttributeIndexer, Record
-from zope.component import adapter, getUtility
-from zope.interface import implementer, Interface
-
-import logging
-
-
-logger = logging.getLogger(__name__)
+from souper.soup import get_soup
+from souper.soup import NodeAttributeIndexer
+from souper.soup import Record
+from zope.component import adapter
+from zope.interface import implementer
+from zope.interface import Interface
 
 
 @implementer(ICatalogFactory)
@@ -28,7 +27,7 @@ class FormDataSoupCatalogFactory(object):
         #  do not set any index here..maybe on each form
         catalog = Catalog()
         block_id_indexer = NodeAttributeIndexer("block_id")
-        catalog[u"block_id"] = CatalogFieldIndex(block_id_indexer)
+        catalog["block_id"] = CatalogFieldIndex(block_id_indexer)
         return catalog
 
 
@@ -65,7 +64,15 @@ class FormDataStore(object):
                 form_block = deepcopy(block)
         if not form_block:
             return {}
-        return form_block.get("subblocks", [])
+
+        subblocks = form_block.get("subblocks", [])
+
+        # Add the 'custom_field_id' field back in as this isn't stored with each subblock
+        for index, field in enumerate(subblocks):
+            if form_block.get(field["field_id"]):
+                subblocks[index]["custom_field_id"] = form_block.get(field["field_id"])
+
+        return subblocks
 
     def add(self, data):
         form_fields = self.get_form_fields()
@@ -77,20 +84,22 @@ class FormDataStore(object):
             )
             return None
 
-        form_ids = [x.get("field_id", "") for x in form_fields]
+        fields = {
+            x["field_id"]: x.get("custom_field_id", x.get("label", x["field_id"]))
+            for x in form_fields
+        }
         record = Record()
-        # record.attrs["metadata"] = {}
-        normalizer = getUtility(IIDNormalizer)
-        for field in data:
-            field_id = field.get("field_id", "")
-            id = normalizer.normalize(field.get("label", ""))
-            value = field.get("value", "")
-            if field_id in form_ids:
-                record.attrs[id] = value
-                # record.attrs["metadata"][id] = {
-                #     "field_id": field_id,
-                #     "label": field.get("label", ""),
-                # }
+        fields_labels = {}
+        fields_order = []
+        for field_data in data:
+            field_id = field_data.get("field_id", "")
+            value = field_data.get("value", "")
+            if field_id in fields:
+                record.attrs[field_id] = value
+                fields_labels[field_id] = fields[field_id]
+                fields_order.append(field_id)
+        record.attrs["fields_labels"] = fields_labels
+        record.attrs["fields_order"] = fields_order
         record.attrs["date"] = datetime.now()
         record.attrs["block_id"] = self.block_id
         return self.soup.add(record)

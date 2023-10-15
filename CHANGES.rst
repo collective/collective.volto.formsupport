@@ -1,10 +1,91 @@
 Changelog
 =========
 
-2.0.4 (unreleased)
+2.7.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Allow attaching an XML version of the form data to the sent email #22
+  [JeffersonBledsoe]
+- Allow the IDs of fields to be customised for CSV download and XML attaachments #22
+  [JeffersonBledsoe]
+- Add Spanish translation.
+  [macagua]
+- Add German translation.
+  [mbarde]
+- Allow forwarding request headers in the sent emails #27
+  [JeffersonBledsoe]
+- Added support for sending emails as a table #31
+  [JeffersonBledsoe]
+
+
+2.7.0 (2023-04-03)
+------------------
+
+- Override content-transfer-encoding using `MAIL_CONTENT_TRANSFER_ENCODING` env
+  [mamico]
+- The form block can now be stored in a Volto block container (columns,
+  accordion, tabs, etc)
+  [tiberiuichim]
+
+
+2.6.2 (2022-11-07)
+------------------
+
+- Fix collective.honeypot version.
+  [cekk]
+
+2.6.1 (2022-11-07)
+------------------
+
+- Fix dependencies.
+  [cekk]
+
+2.6.0 (2022-11-07)
+------------------
+
+- Add collective.honeypot support.
+  [cekk]
+
+
+2.5.0 (2022-10-04)
+------------------
+
+- Add limit attachments validation. Can be configured with environment variable.
+  [cekk]
+- Export also compiling date in csv.
+  [cekk]
+
+2.4.0 (2022-09-08)
+------------------
+
+- Add collective.z3cform.norobots support
+  [erral]
+
+2.3.0 (2022-05-26)
+------------------
+
+- Breaking change: changed the way to store data keys. Now we use field_id as key for Records.
+  [cekk]
+- Fix quoting in csv export.
+  [cekk]
+- Generate csv columns with proper field labels, and keep the form order.
+  [cekk]
+- Captcha support #13.
+  [mamico]
+
+
+2.2.0 (2022-04-07)
+------------------
+
+- Notify an event on sumbit.
+  [mamico]
+
+
+2.1.0 (2022-03-25)
+------------------
+
+- Support for user_as_bcc field in volto-form-block: send a separate mail for each email field with that flag.
+  [cekk]
 
 
 2.0.3 (2021-10-25)

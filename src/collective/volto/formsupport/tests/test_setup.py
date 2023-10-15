@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 """Setup tests for this package."""
-from collective.volto.formsupport.testing import (
-    VOLTO_FORMSUPPORT_INTEGRATION_TESTING,  # noqa: E501,
+from collective.volto.formsupport.testing import (  # noqa: E501,
+    VOLTO_FORMSUPPORT_INTEGRATION_TESTING,
 )
 from plone import api
-from plone.app.testing import setRoles, TEST_USER_ID
+from plone.app.testing import setRoles
+from plone.app.testing import TEST_USER_ID
 
 import unittest
 
@@ -30,9 +31,14 @@ class TestSetup(unittest.TestCase):
 
     def test_product_installed(self):
         """Test if collective.volto.formsupport is installed."""
-        self.assertTrue(
-            self.installer.isProductInstalled("collective.volto.formsupport")
-        )
+        if hasattr(self.installer, "isProductInstalled"):
+            self.assertTrue(
+                self.installer.isProductInstalled("collective.volto.formsupport")
+            )
+        else:  # plone 6
+            self.assertTrue(
+                self.installer.is_product_installed("collective.volto.formsupport")
+            )
 
     def test_browserlayer(self):
         """Test that ICollectiveVoltoFormsupportLayer is registered."""
@@ -41,13 +47,10 @@ class TestSetup(unittest.TestCase):
         )
         from plone.browserlayer import utils
 
-        self.assertIn(
-            ICollectiveVoltoFormsupportLayer, utils.registered_layers()
-        )
+        self.assertIn(ICollectiveVoltoFormsupportLayer, utils.registered_layers())
 
 
 class TestUninstall(unittest.TestCase):
-
     layer = VOLTO_FORMSUPPORT_INTEGRATION_TESTING
 
     def setUp(self):
@@ -58,14 +61,22 @@ class TestUninstall(unittest.TestCase):
             self.installer = api.portal.get_tool("portal_quickinstaller")
         roles_before = api.user.get_roles(TEST_USER_ID)
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
-        self.installer.uninstallProducts(["collective.volto.formsupport"])
+        if hasattr(self.installer, "uninstallProducts"):
+            self.installer.uninstallProducts(["collective.volto.formsupport"])
+        else:  # plone6
+            self.installer.uninstall_product("collective.volto.formsupport")
         setRoles(self.portal, TEST_USER_ID, roles_before)
 
     def test_product_uninstalled(self):
         """Test if collective.volto.formsupport is cleanly uninstalled."""
-        self.assertFalse(
-            self.installer.isProductInstalled("collective.volto.formsupport")
-        )
+        if hasattr(self.installer, "isProductInstalled"):
+            self.assertFalse(
+                self.installer.isProductInstalled("collective.volto.formsupport")
+            )
+        else:  # plone 6
+            self.assertFalse(
+                self.installer.is_product_installed("collective.volto.formsupport")
+            )
 
     def test_browserlayer_removed(self):
         """Test that ICollectiveVoltoFormsupportLayer is removed."""
@@ -74,6 +85,4 @@ class TestUninstall(unittest.TestCase):
         )
         from plone.browserlayer import utils
 
-        self.assertNotIn(
-            ICollectiveVoltoFormsupportLayer, utils.registered_layers()
-        )
+        self.assertNotIn(ICollectiveVoltoFormsupportLayer, utils.registered_layers())

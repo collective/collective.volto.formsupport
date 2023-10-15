@@ -16,7 +16,7 @@ long_description = "\n\n".join(
 
 setup(
     name="collective.volto.formsupport",
-    version="2.0.4.dev0",
+    version="2.7.1.dev0",
     description="Add support for customizable forms in Volto",
     long_description=long_description,
     # Get more from https://pypi.org/classifiers/
@@ -26,8 +26,9 @@ setup(
         "Framework :: Plone :: Addon",
         "Framework :: Plone :: 5.2",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Operating System :: OS Independent",
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
     ],
@@ -39,7 +40,6 @@ setup(
         "PyPI": "https://pypi.python.org/pypi/collective.volto.formsupport",
         "Source": "https://github.com/collective/collective.volto.formsupport",
         "Tracker": "https://github.com/collective/collective.volto.formsupport/issues",
-        # 'Documentation': 'https://collective.volto.formsupport.readthedocs.io/en/latest/',
     },
     license="GPL version 2",
     packages=find_packages("src", exclude=["ez_setup"]),
@@ -50,7 +50,6 @@ setup(
     python_requires=">=3.6",
     install_requires=[
         "setuptools",
-        # -*- Extra requirements: -*-
         "z3c.jbot",
         "plone.api>=1.8.4",
         "plone.restapi",
@@ -58,6 +57,18 @@ setup(
         "souper.plone",
     ],
     extras_require={
+        "hcaptcha": [
+            "plone.formwidget.hcaptcha>=1.0.1",
+        ],
+        "recaptcha": [
+            "plone.formwidget.recaptcha",
+        ],
+        "norobots": [
+            "collective.z3cform.norobots",
+        ],
+        "honeypot": [
+            "collective.honeypot>=2.1",
+        ],
         "test": [
             "plone.app.testing",
             # Plone KGS does not use this version, because it would break
@@ -67,6 +78,10 @@ setup(
             "plone.app.contenttypes",
             "plone.app.robotframework[debug]",
             "collective.MockMailHost",
+            "plone.formwidget.hcaptcha",
+            "plone.formwidget.recaptcha",
+            "collective.z3cform.norobots",
+            "collective.honeypot",
         ],
     },
     entry_points="""

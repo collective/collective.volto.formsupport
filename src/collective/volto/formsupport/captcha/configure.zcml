@@ -1,0 +1,50 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:zcml="http://namespaces.zope.org/zcml">
+
+    <adapter
+        zcml:condition="installed plone.formwidget.hcaptcha"
+        factory=".hcaptcha.HCaptchaSupport"
+        provides="..interfaces.ICaptchaSupport"
+        for="* zope.publisher.interfaces.browser.IBrowserRequest"
+        name="hcaptcha"
+        />
+
+    <adapter
+        zcml:condition="installed plone.formwidget.hcaptcha"
+        factory=".hcaptcha.HCaptchaInvisibleSupport"
+        provides="..interfaces.ICaptchaSupport"
+        for="* zope.publisher.interfaces.browser.IBrowserRequest"
+        name="hcaptcha_invisible"
+        />
+
+    <adapter
+        zcml:condition="installed plone.formwidget.recaptcha"
+        factory=".recaptcha.RecaptchaSupport"
+        provides="..interfaces.ICaptchaSupport"
+        for="* zope.publisher.interfaces.browser.IBrowserRequest"
+        name="recaptcha"
+        />
+
+    <adapter
+        zcml:condition="installed collective.z3cform.norobots"
+        factory=".norobots.NoRobotsSupport"
+        provides="..interfaces.ICaptchaSupport"
+        for="* zope.publisher.interfaces.browser.IBrowserRequest"
+        name="norobots-captcha"
+        />
+    
+    <adapter
+        zcml:condition="installed collective.honeypot"
+        factory=".honeypot.HoneypotSupport"
+        provides="..interfaces.ICaptchaSupport"
+        for="* zope.publisher.interfaces.browser.IBrowserRequest"
+        name="honeypot"
+        />
+
+    <utility
+        name="collective.volto.formsupport.captcha.providers"
+        component=".vocabularies.captcha_providers_vocabulary_factory"
+        />
+
+</configure>

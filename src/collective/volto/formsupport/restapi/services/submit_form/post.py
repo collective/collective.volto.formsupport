@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from collective.volto.formsupport import _
+from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.interfaces import IPostEvent
 from collective.volto.formsupport.utils import get_blocks
+from datetime import datetime
 from email.message import EmailMessage
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
@@ -9,13 +12,33 @@ from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
+from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import ElementTree
+from xml.etree.ElementTree import SubElement
 from zExceptions import BadRequest
-from zope.component import getMultiAdapter, getUtility
+from zope.component import getMultiAdapter
+from zope.component import getUtility
+from zope.event import notify
 from zope.i18n import translate
 from zope.interface import alsoProvides
+from zope.interface import implementer
 
 import codecs
+import logging
+import math
+import os
 import six
+
+
+logger = logging.getLogger(__name__)
+CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
+
+
+@implementer(IPostEvent)
+class PostEventService(object):
+    def __init__(self, context, data):
+        self.context = context
+        self.data = data
 
 
 class SubmitPost(Service):
@@ -37,10 +60,26 @@ class SubmitPost(Service):
         # Disable CSRF protection
         alsoProvides(self.request, IDisableCSRFProtection)
 
+        notify(PostEventService(self.context, self.form_data))
+
+        if send_action:
+            try:
+                self.send_data()
+            except BadRequest as e:
+                raise e
+            except Exception as e:
+                logger.exception(e)
+                message = translate(
+                    _(
+                        "mail_send_exception",
+                        default="Unable to send confirm email. Please retry later or contact site administator.",
+                    ),
+                    context=self.request,
+                )
+                self.request.response.setStatus(500)
+                return dict(type="InternalServerError", message=message)
         if store_action:
             self.store_data()
-        if send_action:
-            self.send_data()
 
         return self.reply_no_content()
 
@@ -92,6 +131,44 @@ class SubmitPost(Service):
                 )
             )
 
+        self.validate_attachments()
+        if self.block.get("captcha", False):
+            getMultiAdapter(
+                (self.context, self.request),
+                ICaptchaSupport,
+                name=self.block["captcha"],
+            ).verify(self.form_data.get("captcha"))
+
+    def validate_attachments(self):
+        attachments_limit = os.environ.get("FORM_ATTACHMENTS_LIMIT", "")
+        if not attachments_limit:
+            return
+        attachments = self.form_data.get("attachments", {})
+        attachments_len = 0
+        for attachment in attachments.values():
+            data = attachment.get("data", "")
+            attachments_len += (len(data) * 3) / 4 - data.count("=", -2)
+        if attachments_len > float(attachments_limit) * pow(1024, 2):
+            size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+            i = int(math.floor(math.log(attachments_len, 1024)))
+            p = math.pow(1024, i)
+            s = round(attachments_len / p, 2)
+            uploaded_str = "{} {}".format(s, size_name[i])
+            raise BadRequest(
+                translate(
+                    _(
+                        "attachments_too_big",
+                        default="Attachments too big. You uploaded ${uploaded_str},"
+                        " but limit is ${max} MB. Try to compress files.",
+                        mapping={
+                            "max": attachments_limit,
+                            "uploaded_str": uploaded_str,
+                        },
+                    ),
+                    context=self.request,
+                )
+            )
+
     def get_block_data(self, block_id):
         blocks = get_blocks(self.context)
 
@@ -131,6 +208,23 @@ class SubmitPost(Service):
 
         return self.form_data.get("from", "") or self.block.get("default_from", "")
 
+    def get_bcc(self):
+        bcc = []
+        bcc_fields = []
+        for field in self.block.get("subblocks", []):
+            if field.get("use_as_bcc", False):
+                field_id = field.get("field_id", "")
+                if field_id not in bcc_fields:
+                    bcc_fields.append(field_id)
+        bcc = []
+        for data in self.form_data.get("data", []):
+            value = data.get("value", "")
+            if not value:
+                continue
+            if data.get("field_id", "") in bcc_fields:
+                bcc.append(data["value"])
+        return bcc
+
     def send_data(self):
         subject = self.form_data.get("subject", "") or self.block.get(
             "default_subject", ""
@@ -160,24 +254,44 @@ class SubmitPost(Service):
         registry = getUtility(IRegistry)
         mail_settings = registry.forInterface(IMailSchema, prefix="plone")
         mto = self.block.get("default_to", mail_settings.email_from_address)
-        encoding = registry.get("plone.email_charset", "utf-8")
+        charset = registry.get("plone.email_charset", "utf-8")
         message = self.prepare_message()
 
         msg = EmailMessage()
-        msg.set_content(message)
+        msg.set_content(message, charset=charset, subtype="html", cte=CTE)
         msg["Subject"] = subject
         msg["From"] = mfrom
         msg["To"] = mto
         msg["Reply-To"] = mreply_to
+
         msg.replace_header("Content-Type", 'text/html; charset="utf-8"')
 
-        self.manage_attachments(msg=msg)
+        headers_to_forward = self.block.get("httpHeaders", [])
+        for header in headers_to_forward:
+            header_value = self.request.get(header)
+            if header_value:
+                msg[header] = header_value
 
-        self.send_mail(msg=msg, encoding=encoding)
+        self.manage_attachments(msg=msg)
+        self.send_mail(msg=msg, charset=charset)
+
+        for bcc in self.get_bcc():
+            # send a copy also to the fields with bcc flag
+            msg.replace_header("To", bcc)
+            self.send_mail(msg=msg, charset=charset)
 
     def prepare_message(self):
+        email_format_page_template_mapping = {
+            "list": "send_mail_template",
+            "table": "send_mail_template_table",
+        }
+        email_format = self.block.get("email_format", "")
+        template_name = email_format_page_template_mapping.get(
+            email_format, "send_mail_template"
+        )
+
         message_template = api.content.get_view(
-            name="send_mail_template",
+            name=template_name,
             context=self.context,
             request=self.request,
         )
@@ -203,24 +317,18 @@ class SubmitPost(Service):
             if x.get("field_id", "") not in skip_fields
         ]
 
-    def send_mail(self, msg, encoding):
+    def send_mail(self, msg, charset):
         host = api.portal.get_tool(name="MailHost")
-        # try:
-
-        host.send(msg, charset=encoding)
-
-        # except (SMTPException, RuntimeError):
-        #     plone_utils = api.portal.get_tool(name="plone_utils")
-        #     exception = plone_utils.exceptionString()
-        #     message = "Unable to send mail: {}".format(exception)
-
-        #     self.request.response.setStatus(500)
-        #     return dict(
-        #         error=dict(type="InternalServerError", message=message)
-        #     )
+        # we set immediate=True because we need to catch exceptions.
+        # by default (False) exceptions are handled by MailHost and we can't catch them.
+        host.send(msg, charset=charset, immediate=True)
 
     def manage_attachments(self, msg):
         attachments = self.form_data.get("attachments", {})
+
+        if self.block.get("attachXml", False):
+            self.attach_xml(msg=msg)
+
         if not attachments:
             return []
         for key, value in attachments.items():
@@ -240,12 +348,39 @@ class SubmitPost(Service):
                     file_data = file_data.encode("utf-8")
             else:
                 file_data = value
+            maintype, subtype = content_type.split("/")
             msg.add_attachment(
                 file_data,
-                maintype=content_type,
-                subtype=content_type,
+                maintype=maintype,
+                subtype=subtype,
                 filename=filename,
             )
+
+    def attach_xml(self, msg):
+        now = (
+            datetime.now()
+            .isoformat(timespec="seconds")
+            .replace(" ", "-")
+            .replace(":", "")
+        )
+        filename = f"formdata_{now}.xml"
+        output = six.BytesIO()
+        xmlRoot = Element("form")
+
+        for field in self.filter_parameters():
+            SubElement(
+                xmlRoot, "field", name=field.get("custom_field_id", field["label"])
+            ).text = str(field["value"])
+
+        doc = ElementTree(xmlRoot)
+        doc.write(output, encoding="utf-8", xml_declaration=True)
+        xmlstr = output.getvalue()
+        msg.add_attachment(
+            xmlstr,
+            maintype="application",
+            subtype="xml",
+            filename=filename,
+        )
 
     def store_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)

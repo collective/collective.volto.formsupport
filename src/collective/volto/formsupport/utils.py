@@ -1,5 +1,6 @@
 from collections import deque
-from plone.restapi.slots.interfaces import ISlot, ISlots
+from plone.restapi.slots.interfaces import ISlot
+from plone.restapi.slots.interfaces import ISlots
 
 import copy
 import json

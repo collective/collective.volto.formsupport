@@ -6,11 +6,17 @@
     :target: https://pypi.python.org/pypi/collective.volto.formsupport
     :alt: Egg Status
 
-.. image:: https://img.shields.io/pypi/pyversions/collective.volto.formsupport.svg?style=plastic   :alt: Supported - Python Versions
+.. image:: https://img.shields.io/pypi/pyversions/collective.volto.formsupport.svg?style=plastic
+    :target: https://pypi.python.org/pypi/collective.volto.formsupport/
+    :alt: Supported - Python Versions
 
 .. image:: https://img.shields.io/pypi/l/collective.volto.formsupport.svg
     :target: https://pypi.python.org/pypi/collective.volto.formsupport/
     :alt: License
+
+.. image:: https://coveralls.io/repos/github/collective/collective.volto.formsupport/badge.svg
+    :target: https://coveralls.io/github/collective/collective.volto.formsupport
+    :alt: Coverage
 
 
 ============================
@@ -45,7 +51,7 @@ Calling this endpoint, it will do some actions (based on block settings) and ret
 
 This is an expansion component.
 
-There is a rule that returns a ``form-data`` item into "components" slot if the user can edit the 
+There is a rule that returns a ``form-data`` item into "components" slot if the user can edit the
 context (**Modify portal content** permission) and there is a block that can store data.
 
 Calling with "expand=true", this endpoint returns the stored data::
@@ -98,7 +104,20 @@ Send
 
 If block is set to send data, an email with form data will be sent to the recipient set in block settings or (if not set) to the site address.
 
-If ther is an ``attachments`` field in the POST data, these files will be attached to the emal sent.
+If there is an ``attachments`` field in the POST data, these files will be attached to the email sent.
+
+XML attachments
+^^^^^^^^^^^^^^^
+
+An XML copy of the data can be optionally attached to the sent email by configuring the volto block's `attachXml` option.
+
+The sent XML follows the same format as the feature in [collective.easyform](https://github.com/collective/collective.easyform). An example is shown below:
+
+```xml
+<?xml version='1.0' encoding='utf-8'?><form><field name="Custom field label">My value</field></form>
+```
+
+The field names in the XML will utilise the Data ID Mapping feature if it is used. Read more about this feature in the following Store section of the documentation.
 
 Store
 -----
@@ -108,6 +127,18 @@ If block is set to store data, we store it into the content that has that block 
 The store is an adapter registered for *IFormDataStore* interface, so you can override it easily.
 
 Only fields that are also in block settings are stored. Missing ones will be skipped.
+
+Each Record stores also two *service* attributes:
+
+- **fields_labels**: a mapping of field ids to field labels. This is useful when we export csv files, so we can labels for the columns.
+- **fields_order**: sorted list of field ids. This can be used in csv export to keep the order of fields.
+
+We store these attributes because the form can change over time and we want to have a snapshot of the fields in the Record.
+
+Data ID Mapping
+^^^^^^^^^^^^^^^
+
+The exported CSV file may need to be used by further processes which require specific values for the columns of the CSV. In such a case, the `Data ID Mapping` feature can be used to change the column name to custom text for each field.
 
 Block serializer
 ================
@@ -119,6 +150,99 @@ This serializer removes all fields that start with "\**default_**\" if the user 
 This is useful because we don't want to expose some internals configurations (for example the recipient email address)
 to external users that should only fill the form.
 
+If the block has a field ``captcha``, an additional property ``captcha_props`` is serialized by the ``serialize``
+method provided by the ICaptchaSupport named adapter, the result contains useful metadata for the client, as the
+captcha public_key, ie::
+
+    {
+        "subblocks": [
+            ...
+        ],
+        "captcha": "recaptcha",
+        "captcha_props": {
+            "provider": "recaptcha",
+            "public_key": "aaaaaaaaaaaaa"
+        }
+    }
+
+Captcha support
+===============
+
+Captcha support requires a specific name adapter that implements ``ICaptchaSupport``.
+This product contains implementations for:
+
+- HCaptcha (plone.formwidget.hcaptcha)
+- Google ReCaptcha (plone.formwidget.recaptcha)
+- Custom questions and answers (collective.z3cform.norobots)
+- Honeypot (collective.honeypot)
+
+
+Each implementation must be included, installed and configured separately.
+
+To include one implementation, you need to install the egg with the needed extras_require:
+
+- collective.volto.formsupport[recaptcha]
+- collective.volto.formsupport[hcaptcha]
+- collective.volto.formsupport[norobots]
+- collective.volto.formsupport[honeypot]
+
+During the form post, the token captcha will be verified with the defined captcha method.
+
+For captcha support `volto-form-block` version >= 2.4.0 is required.
+
+Honeypot configuration
+----------------------
+
+If honeypot dependency is available in the buildout, the honeypot validation is enabled and selectable in forms.
+
+Default field name is `protected_1` and you can change it with an environment variable. See `collective.honeypot <https://github.com/collective/collective.honeypot#id7>`_ for details.
+
+Attachments upload limits
+=========================
+
+Forms can have one or more attachment field to allow users to upload some files.
+
+These files will be sent via mail, so it could be a good idea setting a limit to them.
+For example if you use Gmail as mail server, you can't send messages with attachments > 25MB.
+
+There is an environment variable that you can use to set that limit (in MB)::
+
+    [instance]
+    environment-vars =
+        FORM_ATTACHMENTS_LIMIT 25
+
+By default this is not set.
+
+The upload limit is also passed to the frontend in the form data with the `attachments_limit` key.
+
+Content-transfer-encoding
+=========================
+
+It is possible to set the content-transfer-encoding for the email body, settings the environment
+variable `MAIL_CONTENT_TRANSFER_ENCODING`::
+
+    [instance]
+    environment-vars =
+        MAIL_CONTENT_TRANSFER_ENCODING base64
+
+This is useful for some SMTP servers that have problems with `quoted-printable` encoding.
+
+By default the content-transfer-encoding is `quoted-printable` as overrided in
+https://github.com/zopefoundation/Products.MailHost/blob/master/src/Products/MailHost/MailHost.py#L65
+
+Header forwarding
+=========================
+
+It is possible to configure some headers from the form POST request to be included in the email's headers by configuring the `httpHeaders` field in your volto block.
+
+[volto-formblock](https://github.com/collective/volto-form-block) allows the following headers to be forwarded:
+
+- `HTTP_X_FORWARDED_FOR`
+- `HTTP_X_FORWARDED_PORT`
+- `REMOTE_ADDR`
+- `PATH_INFO`
+- `HTTP_USER_AGENT`
+- `HTTP_REFERER`
 
 Examples
 ========
@@ -126,7 +250,6 @@ Examples
 This add-on can be seen in action at the following sites:
 
 - https://www.comune.modena.it/form/contatti
-
 
 
 Translations
@@ -172,4 +295,4 @@ This product was developed by **RedTurtle Technology** team.
 
 .. image:: https://avatars1.githubusercontent.com/u/1087171?s=100&v=4
    :alt: RedTurtle Technology Site
-   :target: http://www.redturtle.it/
+   :target: https://www.redturtle.it/
