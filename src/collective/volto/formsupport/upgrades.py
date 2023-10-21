@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 from Acquisition import aq_base
+from collective.volto.formsupport.interfaces import IFormDataStore
 from copy import deepcopy
 from plone import api
 from plone.dexterity.utils import iterSchemata
-from zope.schema import getFields
-from collective.volto.formsupport.interfaces import IFormDataStore
-from zope.component import getMultiAdapter
-from zope.globalrequest import getRequest
-from souper.soup import Record
-from zope.component import getUtility
 from plone.i18n.normalizer.interfaces import IIDNormalizer
+from souper.soup import Record
+from zope.component import getMultiAdapter
+from zope.component import getUtility
+from zope.globalrequest import getRequest
+from zope.schema import getFields
 
 
 try:
@@ -129,7 +129,10 @@ def to_1200(context):  # noqa: C901 # pragma: no cover
     portal = api.portal.get()
     portal_blocks = getattr(portal, "blocks", "")
     if portal_blocks:
-        blocks = json.loads(portal_blocks)
+        if isinstance(portal_blocks, str):
+            blocks = json.loads(portal_blocks)
+        else:
+            blocks = portal_blocks
         res = fix_data(blocks, portal)
         if res:
             fixed_contents.append("/")
