@@ -6,7 +6,10 @@ from collective.volto.formsupport.utils import get_blocks
 from copy import deepcopy
 from datetime import datetime
 from plone.dexterity.interfaces import IDexterityContent
+from plone.i18n.normalizer.interfaces import IIDNormalizer
 from plone.restapi.deserializer import json_body
+from plone.restapi.slots.interfaces import ISlot
+from Products.CMFPlone.interfaces.siteroot import IPloneSiteRoot
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.indexes.field import CatalogFieldIndex
 from souper.interfaces import ICatalogFactory
@@ -51,6 +54,7 @@ class FormDataStore(object):
 
         if not blocks:
             return {}
+
         form_block = {}
         for id, block in blocks.items():
             if id != self.block_id:
@@ -118,3 +122,53 @@ class FormDataStore(object):
 
     def clear(self):
         self.soup.clear()
+
+
+@implementer(IFormDataStore)
+@adapter(IPloneSiteRoot, Interface)
+class PloneSiteFormDataStore(FormDataStore):
+    def get_form_fields(self):
+        # TODO: should this be getProperty?
+        blocks = get_blocks(self.context)
+
+        if not blocks:
+            return {}
+
+        form_block = {}
+
+        for id, block in blocks.items():
+            if id != self.block_id:
+                continue
+            block_type = block.get("@type", "")
+            if block_type == "form":
+                form_block = deepcopy(block)
+
+        if not form_block:
+            return {}
+
+        return form_block.get("subblocks", [])
+
+
+@implementer(IFormDataStore)
+@adapter(ISlot, Interface)
+class SlotDataStore(FormDataStore):
+    def get_form_fields(self):
+        # TODO: should this be getProperty?
+        blocks = get_blocks(self.context)
+
+        if not blocks:
+            return {}
+
+        form_block = {}
+
+        for id, block in blocks.items():
+            if id != self.block_id:
+                continue
+            block_type = block.get("@type", "")
+            if block_type == "form":
+                form_block = deepcopy(block)
+
+        if not form_block:
+            return {}
+
+        return form_block.get("subblocks", [])

@@ -8,6 +8,10 @@
         <implements interface="souper.plone.interfaces.ISoupRoot" />
     </class>
 
+    <class class="Products.CMFPlone.interfaces.siteroot.IPloneSiteRoot">
+        <implements interface="souper.plone.interfaces.ISoupRoot" />
+    </class>
+
     <!-- register the catalog -->
     <utility
         provides="souper.interfaces.ICatalogFactory"
@@ -16,4 +20,6 @@
     />
 
     <adapter factory=".catalog.FormDataStore" />
+    <adapter factory=".catalog.PloneSiteFormDataStore" />
+    <adapter factory=".catalog.SlotDataStore" />
 </configure>

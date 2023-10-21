@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from collective.volto.formsupport import _
 from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import IFormDataStore
@@ -13,7 +12,9 @@ from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
-from xml.etree.ElementTree import ElementTree, Element, SubElement
+from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import ElementTree
+from xml.etree.ElementTree import SubElement
 from zExceptions import BadRequest
 from zope.component import getMultiAdapter
 from zope.component import getUtility
@@ -170,8 +171,10 @@ class SubmitPost(Service):
 
     def get_block_data(self, block_id):
         blocks = get_blocks(self.context)
+
         if not blocks:
             return {}
+
         for id, block in blocks.items():
             if id != block_id:
                 continue
@@ -384,3 +387,22 @@ class SubmitPost(Service):
         res = store.add(data=self.filter_parameters())
         if not res:
             raise BadRequest("Unable to store data")
+
+
+class FallbackSubmitPost(SubmitPost):
+    """Submit post service for plone root"""
+
+    def get_block_data(self, block_id):
+        blocks = get_blocks(self.context)
+
+        if not blocks:
+            return {}
+
+        for id, block in blocks.items():
+            if id != block_id:
+                continue
+            block_type = block.get("@type", "")
+            if block_type != "form":
+                continue
+            return block
+        return {}
