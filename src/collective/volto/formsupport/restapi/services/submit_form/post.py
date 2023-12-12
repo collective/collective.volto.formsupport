@@ -95,7 +95,7 @@ class SubmitPost(Service):
                 errors[field.field_id] = field_errors
 
         if errors:
-            self.request.response.setStatus(500)
+            self.request.response.setStatus(400)
             return json_compatible(
                 {
                     "error": {
