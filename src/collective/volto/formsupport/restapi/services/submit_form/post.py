@@ -14,6 +14,7 @@ from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
+from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
 from xml.etree.ElementTree import ElementTree, Element, SubElement
@@ -81,12 +82,28 @@ class SubmitPost(Service):
                         {
                             **field,
                             **submitted_field,
-                            "dislpay_value_mapping": field.get(
-                                "display_values"
-                            ),
+                            "dislpay_value_mapping": field.get("display_values"),
                         }
                     )
         self.fields = construct_fields(fields_data)
+
+        errors = {}
+        for field in self.fields:
+            field_errors = field.validate()
+
+            if field_errors:
+                errors[field.field_id] = field_errors
+
+        if errors:
+            self.request.response.setStatus(500)
+            return json_compatible(
+                {
+                    "error": {
+                        "type": "Invalid",
+                        "errors": errors,
+                    }
+                }
+            )
 
         if send_action:
             try:

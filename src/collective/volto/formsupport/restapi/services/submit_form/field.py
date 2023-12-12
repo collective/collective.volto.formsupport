@@ -1,3 +1,6 @@
+from collective.volto.formsupport.validation import getValidations
+
+
 class Field:
     def __init__(self, field_data):
         def _attribute(attribute_name):
@@ -14,10 +17,14 @@ class Field:
         _attribute("widget")
         _attribute("use_as_reply_to")
         _attribute("use_as_reply_bcc")
+        _attribute("validations")
         self._dislpay_value_mapping = field_data.get("dislpay_value_mapping")
         self._value = field_data.get("value")
         self._custom_field_id = field_data.get("custom_field_id")
         self._label = field_data.get("label")
+        self._validations = field_data.get(
+            "validations"
+        )  # No need to expose the available validations
 
     @property
     def value(self):
@@ -42,6 +49,24 @@ class Field:
     @property
     def send_in_email(self):
         return True
+
+    def validate(self):
+        # Products.validation isn't included by default
+        available_validations = [
+            validation
+            for validationId, validation in getValidations()
+            if validationId in self._validations
+        ]
+
+        errors = []
+        for validation in available_validations:
+            error = validation(self._value)
+            if error:
+                errors.append(error)
+
+        return (
+            errors if errors else None
+        )  # Return None to match how errors normally return in z3c.form
 
 
 class YesNoField(Field):

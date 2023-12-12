@@ -1,0 +1,13 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <!-- Custom validator -->
+  <!-- <adapter factory=".validation.VoltoFormSupportValidator" provides="z3c.form.interfaces.IValidator" /> -->
+
+  <!-- All validations vocabulary -->
+  <utility
+      name="collective.volto.formsupport.Validators"
+      component=".validation.ValidatorsVocabularyFactory"
+      />
+
+
+</configure>
