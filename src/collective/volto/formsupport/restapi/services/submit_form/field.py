@@ -23,7 +23,7 @@ class Field:
         self._custom_field_id = field_data.get("custom_field_id")
         self._label = field_data.get("label")
         self._validations = field_data.get(
-            "validations"
+            "validations", []
         )  # No need to expose the available validations
 
     @property
