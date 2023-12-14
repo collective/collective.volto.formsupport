@@ -17,7 +17,7 @@ import transaction
         allow_extra_args=True,
     ),
 )
-@click.option("--dryrun", is_flag=True, default=True, help="--dryrun (default) simulate, --no-dryrun actually save the changes")
+@click.option("--dryrun/--no-dryrun", is_flag=True, default=True, help="--dryrun (default) simulate, --no-dryrun actually save the changes")
 @click.option("--days", type=int, default=6 * 30, help="default number of days of data retention (default 180)")
 def main(dryrun, days):
     if dryrun:
