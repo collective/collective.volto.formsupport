@@ -14,6 +14,7 @@ import transaction
     help="bin/instance -OPlone run bin/formsupport_data_cleansing [--dryrun|--no-dryrun]",
     context_settings=dict(
         ignore_unknown_options=True,
+        allow_extra_args=True,
     ),
 )
 @click.option("--dryrun", is_flag=True, default=True, help="--dryrun (default) simulate, --no-dryrun actually save the changes")
