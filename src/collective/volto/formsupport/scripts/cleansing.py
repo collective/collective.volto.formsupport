@@ -26,7 +26,7 @@ def main(dryrun, days):
     if "blocks_type" in catalog.indexes():
         brains = catalog(block_types="form")
     else:
-        print("[WARN] This script is optimized with plone.volto >= 4.1.0")
+        print("[WARN] This script is optimized for plone.volto >= 4.1.0")
         brains = catalog()
     for brain in brains:
         obj = brain.getObject()
