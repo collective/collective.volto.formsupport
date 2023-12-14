@@ -55,6 +55,7 @@ setup(
         "plone.restapi",
         "plone.app.dexterity",
         "souper.plone",
+        "click",
     ],
     extras_require={
         "hcaptcha": [
@@ -89,5 +90,6 @@ setup(
     target = plone
     [console_scripts]
     update_locale = collective.volto.formsupport.locales.update:update_locale
+    formsupport_data_cleansing = collective.volto.formsupport.scripts.cleansing:main
     """,
 )
