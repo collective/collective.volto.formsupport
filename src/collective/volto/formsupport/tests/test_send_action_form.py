@@ -537,7 +537,6 @@ class TestMailSend(unittest.TestCase):
     def test_send_attachment_validate_size(
         self,
     ):
-
         os.environ["FORM_ATTACHMENTS_LIMIT"] = "1"
         self.document.blocks = {
             "text-id": {"@type": "text"},
