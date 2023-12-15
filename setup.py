@@ -53,8 +53,13 @@ setup(
         "z3c.jbot",
         "plone.api>=1.8.4",
         "plone.restapi",
-        "plone.app.dexterity",
         "souper.plone",
+        "plone.base",
+        "plone.dexterity",
+        "plone.memoize",
+        "plone.protect",
+        "Products.GenericSetup",
+        "six",  # Can we get rid of this is we don't support python2?
     ],
     extras_require={
         "hcaptcha": [
@@ -69,16 +74,22 @@ setup(
         "honeypot": [
             "collective.honeypot>=2.1",
         ],
+        "blocksfield": [
+            "collective.volto.blocksfield",
+        ],
         "test": [
+            # Plone deps
             "plone.app.testing",
             # Plone KGS does not use this version, because it would break
             # Remove if your package shall be part of coredev.
             # plone_coredev tests as of 2016-04-01.
             "plone.testing>=5.0.0",
+            "plone.browserlayer",
             "plone.app.contenttypes",
-            "plone.app.robotframework[debug]",
+            "Products.MailHost",
+
+            # Externals
             "collective.MockMailHost",
-            "plone.formwidget.hcaptcha",
             "plone.formwidget.recaptcha",
             "collective.z3cform.norobots",
             "collective.honeypot",
