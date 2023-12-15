@@ -16,8 +16,9 @@
             value field/value|nothing;
             label field/label|nothing;
           ">
-        <strong>${label}:</strong>
-         ${value}
+        <strong i18n:translate="send_mail_text_list_field_label">${label}:</strong>
+        <tal:blocks>${value}
+        </tal:blocks>
       </li>
     </tal:field>
   </ul>

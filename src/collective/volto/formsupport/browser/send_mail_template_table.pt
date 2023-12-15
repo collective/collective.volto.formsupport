@@ -17,9 +17,11 @@
       <tr role="row">
         <th role="columnheader"
             scope="col"
+            i18n:translate="send_mail_text_table_field_label"
         >Field</th>
         <th role="columnheader"
             scope="col"
+            i18n:translate="send_mail_text_table_field_value"
         >Value</th>
       </tr>
     </thead>
