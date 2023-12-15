@@ -1,33 +1,33 @@
 # -*- coding: utf-8 -*-
 
-from collective.volto.formsupport import _
-from collective.volto.formsupport.interfaces import ICaptchaSupport
-from collective.volto.formsupport.interfaces import IFormDataStore
-from collective.volto.formsupport.interfaces import IPostEvent
-from collective.volto.formsupport.utils import get_blocks
+import codecs
+import logging
+import math
+import os
 from datetime import datetime
 from email.message import EmailMessage
+from xml.etree.ElementTree import Element, ElementTree, SubElement
+
+import six
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
-from xml.etree.ElementTree import ElementTree, Element, SubElement
 from zExceptions import BadRequest
-from zope.component import getMultiAdapter
-from zope.component import getUtility
+from zope.component import getMultiAdapter, getUtility
 from zope.event import notify
 from zope.i18n import translate
-from zope.interface import alsoProvides
-from zope.interface import implementer
+from zope.interface import alsoProvides, implementer
 
-import codecs
-import logging
-import math
-import os
-import six
-
+from collective.volto.formsupport import _
+from collective.volto.formsupport.interfaces import (
+    ICaptchaSupport,
+    IFormDataStore,
+    IPostEvent,
+)
+from collective.volto.formsupport.utils import get_blocks
 
 logger = logging.getLogger(__name__)
 CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
