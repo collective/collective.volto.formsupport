@@ -10,7 +10,7 @@ from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
-from Products.CMFPlone.interfaces.controlpanel import IMailSchema
+from plone.base.interfaces.controlpanel import IMailSchema
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import SubElement

@@ -3,7 +3,7 @@ from collective.volto.formsupport.interfaces import ICollectiveVoltoFormsupportL
 from plone import api
 from plone.restapi.behaviors import IBlocks
 from plone.restapi.interfaces import IBlockFieldSerializationTransformer
-from Products.CMFPlone.interfaces import IPloneSiteRoot
+from plone.base.interfaces import IPloneSiteRoot
 from zope.component import adapter
 from zope.component import getMultiAdapter
 from zope.interface import implementer
