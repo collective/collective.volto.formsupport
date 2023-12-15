@@ -85,7 +85,7 @@ msgstr ""
 msgid "honeypot_error"
 msgstr ""
 
-#. Default: "Unable to send confirm email. Please retry later or contact site administator."
+#. Default: "Unable to send confirm email. Please retry later or contact site administrator."
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:72
 msgid "mail_send_exception"
 msgstr ""

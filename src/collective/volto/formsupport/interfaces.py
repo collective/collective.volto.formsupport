@@ -33,7 +33,7 @@ class IPostEvent(Interface):
 
 class ICaptchaSupport(Interface):
     def __init__(context, request):
-        """Initialize adpater"""
+        """Initialize adapter"""
 
     def is_enabled():
         """Captcha method enabled

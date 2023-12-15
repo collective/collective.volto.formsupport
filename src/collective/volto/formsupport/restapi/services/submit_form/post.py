@@ -71,7 +71,7 @@ class SubmitPost(Service):
                 message = translate(
                     _(
                         "mail_send_exception",
-                        default="Unable to send confirm email. Please retry later or contact site administator.",
+                        default="Unable to send confirm email. Please retry later or contact site administrator.",
                     ),
                     context=self.request,
                 )

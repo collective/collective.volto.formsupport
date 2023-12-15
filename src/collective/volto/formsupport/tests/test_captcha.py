@@ -313,7 +313,7 @@ class TestCaptcha(unittest.TestCase):
         """test that using norobots the captcha can be passed"""
         self.registry.registerInterface(INorobotsWidgetSettings)
         settings = self.registry.forInterface(INorobotsWidgetSettings)
-        settings.questions = ("Write five using cipers::5", "How much is 10 + 4::14")
+        settings.questions = ("Write five using ciphers::5", "How much is 10 + 4::14")
         transaction.commit()
 
         self.document.blocks = {
@@ -340,7 +340,7 @@ class TestCaptcha(unittest.TestCase):
                 "value": "5",
                 "id": "question0",
                 "id_check": md5(
-                    "Write five using cipers".encode("ascii", "ignore")
+                    "Write five using ciphers".encode("ascii", "ignore")
                 ).hexdigest(),
             }
         )
@@ -360,7 +360,7 @@ class TestCaptcha(unittest.TestCase):
         """test that using norobots and a wrong answer, the captcha is not passed"""
         self.registry.registerInterface(INorobotsWidgetSettings)
         settings = self.registry.forInterface(INorobotsWidgetSettings)
-        settings.questions = ("Write five using cipers::5", "How much is 10 + 4::14")
+        settings.questions = ("Write five using ciphers::5", "How much is 10 + 4::14")
         transaction.commit()
 
         self.document.blocks = {
@@ -387,7 +387,7 @@ class TestCaptcha(unittest.TestCase):
                 "value": "15",
                 "id": "question0",
                 "id_check": md5(
-                    "Write five using cipers".encode("ascii", "ignore")
+                    "Write five using ciphers".encode("ascii", "ignore")
                 ).hexdigest(),
             }
         )
