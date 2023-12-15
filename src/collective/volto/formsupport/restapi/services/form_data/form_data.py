@@ -25,9 +25,7 @@ class FormData:
         if not self.show_component():
             return {}
 
-        result = {
-            "form_data": {"@id": f"{self.context.absolute_url()}/@form-data"}
-        }
+        result = {"form_data": {"@id": f"{self.context.absolute_url()}/@form-data"}}
         if not expand:
             return result
 
