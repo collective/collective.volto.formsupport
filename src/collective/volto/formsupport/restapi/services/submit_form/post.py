@@ -258,35 +258,39 @@ class SubmitPost(Service):
 
         registry = getUtility(IRegistry)
         mail_settings = registry.forInterface(IMailSchema, prefix="plone")
-        mto = self.block.get("default_to", mail_settings.email_from_address)
         charset = registry.get("plone.email_charset", "utf-8")
-        message = self.prepare_message()
-
-        msg = EmailMessage()
-        msg.set_content(message, charset=charset, subtype="html", cte=CTE)
-        msg["Subject"] = subject
-        msg["From"] = mfrom
-        msg["To"] = mto
-        msg["Reply-To"] = mreply_to
-
-        msg.replace_header("Content-Type", 'text/html; charset="utf-8"')
-
-        headers_to_forward = self.block.get("httpHeaders", [])
-        for header in headers_to_forward:
-            header_value = self.request.get(header)
-            if header_value:
-                msg[header] = header_value
 
         should_send = self.block.get("send", [])
-        self.manage_attachments(msg=msg)
         if should_send:
+            mto = self.block.get("default_to", mail_settings.email_from_address)
+            message = self.prepare_message()
+
+            msg = EmailMessage()
+            msg.set_content(message, charset=charset, subtype="html", cte=CTE)
+            msg["Subject"] = subject
+            msg["From"] = mfrom
+            msg["To"] = mto
+            msg["Reply-To"] = mreply_to
+            msg.replace_header("Content-Type", 'text/html; charset="utf-8"')
+
+            headers_to_forward = self.block.get("httpHeaders", [])
+            for header in headers_to_forward:
+                header_value = self.request.get(header)
+                if header_value:
+                    msg[header] = header_value
+
+            self.manage_attachments(msg=msg)
+
             if isinstance(should_send, list):
-                if "recipient" in self.block.get(
-                    "send", []
-                ):
+                if "recipient" in self.block.get("send", []):
                     self.send_mail(msg=msg, charset=charset)
                 # Backwards compatibility for forms before 'acknowledgement' sending
             else:
+                self.send_mail(msg=msg, charset=charset)
+
+            # send a copy also to the fields with bcc flag
+            for bcc in self.get_bcc():
+                msg.replace_header("To", bcc)
                 self.send_mail(msg=msg, charset=charset)
 
         acknowledgement_message = self.block.get("acknowledgementMessage")
@@ -301,11 +305,6 @@ class SubmitPost(Service):
                     acknowledgement_message.get("data"), subtype="html", charset="utf-8"
                 )
                 self.send_mail(msg=acknowledgement_mail, charset=charset)
-
-        for bcc in self.get_bcc():
-            # send a copy also to the fields with bcc flag
-            msg.replace_header("To", bcc)
-            self.send_mail(msg=msg, charset=charset)
 
     def prepare_message(self):
         email_format_page_template_mapping = {
