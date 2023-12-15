@@ -12,9 +12,9 @@ from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from zope.component import getUtility
 
+import os
 import transaction
 import unittest
-import os
 
 
 class TestBlockSerialization(unittest.TestCase):

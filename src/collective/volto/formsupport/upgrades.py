@@ -1,14 +1,14 @@
 from Acquisition import aq_base
+from collective.volto.formsupport.interfaces import IFormDataStore
 from copy import deepcopy
 from plone import api
 from plone.dexterity.utils import iterSchemata
-from zope.schema import getFields
-from collective.volto.formsupport.interfaces import IFormDataStore
-from zope.component import getMultiAdapter
-from zope.globalrequest import getRequest
-from souper.soup import Record
-from zope.component import getUtility
 from plone.i18n.normalizer.interfaces import IIDNormalizer
+from souper.soup import Record
+from zope.component import getMultiAdapter
+from zope.component import getUtility
+from zope.globalrequest import getRequest
+from zope.schema import getFields
 
 
 try:

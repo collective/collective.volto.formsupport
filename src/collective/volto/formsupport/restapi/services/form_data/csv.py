@@ -1,11 +1,12 @@
 from collective.volto.formsupport.interfaces import IFormDataStore
+from io import StringIO
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
-from io import StringIO
 from zope.component import getMultiAdapter
 
 import csv
 import six
+
 
 SKIP_ATTRS = ["block_id", "fields_labels", "fields_order"]
 
