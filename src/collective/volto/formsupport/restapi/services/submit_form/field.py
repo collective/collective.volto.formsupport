@@ -14,15 +14,15 @@ class Field:
         _attribute("widget")
         _attribute("use_as_reply_to")
         _attribute("use_as_reply_bcc")
-        self._dislpay_value_mapping = field_data.get("dislpay_value_mapping")
+        self._display_value_mapping = field_data.get("display_value_mapping")
         self._value = field_data.get("value")
         self._custom_field_id = field_data.get("custom_field_id")
         self._label = field_data.get("label")
 
     @property
     def value(self):
-        if self._dislpay_value_mapping:
-            return self._dislpay_value_mapping.get(self._value, self._value)
+        if self._display_value_mapping:
+            return self._display_value_mapping.get(self._value, self._value)
         return self._value
 
     @value.setter
@@ -47,11 +47,11 @@ class Field:
 class YesNoField(Field):
     @property
     def value(self):
-        if self._dislpay_value_mapping:
+        if self._display_value_mapping:
             if self._value is True:
-                return self._dislpay_value_mapping.get("yes")
+                return self._display_value_mapping.get("yes")
             elif self._value is False:
-                return self._dislpay_value_mapping.get("no")
+                return self._display_value_mapping.get("no")
         return self._value
 
     @property

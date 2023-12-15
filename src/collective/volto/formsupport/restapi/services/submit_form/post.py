@@ -81,7 +81,7 @@ class SubmitPost(Service):
                         {
                             **field,
                             **submitted_field,
-                            "dislpay_value_mapping": field.get(
+                            "display_value_mapping": field.get(
                                 "display_values"
                             ),
                         }
