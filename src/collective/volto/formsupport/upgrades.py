@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from Acquisition import aq_base
 from copy import deepcopy
 from plone import api
@@ -43,7 +42,7 @@ def to_1100(context):  # noqa: C901 # pragma: no cover
                     field["field_type"] = "simple_choice"
                     found = True
             if found:
-                logger.info("[CONVERTED] - {}".format(url))
+                logger.info(f"[CONVERTED] - {url}")
 
     # fix root
     portal = api.portal.get()
@@ -61,7 +60,7 @@ def to_1100(context):  # noqa: C901 # pragma: no cover
     for brain in brains:
         i += 1
         if i % 1000 == 0:
-            logger.info("Progress: {}/{}".format(i, tot))
+            logger.info(f"Progress: {i}/{tot}")
         item = aq_base(brain.getObject())
         for schema in iterSchemata(item):
             for name, field in getFields(schema).items():
@@ -142,7 +141,7 @@ def to_1200(context):  # noqa: C901 # pragma: no cover
     for brain in brains:
         i += 1
         if i % 100 == 0:
-            logger.info("Progress: {}/{}".format(i, tot))
+            logger.info(f"Progress: {i}/{tot}")
         item = brain.getObject()
         for schema in iterSchemata(item.aq_base):
             for name, field in getFields(schema).items():
@@ -163,6 +162,6 @@ def to_1200(context):  # noqa: C901 # pragma: no cover
                         res = fix_data(blocks, item)
                         if res:
                             fixed_contents.append(brain.getPath())
-    logger.info("Fixed {} contents:".format(len(fixed_contents)))
+    logger.info(f"Fixed {len(fixed_contents)} contents:")
     for path in fixed_contents:
-        logger.info("- {}".format(path))
+        logger.info(f"- {path}")

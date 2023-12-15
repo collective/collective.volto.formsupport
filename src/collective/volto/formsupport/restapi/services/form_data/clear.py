@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collective.volto.formsupport.interfaces import IFormDataStore
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.restapi.services import Service

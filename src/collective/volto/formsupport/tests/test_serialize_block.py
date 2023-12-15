@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import ICollectiveVoltoFormsupportLayer
 from plone import api
@@ -12,7 +11,7 @@ from zope.interface import implementer
 import os
 
 
-class FormSerializer(object):
+class FormSerializer:
     """ """
 
     order = 200  # after standard ones

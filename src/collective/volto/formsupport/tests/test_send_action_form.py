@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
@@ -11,7 +10,7 @@ from plone.app.testing import TEST_USER_ID
 from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
-from six import StringIO
+from io import StringIO
 import xml.etree.ElementTree as ET
 from zope.component import getUtility
 
@@ -69,7 +68,7 @@ class TestMailSend(unittest.TestCase):
         transaction.commit()
 
     def submit_form(self, data):
-        url = "{}/@submit-form".format(self.document_url)
+        url = f"{self.document_url}/@submit-form"
         response = self.api_session.post(
             url,
             json=data,
