@@ -601,7 +601,6 @@ class TestMailSend(unittest.TestCase):
                     {
                         "field_id": "contact",
                         "field_type": "from",
-                        "use_as_bcc": True,
                     },
                 ],
             },
@@ -653,7 +652,6 @@ class TestMailSend(unittest.TestCase):
                     {
                         "field_id": "contact",
                         "field_type": "from",
-                        "use_as_bcc": True,
                     },
                 ],
             },
