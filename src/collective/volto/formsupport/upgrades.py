@@ -204,7 +204,7 @@ def to_1300(context):  # noqa: C901 # pragma: no cover
     def update_send_from_bool_to_list_for_content(item):
         blocks = (
             item.blocks
-        )  ## We've already checked we've a form block so no need to guard here
+        )  # We've already checked we've a form block so no need to guard here
 
         for block in blocks.values():
             if block.get("@type", "") != "form":
