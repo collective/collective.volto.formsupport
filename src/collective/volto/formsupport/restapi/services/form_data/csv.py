@@ -5,7 +5,6 @@ from plone.restapi.services import Service
 from zope.component import getMultiAdapter
 
 import csv
-import six
 
 
 SKIP_ATTRS = ["block_id", "fields_labels", "fields_order"]

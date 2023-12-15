@@ -2,7 +2,6 @@ from collections import deque
 
 import copy
 import json
-import six
 
 
 def flatten_block_hierachy(blocks):
