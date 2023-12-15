@@ -56,10 +56,15 @@ setup(
         "souper.plone",
         "plone.base",
         "plone.dexterity",
+        "plone.i18n",
         "plone.memoize",
         "plone.protect",
         "Products.GenericSetup",
+        "repoze.catalog",
         "six",  # Can we get rid of this is we don't support python2?
+
+        # Why do we need these?
+        "souper",  # Should be imported by souper.plone
     ],
     extras_require={
         "hcaptcha": [
