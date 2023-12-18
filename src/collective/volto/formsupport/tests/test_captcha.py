@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
+from collective.z3cform.norobots.browser.interfaces import INorobotsWidgetSettings
 from hashlib import md5
 from plone import api
 from plone.app.testing import setRoles
@@ -10,7 +10,6 @@ from plone.app.testing import SITE_OWNER_PASSWORD
 from plone.app.testing import TEST_USER_ID
 from plone.formwidget.hcaptcha.interfaces import IHCaptchaSettings
 from plone.formwidget.recaptcha.interfaces import IReCaptchaSettings
-from collective.z3cform.norobots.browser.interfaces import INorobotsWidgetSettings
 from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
@@ -69,7 +68,7 @@ class TestCaptcha(unittest.TestCase):
         transaction.commit()
 
     def submit_form(self, data):
-        url = "{}/@submit-form".format(self.document_url)
+        url = f"{self.document_url}/@submit-form"
         response = self.api_session.post(
             url,
             json=data,
@@ -314,7 +313,7 @@ class TestCaptcha(unittest.TestCase):
         """test that using norobots the captcha can be passed"""
         self.registry.registerInterface(INorobotsWidgetSettings)
         settings = self.registry.forInterface(INorobotsWidgetSettings)
-        settings.questions = ("Write five using cipers::5", "How much is 10 + 4::14")
+        settings.questions = ("Write five using ciphers::5", "How much is 10 + 4::14")
         transaction.commit()
 
         self.document.blocks = {
@@ -341,7 +340,7 @@ class TestCaptcha(unittest.TestCase):
                 "value": "5",
                 "id": "question0",
                 "id_check": md5(
-                    "Write five using cipers".encode("ascii", "ignore")
+                    "Write five using ciphers".encode("ascii", "ignore")
                 ).hexdigest(),
             }
         )
@@ -361,7 +360,7 @@ class TestCaptcha(unittest.TestCase):
         """test that using norobots and a wrong answer, the captcha is not passed"""
         self.registry.registerInterface(INorobotsWidgetSettings)
         settings = self.registry.forInterface(INorobotsWidgetSettings)
-        settings.questions = ("Write five using cipers::5", "How much is 10 + 4::14")
+        settings.questions = ("Write five using ciphers::5", "How much is 10 + 4::14")
         transaction.commit()
 
         self.document.blocks = {
@@ -388,7 +387,7 @@ class TestCaptcha(unittest.TestCase):
                 "value": "15",
                 "id": "question0",
                 "id_check": md5(
-                    "Write five using cipers".encode("ascii", "ignore")
+                    "Write five using ciphers".encode("ascii", "ignore")
                 ).hexdigest(),
             }
         )

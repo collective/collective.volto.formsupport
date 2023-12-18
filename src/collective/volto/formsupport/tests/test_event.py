@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
@@ -79,7 +78,7 @@ class TestEvent(unittest.TestCase):
         transaction.commit()
 
     def submit_form(self, data):
-        url = "{}/@submit-form".format(self.document_url)
+        url = f"{self.document_url}/@submit-form"
         response = self.api_session.post(
             url,
             json=data,

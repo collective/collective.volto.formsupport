@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.utils import get_blocks
 from plone import api
@@ -13,12 +11,11 @@ from zope.interface import implementer
 from zope.interface import Interface
 
 import json
-import six
 
 
 @implementer(IExpandableElement)
 @adapter(Interface, Interface)
-class FormData(object):
+class FormData:
     def __init__(self, context, request):
         self.context = context
         self.request = request
@@ -27,9 +24,7 @@ class FormData(object):
         if not self.show_component():
             return {}
 
-        result = {
-            "form_data": {"@id": "{}/@form-data".format(self.context.absolute_url())}
-        }
+        result = {"form_data": {"@id": f"{self.context.absolute_url()}/@form-data"}}
         if not expand:
             return result
 
@@ -37,7 +32,7 @@ class FormData(object):
         data = store.search()
         items = [self.expand_records(x) for x in data]
         data = {
-            "@id": "{}/@form-data".format(self.context.absolute_url()),
+            "@id": f"{self.context.absolute_url()}/@form-data",
             "items": items,
             "items_total": len(items),
         }
@@ -50,7 +45,7 @@ class FormData(object):
     def form_block(self):
         blocks = get_blocks(self.context)
 
-        if isinstance(blocks, six.text_type):
+        if isinstance(blocks, str):
             blocks = json.loads(blocks)
         if not blocks:
             return {}

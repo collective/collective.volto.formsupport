@@ -1,8 +1,6 @@
 from . import CaptchaSupport
 from collective.volto.formsupport import _
-from collective.z3cform.norobots.browser.interfaces import (
-    INorobotsWidgetSettings,
-)
+from collective.z3cform.norobots.browser.interfaces import INorobotsWidgetSettings
 from plone import api
 from plone.registry.interfaces import IRegistry
 from zExceptions import BadRequest

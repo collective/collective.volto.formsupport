@@ -227,7 +227,7 @@ variable `MAIL_CONTENT_TRANSFER_ENCODING`::
 
 This is useful for some SMTP servers that have problems with `quoted-printable` encoding.
 
-By default the content-transfer-encoding is `quoted-printable` as overrided in
+By default the content-transfer-encoding is `quoted-printable` as overridden in
 https://github.com/zopefoundation/Products.MailHost/blob/master/src/Products/MailHost/MailHost.py#L65
 
 Header forwarding

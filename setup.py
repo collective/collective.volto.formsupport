@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Installer for the collective.volto.formsupport package."""
 
 from setuptools import find_packages
@@ -31,6 +30,7 @@ setup(
         "Programming Language :: Python :: 3.9",
         "Operating System :: OS Independent",
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+        "Development Status :: 5 - Production/Stable",
     ],
     keywords="Python Plone CMS",
     author="RedTurtle Technology",
@@ -47,14 +47,23 @@ setup(
     package_dir={"": "src"},
     include_package_data=True,
     zip_safe=False,
-    python_requires=">=3.6",
+    python_requires=">3.6, <3.10",
     install_requires=[
         "setuptools",
         "z3c.jbot",
         "plone.api>=1.8.4",
         "plone.restapi",
-        "plone.app.dexterity",
         "souper.plone",
+        "plone.base",
+        "plone.dexterity",
+        "plone.i18n",
+        "plone.memoize",
+        "plone.protect",
+        "Products.GenericSetup",
+        "repoze.catalog",
+        "six",  # Can we get rid of this is we don't support python2?
+        # Why do we need these?
+        "souper",  # Should be imported by souper.plone
     ],
     extras_require={
         "hcaptcha": [
@@ -69,16 +78,21 @@ setup(
         "honeypot": [
             "collective.honeypot>=2.1",
         ],
+        "blocksfield": [
+            "collective.volto.blocksfield",
+        ],
         "test": [
+            # Plone deps
             "plone.app.testing",
             # Plone KGS does not use this version, because it would break
             # Remove if your package shall be part of coredev.
             # plone_coredev tests as of 2016-04-01.
             "plone.testing>=5.0.0",
+            "plone.browserlayer",
             "plone.app.contenttypes",
-            "plone.app.robotframework[debug]",
+            "Products.MailHost",
+            # Externals
             "collective.MockMailHost",
-            "plone.formwidget.hcaptcha",
             "plone.formwidget.recaptcha",
             "collective.z3cform.norobots",
             "collective.honeypot",

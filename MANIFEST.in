@@ -3,5 +3,8 @@ graft docs
 include *.rst
 include *.GPL
 include *.txt
+recursive-include news *.gitkeep
 global-exclude *.pyc
 exclude coverage.json
+exclude .coveragerc
+exclude *.cfg
