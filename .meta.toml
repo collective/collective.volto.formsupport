@@ -6,4 +6,4 @@ template = "default"
 commit-id = "8c30aa23"
 
 [pyproject]
-dependencies_ignores = """['plone.formwidget.hcaptcha', 'plone.formwidget.recaptcha', 'collective.z3cform.norobots', 'collective.honeypot', 'collective.volto.blocksfield']"""
+dependencies_ignores = "['plone.formwidget.hcaptcha', 'plone.formwidget.recaptcha', 'collective.z3cform.norobots', 'collective.honeypot', 'collective.volto.blocksfield']"
