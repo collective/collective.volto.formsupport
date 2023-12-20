@@ -14,6 +14,7 @@ IGNORED_VALIDATION_DEFINITION_ARGUMENTS = [
     "errmsg",
     "regex",
     "regex_strings",
+    "ignore",
 ]
 
 python_type_to_volto_type_mapping = {
