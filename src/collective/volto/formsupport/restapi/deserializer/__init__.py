@@ -1,4 +1,4 @@
-from plone.restapi.bbb import IPloneSiteRoot
+from plone.base.interfaces import IPloneSiteRoot
 from plone.restapi.behaviors import IBlocks
 from plone.restapi.interfaces import IBlockFieldSerializationTransformer
 from zope.component import adapter
