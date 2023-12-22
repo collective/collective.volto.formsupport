@@ -1,6 +1,11 @@
 from collective.volto.formsupport.validation import getValidations
 
 
+import re
+
+validation_message_matcher = re.compile("Validation failed\(([^\)]+)\): ")
+
+
 class Field:
     def __init__(self, field_data):
         def _attribute(attribute_name):
@@ -58,11 +63,18 @@ class Field:
             if validationId in self._validations
         ]
 
-        errors = []
+        errors = {}
         for validation in available_validations:
             error = validation(self._value)
             if error:
-                errors.append(error)
+                match_result = validation_message_matcher.match(error)
+                # We should be able to clean up messages that follow the
+                #   `Validation failed({validation_id}): {message}` pattern.
+                #   No guarantees we will encounter it though.
+                if match_result:
+                    error = validation_message_matcher.sub("", error)
+
+                errors[validation._name] = error
 
         return (
             errors if errors else None
