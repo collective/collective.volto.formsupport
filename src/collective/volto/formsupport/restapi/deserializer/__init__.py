@@ -58,12 +58,13 @@ class FormBlockSerializerBase:
         for validation_id, validation in matched_validation_definitions:
             settings = vars(validation)["_settings"]
             settings = {
-                k: v
-                for k, v in settings.items()
-                for ignored_setting in IGNORED_VALIDATION_DEFINITION_ARGUMENTS
-                if ignored_setting not in settings
+                setting_name: val
+                for setting_name, val in settings.items()
+                if setting_name not in IGNORED_VALIDATION_DEFINITION_ARGUMENTS
             }
-            field[validation_id] = settings
+
+            if settings:
+                field[validation_id] = settings
 
         # if api.user.has_permission("Modify portal content", obj=self.context):
         #     return value

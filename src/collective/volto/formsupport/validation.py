@@ -34,7 +34,7 @@ def _clean_validation_settings(settings):
 class ValidationDefinition:
     def __init__(self, validator):
         self._name = validator.name
-        self._settings = _clean_validation_settings(vars(validator))
+        self._settings = vars(validator)
 
     def __call__(self, value, **kwargs):
         """Allow using the class directly as a validator"""
