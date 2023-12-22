@@ -17,6 +17,10 @@ class IFieldValidator(Interface):
     """Base marker for collective.volto.formsupport field validators."""
 
 
+def inMaxCharacters(value, **kwargs):
+    breakpoint()
+
+
 def _clean_validation_settings(settings):
     def delete_setting(setting):
         if hasattr(settings, setting):
@@ -40,6 +44,7 @@ class ValidationDefinition:
         """Allow using the class directly as a validator"""
         return self.validate(value, **kwargs)
 
+    @property
     def settings(self):
         return self._settings
 

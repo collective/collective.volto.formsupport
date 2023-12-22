@@ -1,7 +1,16 @@
 <configure xmlns="http://namespaces.zope.org/zope">
 
-  <!-- Custom validator -->
-  <!-- <adapter factory=".validation.VoltoFormSupportValidator" provides="z3c.form.interfaces.IValidator" /> -->
+  <!-- Custom validators -->
+  <utility
+      provides=".validation.IFieldValidator"
+      name="maxCharacters"
+      component=".validation.custom_validators.maxCharacters"
+      />
+  <utility
+      provides=".validation.IFieldValidator"
+      name="minCharacters"
+      component=".validation.custom_validators.minCharacters"
+      />
 
   <!-- All validations vocabulary -->
   <utility

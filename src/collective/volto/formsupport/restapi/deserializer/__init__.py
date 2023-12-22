@@ -15,6 +15,7 @@ IGNORED_VALIDATION_DEFINITION_ARGUMENTS = [
     "regex",
     "regex_strings",
     "ignore",
+    "_internal_type",
 ]
 
 python_type_to_volto_type_mapping = {
@@ -45,6 +46,7 @@ class FormBlockSerializerBase:
         for field in data.get("subblocks", []):
             if len(field.get("validations", [])) > 0:
                 self._expand_validation_field(field)
+
         return data
 
     def _expand_validation_field(self, field):
@@ -56,13 +58,12 @@ class FormBlockSerializerBase:
         ]
 
         for validation_id, validation in matched_validation_definitions:
-            settings = vars(validation)["_settings"]
+            settings = validation.settings
             settings = {
                 setting_name: val
                 for setting_name, val in settings.items()
                 if setting_name not in IGNORED_VALIDATION_DEFINITION_ARGUMENTS
             }
-
             if settings:
                 field[validation_id] = settings
 
