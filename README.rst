@@ -119,6 +119,13 @@ The sent XML follows the same format as the feature in [collective.easyform](htt
 
 The field names in the XML will utilise the Data ID Mapping feature if it is used. Read more about this feature in the following Store section of the documentation.
 
+Acknowledgement email
+^^^^^^^^^^^^^^^
+
+It is possible to also send an email to the user who filled in the form.
+
+Set the 'Send to' value to include `acknowledgement` to enable this behaviour. The additional block field `acknowledgementMessage` can then be used to write the message being sent to the user and the `acknowledgementFields` block field used to choose the field that will contain the email address the acknowledgement will be sent to.
+
 Store
 -----
 
