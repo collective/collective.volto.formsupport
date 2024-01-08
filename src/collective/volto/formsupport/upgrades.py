@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
-from Acquisition import aq_base
 from copy import deepcopy
+
+from Acquisition import aq_base
 from plone import api
 from plone.dexterity.utils import iterSchemata
-from zope.schema import getFields
-from collective.volto.formsupport.interfaces import IFormDataStore
-from zope.component import getMultiAdapter
-from zope.globalrequest import getRequest
-from souper.soup import Record
-from zope.component import getUtility
 from plone.i18n.normalizer.interfaces import IIDNormalizer
+from souper.soup import Record
+from zope.component import getMultiAdapter, getUtility
+from zope.globalrequest import getRequest
+from zope.schema import getFields
 
+from collective.volto.formsupport.interfaces import IFormDataStore
 
 try:
     from collective.volto.blocksfield.field import BlocksField
@@ -19,12 +19,44 @@ try:
 except ImportError:
     HAS_BLOCKSFIELD = False
 
-from collective.volto.formsupport import logger
-
 import json
 
+from collective.volto.formsupport import logger
 
 DEFAULT_PROFILE = "profile-collective.volto.formsupport:default"
+
+
+def _has_block_form(block_data):
+    for block in block_data.values():
+        if block.get("@type", "") == "form":
+            return True
+    return False
+
+
+def _get_all_content_with_blocks():
+    content = []
+
+    portal = api.portal.get()
+    portal_blocks = getattr(portal, "blocks", "")
+    if portal_blocks:
+        if _has_block_form(portal_blocks):
+            content.append(portal)
+
+    pc = api.portal.get_tool(name="portal_catalog")
+    brains = pc()
+    total = len(brains)
+
+    for i, brain in enumerate(brains):
+        if i % 100 == 0:
+            logger.info("Progress: {}/{}".format(i + 1, total))
+        item = brain.getObject()
+        for schema in iterSchemata(item.aq_base):
+            for name, field in getFields(schema).items():
+                if name == "blocks":
+                    if _has_block_form(getattr(item, "blocks", {})):
+                        content.append(item)
+
+    return content
 
 
 def to_1100(context):  # noqa: C901 # pragma: no cover
@@ -166,3 +198,36 @@ def to_1200(context):  # noqa: C901 # pragma: no cover
     logger.info("Fixed {} contents:".format(len(fixed_contents)))
     for path in fixed_contents:
         logger.info("- {}".format(path))
+
+
+def to_1300(context):  # noqa: C901 # pragma: no cover
+    def update_send_from_bool_to_list_for_content(item):
+        blocks = (
+            item.blocks
+        )  # We've already checked we've a form block so no need to guard here
+
+        for block in blocks.values():
+            if block.get("@type", "") != "form":
+                continue
+            send = block.get("send")
+            if isinstance(send, bool):
+                new_send_value = ["recipient"] if block.get("send") else []
+                block["send"] = new_send_value
+                logger.info(
+                    "[CONVERTED] - {} form send value from {} to {}".format(
+                        item, send, new_send_value
+                    )
+                )
+
+        item.blocks = blocks
+
+    logger.info("### START UPGRADE SEND FROM STRING TO ARRAY ###")
+
+    content = _get_all_content_with_blocks()
+
+    for item in content:
+        update_send_from_bool_to_list_for_content(item)
+
+    logger.info("### FINISHED UPGRADE SEND FROM STRING TO ARRAY ###")
+
+    # self.block.get("send")
