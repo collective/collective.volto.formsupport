@@ -201,7 +201,7 @@ class SubmitPost(Service):
                     if field_id:
                         for data in self.form_data.get("data", ""):
                             if data.get("field_id", "") == field_id:
-                                return data["value"]
+                                return data.get("value", "")
 
         return self.form_data.get("from", "") or self.block.get("default_from", "")
 
@@ -396,7 +396,7 @@ class SubmitPost(Service):
         for field in self.filter_parameters():
             SubElement(
                 xmlRoot, "field", name=field.get("custom_field_id", field["label"])
-            ).text = str(field["value"])
+            ).text = str(field.get("value", ""))
 
         doc = ElementTree(xmlRoot)
         doc.write(output, encoding="utf-8", xml_declaration=True)

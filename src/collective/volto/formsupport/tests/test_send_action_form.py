@@ -12,13 +12,13 @@ from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
 from six import StringIO
-import xml.etree.ElementTree as ET
 from zope.component import getUtility
 
-import transaction
-import unittest
 import base64
 import os
+import transaction
+import unittest
+import xml.etree.ElementTree as ET
 
 
 class TestMailSend(unittest.TestCase):
