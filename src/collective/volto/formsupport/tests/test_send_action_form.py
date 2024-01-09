@@ -1,24 +1,27 @@
 # -*- coding: utf-8 -*-
-from collective.volto.formsupport.testing import (  # noqa: E501,
-    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
-)
+import base64
+import os
+import unittest
+import xml.etree.ElementTree as ET
 from email.parser import Parser
+
+import transaction
 from plone import api
-from plone.app.testing import setRoles
-from plone.app.testing import SITE_OWNER_NAME
-from plone.app.testing import SITE_OWNER_PASSWORD
-from plone.app.testing import TEST_USER_ID
+from plone.app.testing import (
+    SITE_OWNER_NAME,
+    SITE_OWNER_PASSWORD,
+    TEST_USER_ID,
+    setRoles,
+)
 from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
 from six import StringIO
 from zope.component import getUtility
 
-import base64
-import os
-import transaction
-import unittest
-import xml.etree.ElementTree as ET
+from collective.volto.formsupport.testing import (  # noqa: E501,
+    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
+)
 
 
 class TestMailSend(unittest.TestCase):
@@ -840,6 +843,46 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("Reply-To: john@doe.com", msg)
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> Paul", msg)
+
+    def test_send_custom_field_id(self):
+        """Custom field IDs should still appear as their friendly names in the email"""
+        self.document.blocks = {
+            "form-id": {"@type": "form", "send": True},
+        }
+        transaction.commit()
+
+        form_data = [
+            {"label": "Name", "value": "John"},
+            {
+                "label": "Other name",
+                "value": "Test",
+                "custom_field_id": "My custom field id",
+            },
+        ]
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": form_data,
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+        self.assertEqual(response.status_code, 204)
+        msg = self.mailhost.messages[0]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+
+        parsed_msgs = Parser().parse(StringIO(msg))
+        body = parsed_msgs.get_payload()
+
+        self.assertIn("Name", body)
+        self.assertIn("John", body)
+        self.assertNotIn("My custom field id", body)
+        self.assertIn("Other name", body)
+        self.assertIn("Test", body)
 
     def test_send_xml(self):
         self.document.blocks = {
