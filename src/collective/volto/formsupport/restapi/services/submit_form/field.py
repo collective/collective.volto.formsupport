@@ -3,7 +3,6 @@ class Field:
         def _attribute(attribute_name):
             setattr(self, attribute_name, field_data.get(attribute_name))
 
-        _attribute("field_id")
         _attribute("field_type")
         _attribute("id")
         _attribute("show_when_when")
@@ -18,6 +17,7 @@ class Field:
         self._value = field_data.get("value", "")
         self._custom_field_id = field_data.get("custom_field_id")
         self._label = field_data.get("label", "")
+        self._field_id = field_data.get("field_id", "")
 
     @property
     def value(self):
@@ -31,13 +31,21 @@ class Field:
 
     @property
     def label(self):
-        if self._custom_field_id:
-            return self._custom_field_id
         return self._label if self._label else self.field_id
 
     @label.setter
     def label(self, label):
         self._label = label
+
+    @property
+    def field_id(self):
+        if self._custom_field_id:
+            return self._custom_field_id
+        return self._field_id if self._field_id else self._label
+
+    @field_id.setter
+    def field_id(self, field_id):
+        self._field_id = field_id
 
     @property
     def send_in_email(self):
