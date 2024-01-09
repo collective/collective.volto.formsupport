@@ -1,6 +1,10 @@
 [run]
 relative_files = True
 
+omit =
+    src/collective/volto/formsupport/tests/*
+    src/collective/volto/formsupport/upgrades.py
+
 [report]
 include =
     */src/collective/*
