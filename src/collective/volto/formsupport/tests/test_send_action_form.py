@@ -847,7 +847,18 @@ class TestMailSend(unittest.TestCase):
     def test_send_custom_field_id(self):
         """Custom field IDs should still appear as their friendly names in the email"""
         self.document.blocks = {
-            "form-id": {"@type": "form", "send": True},
+            "form-id": {
+                "@type": "form",
+                "send": True,
+                "internal_mapped_name": "renamed-internal_mapped_name",
+                "subblocks": [
+                    {
+                        "field_id": "internal_mapped_name",
+                        "label": "Name with internal mapping",
+                        "field_type": "text",
+                    },
+                ],
+            },
         }
         transaction.commit()
 
@@ -857,6 +868,10 @@ class TestMailSend(unittest.TestCase):
                 "label": "Other name",
                 "value": "Test",
                 "custom_field_id": "My custom field id",
+            },
+            {
+                "field_id": "internal_mapped_name",
+                "value": "Test",
             },
         ]
 
@@ -883,17 +898,40 @@ class TestMailSend(unittest.TestCase):
         self.assertNotIn("My custom field id", body)
         self.assertIn("Other name", body)
         self.assertIn("Test", body)
+        self.assertIn("Name with internal mapping", body)
 
     def test_send_xml(self):
         self.document.blocks = {
-            "form-id": {"@type": "form", "send": True, "attachXml": True},
+            "form-id": {
+                "@type": "form",
+                "send": True,
+                "attachXml": True,
+                "custom_name": "renamed_custom_name",
+                "subblocks": [
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "field_type": "text",
+                    },
+                    {
+                        "field_id": "name",
+                        "label": "Name",
+                        "field_type": "text",
+                    },
+                    {
+                        "field_id": "custom_name",
+                        "label": "Name",
+                        "field_type": "text",
+                    },
+                ],
+            },
         }
         transaction.commit()
 
         form_data = [
             {"label": "Message", "value": "just want to say hi"},
             {"label": "Name", "value": "John"},
-            {"label": "Name", "value": "Test", "custom_field_id": "My custom field id"},
+            {"label": "Name", "value": "Test"},
         ]
 
         response = self.submit_form(
