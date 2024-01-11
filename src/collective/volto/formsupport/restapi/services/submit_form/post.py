@@ -83,6 +83,7 @@ class SubmitPost(Service):
                             **field,
                             **submitted_field,
                             "display_value_mapping": field.get("display_values"),
+                            "custom_field_id": self.block.get(field["field_id"]),
                         }
                     )
         self.fields = construct_fields(fields_data)
