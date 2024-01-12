@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from collective.volto.formsupport import _
-from collective.volto.formsupport.interfaces import ICaptchaSupport
-from collective.volto.formsupport.interfaces import IFormDataStore
-from collective.volto.formsupport.interfaces import IPostEvent
-from collective.volto.formsupport.restapi.services.submit_form.field import (
-    construct_fields,
-)
-from collective.volto.formsupport.utils import get_blocks
+
+import codecs
+import logging
+import math
+import os
 from datetime import datetime
 from email.message import EmailMessage
+from xml.etree.ElementTree import Element, ElementTree, SubElement
+
+import six
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
@@ -17,21 +17,22 @@ from plone.restapi.deserializer import json_body
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
-from xml.etree.ElementTree import ElementTree, Element, SubElement
 from zExceptions import BadRequest
-from zope.component import getMultiAdapter
-from zope.component import getUtility
+from zope.component import getMultiAdapter, getUtility
 from zope.event import notify
 from zope.i18n import translate
-from zope.interface import alsoProvides
-from zope.interface import implementer
+from zope.interface import alsoProvides, implementer
 
-import codecs
-import logging
-import math
-import os
-import six
-
+from collective.volto.formsupport import _
+from collective.volto.formsupport.interfaces import (
+    ICaptchaSupport,
+    IFormDataStore,
+    IPostEvent,
+)
+from collective.volto.formsupport.restapi.services.submit_form.field import (
+    construct_fields,
+)
+from collective.volto.formsupport.utils import get_blocks
 
 logger = logging.getLogger(__name__)
 CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
@@ -60,7 +61,7 @@ class SubmitPost(Service):
         self.validate_form()
 
         store_action = self.block.get("store", False)
-        send_action = self.block.get("send", False)
+        send_action = self.block.get("send", [])
 
         # Disable CSRF protection
         alsoProvides(self.request, IDisableCSRFProtection)
@@ -82,7 +83,8 @@ class SubmitPost(Service):
                         {
                             **field,
                             **submitted_field,
-                            "dislpay_value_mapping": field.get("display_values"),
+                            "display_value_mapping": field.get("display_values"),
+                            "custom_field_id": self.block.get(field["field_id"]),
                         }
                     )
         self.fields = construct_fields(fields_data)
@@ -152,7 +154,7 @@ class SubmitPost(Service):
                 ),
             )
 
-        if not self.block.get("store", False) and not self.block.get("send", False):
+        if not self.block.get("store", False) and not self.block.get("send", []):
             raise BadRequest(
                 translate(
                     _(
@@ -245,7 +247,7 @@ class SubmitPost(Service):
                     if field_id:
                         for data in self.form_data.get("data", ""):
                             if data.get("field_id", "") == field_id:
-                                return data["value"]
+                                return data.get("value", "")
 
         return self.form_data.get("from", "") or self.block.get("default_from", "")
 
@@ -265,6 +267,14 @@ class SubmitPost(Service):
             if data.get("field_id", "") in bcc_fields:
                 bcc.append(data["value"])
         return bcc
+
+    def get_acknowledgement_field_value(self):
+        acknowledgementField = self.block["acknowledgementFields"]
+        for field in self.block.get("subblocks", []):
+            if field.get("field_id") == acknowledgementField:
+                for data in self.form_data.get("data", []):
+                    if data.get("field_id", "") == field.get("field_id"):
+                        return data.get("value")
 
     def send_data(self):
         subject = self.form_data.get("subject", "") or self.block.get(
@@ -294,32 +304,53 @@ class SubmitPost(Service):
 
         registry = getUtility(IRegistry)
         mail_settings = registry.forInterface(IMailSchema, prefix="plone")
-        mto = self.block.get("default_to", mail_settings.email_from_address)
         charset = registry.get("plone.email_charset", "utf-8")
-        message = self.prepare_message()
 
-        msg = EmailMessage()
-        msg.set_content(message, charset=charset, subtype="html", cte=CTE)
-        msg["Subject"] = subject
-        msg["From"] = mfrom
-        msg["To"] = mto
-        msg["Reply-To"] = mreply_to
+        should_send = self.block.get("send", [])
+        if should_send:
+            mto = self.block.get("default_to", mail_settings.email_from_address)
+            message = self.prepare_message()
 
-        msg.replace_header("Content-Type", 'text/html; charset="utf-8"')
+            msg = EmailMessage()
+            msg.set_content(message, charset=charset, subtype="html", cte=CTE)
+            msg["Subject"] = subject
+            msg["From"] = mfrom
+            msg["To"] = mto
+            msg["Reply-To"] = mreply_to
+            msg.replace_header("Content-Type", 'text/html; charset="utf-8"')
 
-        headers_to_forward = self.block.get("httpHeaders", [])
-        for header in headers_to_forward:
-            header_value = self.request.get(header)
-            if header_value:
-                msg[header] = header_value
+            headers_to_forward = self.block.get("httpHeaders", [])
+            for header in headers_to_forward:
+                header_value = self.request.get(header)
+                if header_value:
+                    msg[header] = header_value
 
-        self.manage_attachments(msg=msg)
-        self.send_mail(msg=msg, charset=charset)
+            self.manage_attachments(msg=msg)
 
-        for bcc in self.get_bcc():
+            if isinstance(should_send, list):
+                if "recipient" in self.block.get("send", []):
+                    self.send_mail(msg=msg, charset=charset)
+                # Backwards compatibility for forms before 'acknowledgement' sending
+            else:
+                self.send_mail(msg=msg, charset=charset)
+
             # send a copy also to the fields with bcc flag
-            msg.replace_header("To", bcc)
-            self.send_mail(msg=msg, charset=charset)
+            for bcc in self.get_bcc():
+                msg.replace_header("To", bcc)
+                self.send_mail(msg=msg, charset=charset)
+
+        acknowledgement_message = self.block.get("acknowledgementMessage")
+        if acknowledgement_message and "acknowledgement" in self.block.get("send", []):
+            acknowledgement_address = self.get_acknowledgement_field_value()
+            if acknowledgement_address:
+                acknowledgement_mail = EmailMessage()
+                acknowledgement_mail["Subject"] = subject
+                acknowledgement_mail["From"] = mfrom
+                acknowledgement_mail["To"] = acknowledgement_address
+                acknowledgement_mail.set_content(
+                    acknowledgement_message.get("data"), subtype="html", charset="utf-8"
+                )
+                self.send_mail(msg=acknowledgement_mail, charset=charset)
 
     def prepare_message(self):
         email_format_page_template_mapping = {
@@ -400,7 +431,7 @@ class SubmitPost(Service):
         xmlRoot = Element("form")
 
         for field in self.filter_parameters():
-            SubElement(xmlRoot, "field", name=field.label).text = str(field._value)
+            SubElement(xmlRoot, "field", name=field.field_id).text = str(field._value)
 
         doc = ElementTree(xmlRoot)
         doc.write(output, encoding="utf-8", xml_declaration=True)

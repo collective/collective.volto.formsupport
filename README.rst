@@ -119,6 +119,13 @@ The sent XML follows the same format as the feature in [collective.easyform](htt
 
 The field names in the XML will utilise the Data ID Mapping feature if it is used. Read more about this feature in the following Store section of the documentation.
 
+Acknowledgement email
+^^^^^^^^^^^^^^^
+
+It is possible to also send an email to the user who filled in the form.
+
+Set the 'Send to' value to include `acknowledgement` to enable this behaviour. The additional block field `acknowledgementMessage` can then be used to write the message being sent to the user and the `acknowledgementFields` block field used to choose the field that will contain the email address the acknowledgement will be sent to.
+
 Store
 -----
 
@@ -250,6 +257,13 @@ Examples
 This add-on can be seen in action at the following sites:
 
 - https://www.comune.modena.it/form/contatti
+
+Custom label mapping
+=========================
+
+In some cases, the text that is displayed for a field on the page and in the sent email may need to be different from the value that is stored internally. For example, you may want your "Yes/ No" widget to show "Accept" and "Decline" as the labels, but internally still store `True` and `False`.
+
+By storing a `display_values` dictionary for each field in the block data, you can perform these mappings.
 
 
 Translations
