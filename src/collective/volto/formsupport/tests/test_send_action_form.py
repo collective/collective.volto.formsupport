@@ -746,8 +746,8 @@ class TestMailSend(unittest.TestCase):
         self.assertIn(
             """<thead>
       <tr role="row">
-        <th scope="col" role="columnheader">Field</th>
-        <th scope="col" role="columnheader">Value</th>
+        <th align="left" scope="col" role="columnheader">Field</th>
+        <th align="left" scope="col" role="columnheader">Value</th>
       </tr>
     </thead>""",
             msg,
@@ -755,16 +755,16 @@ class TestMailSend(unittest.TestCase):
 
         self.assertIn(
             """<tr role="row">
-          <th scope="row" role="rowheader">Name</th>""",
+          <th align="left" scope="row" role="rowheader">Name</th>""",
             msg,
         )
-        self.assertIn(f"<td>{name}</td>", msg)
+        self.assertIn(f'<td align="left">{name}</td>', msg)
         self.assertIn(
             """<tr role="row">
-          <th scope="row" role="rowheader">""",
+          <th align="left" scope="row" role="rowheader">""",
             msg,
         )
-        self.assertIn(f"<td>{message}</td>", msg)
+        self.assertIn(f'<td align="left">{message}</td>', msg)
 
     def test_email_body_formated_as_list(
         self,
