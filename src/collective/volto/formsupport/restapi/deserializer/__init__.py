@@ -1,6 +1,8 @@
 from plone.base.interfaces import IPloneSiteRoot
 from plone.restapi.behaviors import IBlocks
-from plone.restapi.interfaces import IBlockFieldSerializationTransformer
+from plone.restapi.interfaces import IBlockFieldDeserializationTransformer
+
+# from plone.restapi.interfaces import IBlockFieldSerializationTransformer
 from zope.component import adapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
@@ -25,9 +27,8 @@ python_type_to_volto_type_mapping = {
 }
 
 
-@implementer(IBlockFieldSerializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
-class FormBlockSerializerBase:
+class FormBlockDeserializerBase:
     block_type = "form"
     order = 100
 
@@ -43,41 +44,47 @@ class FormBlockSerializerBase:
         data,
     ):
         # Field is the full field definition
-        for field in data.get("subblocks", []):
+        for index, field in enumerate(data.get("subblocks", [])):
             if len(field.get("validations", [])) > 0:
-                self._expand_validation_field(field)
+                data["subblocks"][index] = self._update_validations(field)
 
         return data
 
-    def _expand_validation_field(self, field):
-        field_validations = field.get("validations")
-        matched_validation_definitions = [
-            validation
-            for validation in getValidations()
-            if validation[0] in field_validations
-        ]
-
-        for validation_id, validation in matched_validation_definitions:
-            settings = validation.settings
-            settings = {
-                setting_name: val
-                for setting_name, val in settings.items()
-                if setting_name not in IGNORED_VALIDATION_DEFINITION_ARGUMENTS
-            }
+    def _update_validations(self, field):
+        validations = field.get("validations")
+        new_settings = field.get("validationSettings")
+        # The settings were collapsed on the frontend, we need to find the validation it was for
+        for validation_id in validations:
+            settings = (
+                {
+                    setting_name: val
+                    for setting_name, val in new_settings.items()
+                    if setting_name not in IGNORED_VALIDATION_DEFINITION_ARGUMENTS
+                }
+                if field.get(validation_id)
+                else None
+            )
             if settings:
                 field[validation_id] = settings
 
-        # if api.user.has_permission("Modify portal content", obj=self.context):
-        #     return value
+                validation_to_update = [
+                    validation
+                    for validation in getValidations()
+                    if validation[0] == validation_id
+                ][0][1]
+                for setting_id, setting_value in settings.items():
+                    validation_to_update._settings[setting_id] = setting_value
+
+        return field
 
 
-@implementer(IBlockFieldSerializationTransformer)
+@implementer(IBlockFieldDeserializationTransformer)
 @adapter(IBlocks, IBrowserRequest)
-class FormBlockSerializer(FormBlockSerializerBase):
+class FormBlockDeserializer(FormBlockDeserializerBase):
     """Serializer for content-types with IBlocks behavior"""
 
 
-@implementer(IBlockFieldSerializationTransformer)
+@implementer(IBlockFieldDeserializationTransformer)
 @adapter(IPloneSiteRoot, IBrowserRequest)
-class FormBlockSerializerRoot(FormBlockSerializerBase):
+class FormBlockDeserializerRoot(FormBlockDeserializerBase):
     """Serializer for site root"""

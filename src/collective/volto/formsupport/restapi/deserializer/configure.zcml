@@ -5,12 +5,12 @@
     >
 
   <subscriber
-      factory="collective.volto.formsupport.restapi.deserializer.FormBlockSerializer"
-      provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
+      factory="collective.volto.formsupport.restapi.deserializer.FormBlockDeserializer"
+      provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
       />
   <subscriber
-      factory="collective.volto.formsupport.restapi.deserializer.FormBlockSerializerRoot"
-      provides="plone.restapi.interfaces.IBlockFieldSerializationTransformer"
+      factory="collective.volto.formsupport.restapi.deserializer.FormBlockDeserializerRoot"
+      provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
       />
 
 </configure>

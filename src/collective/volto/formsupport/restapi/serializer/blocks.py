@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
-from collective.volto.formsupport.interfaces import ICaptchaSupport
-from collective.volto.formsupport.interfaces import ICollectiveVoltoFormsupportLayer
+import os
+
 from plone import api
 from plone.restapi.behaviors import IBlocks
 from plone.restapi.interfaces import IBlockFieldSerializationTransformer
+from plone.restapi.serializer.converters import json_compatible
 from Products.CMFPlone.interfaces import IPloneSiteRoot
-from zope.component import adapter
-from zope.component import getMultiAdapter
+from zope.component import adapter, getMultiAdapter
 from zope.interface import implementer
 
-import os
-
+from collective.volto.formsupport.interfaces import (
+    ICaptchaSupport,
+    ICollectiveVoltoFormsupportLayer,
+)
+from collective.volto.formsupport.validation import getValidations
 
 IGNORED_VALIDATION_DEFINITION_ARGUMENTS = [
     "title",
@@ -50,28 +53,33 @@ class FormSerializer(object):
         if attachments_limit:
             value["attachments_limit"] = attachments_limit
 
-        for field in value.get("subblocks", []):
-            if field.get('validationSettings'):
-                self._update_validations(field)
+        for index, field in enumerate(value.get("subblocks", [])):
+            if field.get("validationSettings"):
+                value["subblocks"][index] = self._expand_validation_field(field)
 
         if api.user.has_permission("Modify portal content", obj=self.context):
             return value
         return {k: v for k, v in value.items() if not k.startswith("default_")}
 
-    def _update_validations(self, field):
-        validations = field.get("validations")
-        new_settings = field.get('validationSettings')
-        # The settings were collapsed on the frontend, we need to find the validation it was for
-        for validation_id in validations:
+    def _expand_validation_field(self, field):
+        field_validations = field.get("validations")
+        matched_validation_definitions = [
+            validation
+            for validation in getValidations()
+            if validation[0] in field_validations
+        ]
+
+        for validation_id, validation in matched_validation_definitions:
+            settings = validation.settings
             settings = {
                 setting_name: val
-                for setting_name, val in new_settings.items()
+                for setting_name, val in settings.items()
                 if setting_name not in IGNORED_VALIDATION_DEFINITION_ARGUMENTS
-            } if field.get(validation_id) else None
-            # breakpoint()
+            }
             if settings:
-                field[validation_id] = settings
-                    
+                field[validation_id] = json_compatible(settings)
+
+        return field
 
 
 @implementer(IBlockFieldSerializationTransformer)
