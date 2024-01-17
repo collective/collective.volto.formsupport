@@ -19,24 +19,6 @@ class IFieldValidator(Interface):
     """Base marker for collective.volto.formsupport field validators."""
 
 
-def inMaxCharacters(value, **kwargs):
-    breakpoint()
-
-
-def _clean_validation_settings(settings):
-    def delete_setting(setting):
-        if hasattr(settings, setting):
-            del settings[setting]
-
-    delete_setting("name")
-    delete_setting("title")
-    delete_setting("description")
-    delete_setting("regex_strings")
-    delete_setting("regex")
-    delete_setting("errmsg")
-    return settings
-
-
 def _update_validators():
     """
     Add Products.validation validators to the available list of validators
