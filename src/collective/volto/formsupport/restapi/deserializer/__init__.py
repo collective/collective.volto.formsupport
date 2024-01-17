@@ -59,20 +59,18 @@ class FormBlockDeserializerBase:
             return field
 
         # The settings were collapsed to a single control on the frontend, we need to find the validation it was for and tidy things up before continuing
-        if set(validation_ids_on_field) != set(all_validation_settings):
-            top_level_settings = {
-                setting_id: setting_value
-                for setting_id, setting_value in all_validation_settings.items()
-                if setting_id not in validation_ids_on_field
-            }
-            top_level_setting_ids = []
-            for validation_id, settings in all_validation_settings.items():
-                if set(settings) == set(top_level_settings):
-                    all_validation_settings[validation_id] = top_level_settings
-                    for setting_id in top_level_settings.keys():
-                        top_level_setting_ids.append(setting_id)
-            for setting_id in top_level_setting_ids:
-                del all_validation_settings[setting_id]
+        all_setting_ids = all_validation_settings.keys()
+        top_level_setting_ids = []
+        for validation_id in validation_ids_on_field:
+            id_to_check = f"{validation_id}-"
+            for setting_id in all_setting_ids:
+                if setting_id.startswith(id_to_check):
+                    top_level_setting_ids.append(setting_id)
+        for top_level_setting_id in top_level_setting_ids:
+            validation_id, setting_id = top_level_setting_id.split("-")
+            all_validation_settings[validation_id][
+                setting_id
+            ] = all_validation_settings[top_level_setting_id]
 
         # update the internal definitions for the field settings
         for validation_id in validation_ids_on_field:
@@ -105,9 +103,6 @@ class FormBlockDeserializerBase:
                 keys_to_delete.append(key)
         for key in keys_to_delete:
             del all_validation_settings[key]
-
-        # # Finally, update the actual validators with what's left in the validation settings
-        # breakpoint()
 
         return field
 
