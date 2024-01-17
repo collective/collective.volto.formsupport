@@ -5,8 +5,10 @@ from zope.interface import Interface, provider
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleVocabulary
 
+from collective.volto.formsupport.validation.custom_validators import custom_validators
+from collective.volto.formsupport.validation.definition import ValidationDefinition
+
 try:
-    from Products.validation import validation
     from Products.validation.validators.BaseValidators import baseValidators
 except ImportError:  # Products.validation is optional
     validation = None
@@ -35,41 +37,25 @@ def _clean_validation_settings(settings):
     return settings
 
 
-class ValidationDefinition:
-    def __init__(self, validator):
-        self._name = validator.name
-        self._settings = vars(validator)
-
-    def __call__(self, value, **kwargs):
-        """Allow using the class directly as a validator"""
-        return self.validate(value, **kwargs)
-
-    @property
-    def settings(self):
-        return self._settings
-
-    def validate(self, value, **kwargs):
-        if value is None:
-            # Let the system for required take care of None values
-            return
-        res = validation(self._name, value, **kwargs)
-        if res != 1:
-            return res
-
-
 def _update_validators():
     """
     Add Products.validation validators to the available list of validators
     Code taken from collective.easyform . Could lookup based on `IValidator` instead of re-registering?
     """
 
-    if validation and baseValidators:
+    if baseValidators:
         for validator in baseValidators:
             provideUtility(
                 ValidationDefinition(validator),
                 provides=IFieldValidator,
                 name=validator.name,
             )
+    for validator in custom_validators:
+        provideUtility(
+            ValidationDefinition(validator),
+            provides=IFieldValidator,
+            name=validator.name,
+        )
 
 
 _update_validators()

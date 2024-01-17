@@ -1,0 +1,10 @@
+<configure xmlns="http://namespaces.zope.org/zope">
+
+  <!-- All validations vocabulary -->
+  <utility
+      name="collective.volto.formsupport.Validators"
+      component=".validation.ValidatorsVocabularyFactory"
+      />
+
+
+</configure>

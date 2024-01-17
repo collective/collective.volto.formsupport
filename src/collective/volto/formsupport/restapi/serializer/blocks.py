@@ -4,7 +4,6 @@ import os
 from plone import api
 from plone.restapi.behaviors import IBlocks
 from plone.restapi.interfaces import IBlockFieldSerializationTransformer
-from plone.restapi.serializer.converters import json_compatible
 from Products.CMFPlone.interfaces import IPloneSiteRoot
 from zope.component import adapter, getMultiAdapter
 from zope.interface import implementer
@@ -13,7 +12,6 @@ from collective.volto.formsupport.interfaces import (
     ICaptchaSupport,
     ICollectiveVoltoFormsupportLayer,
 )
-from collective.volto.formsupport.validation import getValidations
 
 IGNORED_VALIDATION_DEFINITION_ARGUMENTS = [
     "title",
@@ -62,22 +60,19 @@ class FormSerializer(object):
         return {k: v for k, v in value.items() if not k.startswith("default_")}
 
     def _expand_validation_field(self, field):
-        field_validations = field.get("validations")
-        matched_validation_definitions = [
-            validation
-            for validation in getValidations()
-            if validation[0] in field_validations
-        ]
-
-        for validation_id, validation in matched_validation_definitions:
-            settings = validation.settings
-            settings = {
-                setting_name: val
+        """Adds the individual validation settings to the `validationSettings` key in the format `{validation_id}-{setting_name}`"""
+        validation_settings = field.get("validationSettings")
+        settings_to_add = {}
+        for validation_id, settings in validation_settings.items():
+            cleaned_settings = {
+                f"{validation_id}-{setting_name}": val
                 for setting_name, val in settings.items()
                 if setting_name not in IGNORED_VALIDATION_DEFINITION_ARGUMENTS
             }
-            if settings:
-                field[validation_id] = json_compatible(settings)
+
+            if cleaned_settings:
+                settings_to_add = {**settings_to_add, **cleaned_settings}
+        field["validationSettings"] = {**validation_settings, **settings_to_add}
 
         return field
 

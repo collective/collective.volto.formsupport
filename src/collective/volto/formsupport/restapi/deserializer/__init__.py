@@ -51,29 +51,63 @@ class FormBlockDeserializerBase:
         return data
 
     def _update_validations(self, field):
-        validations = field.get("validations")
-        new_settings = field.get("validationSettings")
-        # The settings were collapsed on the frontend, we need to find the validation it was for
-        for validation_id in validations:
-            settings = (
-                {
-                    setting_name: val
-                    for setting_name, val in new_settings.items()
-                    if setting_name not in IGNORED_VALIDATION_DEFINITION_ARGUMENTS
-                }
-                if field.get(validation_id)
-                else None
-            )
-            if settings:
-                field[validation_id] = settings
+        validation_ids_on_field = field.get("validations")
+        all_validation_settings = field.get("validationSettings")
 
-                validation_to_update = [
-                    validation
-                    for validation in getValidations()
-                    if validation[0] == validation_id
-                ][0][1]
-                for setting_id, setting_value in settings.items():
-                    validation_to_update._settings[setting_id] = setting_value
+        if not validation_ids_on_field:
+            field["validationSettings"] = {}
+            return field
+
+        # The settings were collapsed to a single control on the frontend, we need to find the validation it was for and tidy things up before continuing
+        if set(validation_ids_on_field) != set(all_validation_settings):
+            top_level_settings = {
+                setting_id: setting_value
+                for setting_id, setting_value in all_validation_settings.items()
+                if setting_id not in validation_ids_on_field
+            }
+            top_level_setting_ids = []
+            for validation_id, settings in all_validation_settings.items():
+                if set(settings) == set(top_level_settings):
+                    all_validation_settings[validation_id] = top_level_settings
+                    for setting_id in top_level_settings.keys():
+                        top_level_setting_ids.append(setting_id)
+            for setting_id in top_level_setting_ids:
+                del all_validation_settings[setting_id]
+
+        # update the internal definitions for the field settings
+        for validation_id in validation_ids_on_field:
+            validation_to_update = [
+                validation
+                for validation in getValidations()
+                if validation[0] == validation_id
+            ][0][1]
+
+            validation_settings = all_validation_settings.get(validation_id)
+
+            if validation_settings:
+                for setting_name, setting_value in all_validation_settings[
+                    validation_id
+                ].items():
+                    if setting_name in IGNORED_VALIDATION_DEFINITION_ARGUMENTS:
+                        continue
+                    validation_to_update._settings[setting_name] = setting_value
+
+            field["validationSettings"][validation_id] = {
+                k: v
+                for k, v in validation_to_update.settings.items()
+                if k not in IGNORED_VALIDATION_DEFINITION_ARGUMENTS
+            }
+
+        # Remove any old settings
+        keys_to_delete = []
+        for key in all_validation_settings.keys():
+            if key not in validation_ids_on_field:
+                keys_to_delete.append(key)
+        for key in keys_to_delete:
+            del all_validation_settings[key]
+
+        # # Finally, update the actual validators with what's left in the validation settings
+        # breakpoint()
 
         return field
 

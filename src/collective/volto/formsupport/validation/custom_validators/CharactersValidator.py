@@ -1,12 +1,12 @@
 from Products.validation.interfaces.IValidator import IValidator
 from zope.interface import implementer
 
-from collective.volto.formsupport.validation import ValidationDefinition
+from collective.volto.formsupport.validation.definition import ValidationDefinition
 
 
 # TODO: Tidy up code structure so we don't need to be a definition
 @implementer(IValidator)
-class CharactersValidator(ValidationDefinition):
+class CharactersValidator():
     def __init__(self, name, title="", description="", characters=0, _internal_type=""):
         self.name = name
         self.title = title or name
@@ -25,18 +25,20 @@ class CharactersValidator(ValidationDefinition):
 
     def __call__(self, value="", *args, **kwargs):
         if self._internal_type == "max":
-            if (not value or len(value) > self.characters):
+            if not value or len(value) > self.characters:
                 # TODO: i18n
                 msg = f"Validation failed({self.name}): is more than {self.characters}"
                 return msg
         elif self._internal_type == "min":
-            if (not value or len(value) < self.characters):
+            if not value or len(value) < self.characters:
                 # TODO: i18n
-                msg = f"Validation failed({self.name}): is less than {self.characters}",
+                msg = (
+                    f"Validation failed({self.name}): is less than {self.characters}",
+                )
                 return msg
         else:
             # TODO: i18n
-            msg = f"Validation failed({self.name}): Unknown characters validator type",
+            msg = (
+                f"Validation failed({self.name}): Unknown characters validator type",
+            )
             return msg
-
-
