@@ -5,6 +5,9 @@ class ValidationDefinition:
     def __init__(self, validator):
         self._name = validator.name
         self._settings = vars(validator)
+        # Make sure the validation service has the validator in it.
+        if not validation._validator.get(validator.name):
+            validation.register(validator)
 
     def __call__(self, value, **kwargs):
         """Allow using the class directly as a validator"""
@@ -22,6 +25,6 @@ class ValidationDefinition:
         if value is None:
             # Let the system for required take care of None values
             return
-        res = validation(self._name, value, **kwargs)
+        res = validation(self._name, value, **self.settings, **kwargs)
         if res != 1:
             return res
