@@ -64,6 +64,8 @@ class FormSerializer(object):
         validation_settings = field.get("validationSettings")
         settings_to_add = {}
         for validation_id, settings in validation_settings.items():
+            if not isinstance(settings, dict):
+                continue
             cleaned_settings = {
                 f"{validation_id}-{setting_name}": val
                 for setting_name, val in settings.items()
