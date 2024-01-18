@@ -2,7 +2,6 @@ from Products.validation.interfaces.IValidator import IValidator
 from zope.interface import implementer
 
 
-# TODO: Tidy up code structure so we don't need to be a definition
 @implementer(IValidator)
 class CharactersValidator:
     def __init__(self, name, title="", description="", characters=0, _internal_type=""):
@@ -12,21 +11,22 @@ class CharactersValidator:
         self.characters = characters
         self._internal_type = _internal_type
 
-    @property
-    def settings(self):
-        return vars(self)
-
     def __call__(self, value="", *args, **kwargs):
+        characters = (
+            int(self.characters)
+            if isinstance(self.characters, str)
+            else self.characters
+        )
         if self._internal_type == "max":
-            if not value or len(value) > self.characters:
+            if not value or len(value) > characters:
                 # TODO: i18n
-                msg = f"Validation failed({self.name}): is more than {self.characters}"
+                msg = f"Validation failed({self.name}): is more than {characters} characters long"
                 return msg
         elif self._internal_type == "min":
-            if not value or len(value) < self.characters:
+            if not value or len(value) < characters:
                 # TODO: i18n
                 msg = (
-                    f"Validation failed({self.name}): is less than {self.characters}",
+                    f"Validation failed({self.name}): is less than {characters} characters long",
                 )
                 return msg
         else:
