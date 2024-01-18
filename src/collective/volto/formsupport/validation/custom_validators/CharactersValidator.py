@@ -18,20 +18,18 @@ class CharactersValidator:
             else self.characters
         )
         if self._internal_type == "max":
-            if not value or len(value) > characters:
+            if not value:
+                return
+            if len(value) > characters:
                 # TODO: i18n
                 msg = f"Validation failed({self.name}): is more than {characters} characters long"
                 return msg
         elif self._internal_type == "min":
             if not value or len(value) < characters:
                 # TODO: i18n
-                msg = (
-                    f"Validation failed({self.name}): is less than {characters} characters long",
-                )
+                msg = f"Validation failed({self.name}): is less than {characters} characters long"
                 return msg
         else:
             # TODO: i18n
-            msg = (
-                f"Validation failed({self.name}): Unknown characters validator type",
-            )
+            msg = f"Validation failed({self.name}): Unknown characters validator type"
             return msg
