@@ -91,7 +91,7 @@ class FormDataStore(object):
         for field_data in data:
             field_id = field_data.field_id
             # TODO: not nice using the protected member to access the real internal value, but easiest way.
-            value = field_data._value
+            value = field_data.value
             if field_id in fields:
                 record.attrs[field_id] = value
                 fields_labels[field_id] = fields[field_id]

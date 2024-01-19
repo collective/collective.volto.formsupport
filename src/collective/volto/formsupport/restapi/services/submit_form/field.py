@@ -20,32 +20,24 @@ class Field:
         self._field_id = field_data.get("field_id", "")
 
     @property
-    def value(self):
+    def display_value(self):
         if self._display_value_mapping:
             return self._display_value_mapping.get(self._value, self._value)
         return self._value
 
-    @value.setter
-    def value(self, value):
-        self._value = value
+    @property
+    def value(self):
+        return self._value
 
     @property
     def label(self):
         return self._label if self._label else self.field_id
-
-    @label.setter
-    def label(self, label):
-        self._label = label
 
     @property
     def field_id(self):
         if self._custom_field_id:
             return self._custom_field_id
         return self._field_id if self._field_id else self._label
-
-    @field_id.setter
-    def field_id(self, field_id):
-        self._field_id = field_id
 
     @property
     def send_in_email(self):
@@ -55,12 +47,12 @@ class Field:
 class YesNoField(Field):
     @property
     def value(self):
-        if self._display_value_mapping:
-            if self._value is True:
-                return self._display_value_mapping.get("yes")
-            elif self._value is False:
-                return self._display_value_mapping.get("no")
-        return self._value
+        if not self._display_value_mapping:
+            return self._value
+        if self._value is True:
+            return self._display_value_mapping.get("yes")
+        elif self._value is False:
+            return self._display_value_mapping.get("no")
 
     @property
     def send_in_email(self):
