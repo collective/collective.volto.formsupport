@@ -26,7 +26,7 @@ class Field:
         return self._value
 
     @property
-    def value(self):
+    def internal_value(self):
         return self._value
 
     @property
@@ -46,7 +46,7 @@ class Field:
 
 class YesNoField(Field):
     @property
-    def value(self):
+    def display_value(self):
         if not self._display_value_mapping:
             return self._value
         if self._value is True:
