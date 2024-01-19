@@ -258,7 +258,7 @@ This add-on can be seen in action at the following sites:
 
 - https://www.comune.modena.it/form/contatti
 
-Custom label mapping
+Storing different values from how they are displayed
 =========================
 
 In some cases, the text that is displayed for a field on the page and in the sent email may need to be different from the value that is stored internally. For example, you may want your "Yes/ No" widget to show "Accept" and "Decline" as the labels, but internally still store `True` and `False`.
