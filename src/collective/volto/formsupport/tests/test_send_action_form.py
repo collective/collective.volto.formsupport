@@ -811,11 +811,31 @@ class TestMailSend(unittest.TestCase):
                         "field_id": "12345678",
                         "display_values": {"John": "Paul"},
                     },
+                    {
+                        "field_id": "000000002",
+                        "field_type": "yes_no",
+                        "widget": "single_choice",
+                        "display_values": {"yes": "Correct", "no": "Incorrect"},
+                    },
+                    {
+                        "label": "Yes/ no radio without display value",
+                        "field_id": "000000003",
+                        "field_type": "yes_no",
+                        "widget": "single_choice",
+                    },
+                    {
+                        "label": "My attachment field",
+                        "field_id": "000000004",
+                        "field_type": "attachment",
+                    },
                 ],
             }
         }
         transaction.commit()
 
+        filename = os.path.join(os.path.dirname(__file__), "file.pdf")
+        with open(filename, "rb") as f:
+            file_str = f.read()
         response = self.submit_form(
             data={
                 "from": "john@doe.com",
@@ -826,7 +846,21 @@ class TestMailSend(unittest.TestCase):
                         "field_id": "12345678",
                         "value": "John",
                     },
+                    {
+                        "label": "Yes/ no",
+                        "field_id": "000000002",
+                        "value": True,
+                    },
+                    {
+                        "field_id": "000000003",
+                        "value": True,
+                    },
+                    {
+                        "field_id": "000000004",
+                        "value": "Attachments don't work this way normally, this is just to test",
+                    },
                 ],
+                "attachments": {"foo": {"data": base64.b64encode(file_str)}},
                 "subject": "test subject",
                 "block_id": "form-id",
             },
@@ -843,6 +877,47 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("Reply-To: john@doe.com", msg)
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> Paul", msg)
+        self.assertIn("<strong>Yes/ no:</strong> Correct", msg)
+        self.assertIn("<strong>Yes/ no radio without display value:</strong> True", msg)
+        self.assertNotIn(
+            "<strong>My attachment field:</strong>",
+            Parser()
+            .parse(StringIO(msg))
+            .get_payload()[0]
+            .get_payload(),  # 1st get_payload splits the messages. First message is the body and second is the attachment
+        )
+        self.assertNotIn("foo", msg)
+
+        # breakpoint()
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": [
+                    {
+                        "label": "Yes/ no",
+                        "field_id": "000000002",
+                        "value": False,
+                    },
+                    {
+                        "field_id": "000000003",
+                        "value": False,
+                    },
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+
+        msg = self.mailhost.messages[1]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+        self.assertIn("<strong>Yes/ no:</strong> Incorrect", msg)
+        self.assertIn(
+            "<strong>Yes/ no radio without display value:</strong> False", msg
+        )
 
     def test_send_custom_field_id(self):
         """Custom field IDs should still appear as their friendly names in the email"""

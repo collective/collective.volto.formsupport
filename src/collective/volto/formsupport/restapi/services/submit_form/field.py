@@ -54,10 +54,6 @@ class YesNoField(Field):
         elif self._value is False:
             return self._display_value_mapping.get("no")
 
-    @property
-    def send_in_email(self):
-        return True
-
 
 class AttachmentField(Field):
     @property
