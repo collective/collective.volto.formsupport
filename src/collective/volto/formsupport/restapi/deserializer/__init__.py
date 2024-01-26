@@ -22,7 +22,14 @@ class FormBlockDeserializerBase:
         self,
         data,
     ):
+        self._update_validations(data)
         return data
+
+    def _update_validations(self, data):
+        for field in data.get("subblocks"):
+            if field.get("field_type") not in ["text", "textarea", "from"]:
+                field["validations"] = []
+                field["validationSettings"] = {}
 
 
 @implementer(IBlockFieldDeserializationTransformer)
