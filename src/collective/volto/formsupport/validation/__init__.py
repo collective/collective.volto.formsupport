@@ -15,6 +15,18 @@ except ImportError:  # Products.validation is optional
     baseValidators = None
 
 
+IGNORED_VALIDATION_DEFINITION_ARGUMENTS = [
+    "title",
+    "description",
+    "name",
+    "errmsg",
+    "regex",
+    "regex_strings",
+    "ignore",
+    "_internal_type",
+]
+
+
 class IFieldValidator(Interface):
     """Base marker for collective.volto.formsupport field validators."""
 
@@ -46,6 +58,46 @@ _update_validators()
 def getValidations():
     utils = getUtilitiesFor(IFieldValidator)
     return utils
+
+
+PYTHON_TYPE_SCHEMA_TYPE_MAPPING = {
+    "bool": "boolean",
+    "date": "date",
+    "dict": "obj",
+    "float": "number",
+    "int": "integer",
+    "list": "array",
+    "str": "string",
+    "time": "datetime",
+}
+
+
+def get_validation_information():
+    """Adds the individual validation settings to the `validationSettings` key in the format `{validation_id}-{setting_name}`"""
+    settings_to_add = {}
+
+    for validation_id, validation in getValidations():
+        settings = validation.settings
+        if not isinstance(settings, dict) or not settings:
+            # We don't have any settings, skip including it
+            continue
+        cleaned_settings = {
+            setting_name: val
+            for setting_name, val in settings.items()
+            if setting_name not in IGNORED_VALIDATION_DEFINITION_ARGUMENTS
+        }
+
+        for setting_id, setting_value in cleaned_settings.items():
+            settings_to_add[f"{validation_id}-{setting_id}"] = {
+                "validation_title": getattr(settings, "title", validation_id),
+                "title": setting_id,
+                "type": PYTHON_TYPE_SCHEMA_TYPE_MAPPING.get(
+                    type(setting_value).__name__, "string"
+                ),
+                "default": setting_value,
+            }
+
+    return settings_to_add
 
 
 @provider(IVocabularyFactory)

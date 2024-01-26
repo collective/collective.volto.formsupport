@@ -12,17 +12,7 @@ from collective.volto.formsupport.interfaces import (
     ICaptchaSupport,
     ICollectiveVoltoFormsupportLayer,
 )
-
-IGNORED_VALIDATION_DEFINITION_ARGUMENTS = [
-    "title",
-    "description",
-    "name",
-    "errmsg",
-    "regex",
-    "regex_strings",
-    "ignore",
-    "_internal_type",
-]
+from collective.volto.formsupport.validation import get_validation_information
 
 
 class FormSerializer(object):
@@ -51,32 +41,13 @@ class FormSerializer(object):
         if attachments_limit:
             value["attachments_limit"] = attachments_limit
 
-        for index, field in enumerate(value.get("subblocks", [])):
-            if field.get("validationSettings"):
-                value["subblocks"][index] = self._expand_validation_field(field)
+        # Add information on the settings for validations to the response
+        validation_settings = get_validation_information()
+        value["validationSettings"] = validation_settings
 
         if api.user.has_permission("Modify portal content", obj=self.context):
             return value
         return {k: v for k, v in value.items() if not k.startswith("default_")}
-
-    def _expand_validation_field(self, field):
-        """Adds the individual validation settings to the `validationSettings` key in the format `{validation_id}-{setting_name}`"""
-        validation_settings = field.get("validationSettings")
-        settings_to_add = {}
-        for validation_id, settings in validation_settings.items():
-            if not isinstance(settings, dict):
-                continue
-            cleaned_settings = {
-                f"{validation_id}-{setting_name}": val
-                for setting_name, val in settings.items()
-                if setting_name not in IGNORED_VALIDATION_DEFINITION_ARGUMENTS
-            }
-
-            if cleaned_settings:
-                settings_to_add = {**settings_to_add, **cleaned_settings}
-        field["validationSettings"] = {**validation_settings, **settings_to_add}
-
-        return field
 
 
 @implementer(IBlockFieldSerializationTransformer)

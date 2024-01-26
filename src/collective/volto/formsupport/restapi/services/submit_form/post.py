@@ -79,12 +79,26 @@ class SubmitPost(Service):
                 if field.get("id", field.get("field_id")) == submitted_field.get(
                     "field_id"
                 ):
+                    validation_ids_to_apply = field.get("validations")
+                    validations_for_field = {}
+                    for validation_and_setting_id, setting_value in field.get(
+                        "validationSettings"
+                    ).items():
+                        validation_id, setting_id = validation_and_setting_id.split("-")
+                        if validation_id not in validation_ids_to_apply:
+                            continue
+                        if validation_id not in validations_for_field:
+                            validations_for_field[validation_id] = {}
+                        validations_for_field[validation_id][setting_id] = setting_value
                     fields_data.append(
                         {
                             **field,
                             **submitted_field,
                             "display_value_mapping": field.get("display_values"),
                             "custom_field_id": self.block.get(field["field_id"]),
+                            # We're straying from how validations are serialized and deserialized here to make our lives easier.
+                            #   Let's use a dictionary of {'validation_id': {'setting_id': 'setting_value'}} when working inside fields for simplicity.
+                            "validations": validations_for_field,
                         }
                     )
         self.fields = construct_fields(fields_data)

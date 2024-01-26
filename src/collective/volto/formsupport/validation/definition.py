@@ -11,7 +11,7 @@ class ValidationDefinition:
 
     def __call__(self, value, **kwargs):
         """Allow using the class directly as a validator"""
-        return self.validate(value, **kwargs)
+        return self.validate(value=value, **kwargs)
 
     @property
     def settings(self):
@@ -19,12 +19,12 @@ class ValidationDefinition:
 
     @settings.setter
     def settings(self, value):
-        self._value = value
+        self._settings = value
 
     def validate(self, value, **kwargs):
         if value is None:
             # Let the system for required take care of None values
             return
-        res = validation(self._name, value, **self.settings, **kwargs)
+        res = validation(self._name, value, **kwargs)
         if res != 1:
             return res

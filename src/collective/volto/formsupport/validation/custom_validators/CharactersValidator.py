@@ -5,18 +5,18 @@ from zope.interface import implementer
 @implementer(IValidator)
 class CharactersValidator:
     def __init__(self, name, title="", description="", characters=0, _internal_type=""):
+        """ "Unused properties are for default values and type information"""
         self.name = name
         self.title = title or name
         self.description = description
-        self.characters = characters
         self._internal_type = _internal_type
+        # Default values
+        self.characters = characters
 
     def __call__(self, value="", *args, **kwargs):
-        characters = (
-            int(self.characters)
-            if isinstance(self.characters, str)
-            else self.characters
-        )
+        characters = kwargs.get("characters", self.characters)
+        characters = int(characters) if isinstance(characters, str) else characters
+
         if self._internal_type == "max":
             if not value:
                 return

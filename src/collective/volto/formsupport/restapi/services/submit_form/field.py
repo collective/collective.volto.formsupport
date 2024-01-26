@@ -7,7 +7,7 @@ validation_message_matcher = re.compile("Validation failed\(([^\)]+)\): ")
 
 class Field:
     def __init__(self, field_data):
-        def _attribute(attribute_name):
+        def _attribute(attribute_name: str):
             setattr(self, attribute_name, field_data.get(attribute_name))
 
         _attribute("field_type")
@@ -26,9 +26,6 @@ class Field:
         self._custom_field_id = field_data.get("custom_field_id")
         self._label = field_data.get("label")
         self._field_id = field_data.get("field_id", "")
-        self._validations = field_data.get(
-            "validations", []
-        )  # No need to expose the available validations
 
     @property
     def value(self):
@@ -63,16 +60,16 @@ class Field:
         return True
 
     def validate(self):
-        # Products.validation isn't included by default
+        # Making sure we've got a validation that actually exists.
         available_validations = [
             validation
             for validationId, validation in getValidations()
-            if validationId in self._validations
+            if validationId in self.validations.keys()
         ]
 
         errors = {}
         for validation in available_validations:
-            error = validation(self._value)
+            error = validation(self._value, **self.validations.get(validation._name))
             if error:
                 match_result = validation_message_matcher.match(error)
                 # We should be able to clean up messages that follow the
