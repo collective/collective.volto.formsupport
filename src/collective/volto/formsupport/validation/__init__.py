@@ -26,6 +26,8 @@ IGNORED_VALIDATION_DEFINITION_ARGUMENTS = [
     "_internal_type",
 ]
 
+VALIDATIONS_TO_IGNORE = ["inNumericRange"]
+
 
 class IFieldValidator(Interface):
     """Base marker for collective.volto.formsupport field validators."""
@@ -39,6 +41,8 @@ def _update_validators():
 
     if baseValidators:
         for validator in baseValidators:
+            if validator.name in VALIDATIONS_TO_IGNORE:
+                continue
             provideUtility(
                 ValidationDefinition(validator),
                 provides=IFieldValidator,
