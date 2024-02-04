@@ -6,8 +6,9 @@ Changelog
 
 - Breaking change: clear data method changed from GET to DELETE
   [mamico]
-- Fix: with multiple block in the same page, the clear all the data. Now if passed a
-  block_id parameter, only the record related to the block are deleted
+- Fix: with multiple blocks on the same page, all data is deleted. 
+  Now, if you pass a parameter block_id, only the records related to the 
+  block are deleted.
   [mamico]
 - Feat: clear data restapi accept a parameter for remove the expired records
   [mamico]

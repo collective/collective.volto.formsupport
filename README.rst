@@ -58,11 +58,14 @@ Calling with "expand=true", this endpoint returns the stored data::
 
 > curl -i -X GET http://localhost:8080/Plone/my-form/@form-data -H 'Accept: application/json' -H 'Content-Type: application/json' --user admin:admin
 
+Specifying a block_id parameter returns only the records associated with a specific block on the page.
+
+> curl -i -X GET http://localhost:8080/Plone/my-form/@form-data?block_id=123456789 -H 'Accept: application/json' -H 'Content-Type: application/json' --user admin:admin
 
 And replies with something similar::
 
     {
-        "@id": "http://localhost:8080/Plone/my-form/@form-data",
+        "@id": "http://localhost:8080/Plone/my-form/@form-data?block_id=123456789",
         "items": [
             {
             "block_id": "123456789",
@@ -73,7 +76,8 @@ And replies with something similar::
             },
             ...
         ],
-        "items_total": 42
+        "items_total": 42,
+        "expired_total": 2
     }
 
 @form-data-export
@@ -90,8 +94,12 @@ If form fields changed between some submissions, you will see also columns relat
 
 Reset the store (only for users that have **Modify portal content** permission)::
 
-> curl -i -X GET http://localhost:8080/Plone/my-form/@form-data-clear -H 'Accept: application/json' -H 'Content-Type: application/json' --user admin:admin
+> curl -i -X DELETE http://localhost:8080/Plone/my-form/@form-data-clear --data-raw '{block_id: bbb}' -H 'Accept: application/json' -H 'Content-Type: application/json' --user admin:admin
 
+Optional paramaters could be passed in the payload: 
+
+* `block_id` to delete only data related to a specific block on the page, otherwise data from all form blocks on the page will be deleted
+* `expired` a boolean that, if `true`, removes only records older than the value of days specified in the block configuration (the above `block_id` parameter is required)
 
 Form actions
 ============
