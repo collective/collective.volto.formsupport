@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from collective.volto.formsupport.interfaces import IFormDataStore
+from plone.namedfile import NamedBlobFile
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
 from six import StringIO
@@ -7,6 +8,7 @@ from zope.component import getMultiAdapter
 
 import csv
 import six
+
 
 SKIP_ATTRS = ["block_id", "fields_labels", "fields_order"]
 
@@ -79,7 +81,10 @@ class FormDataExportGet(Service):
                 label = fields_labels.get(k, k)
                 if label not in columns and label not in fixed_columns:
                     columns.append(label)
-                data[label] = json_compatible(value)
+                if isinstance(value, NamedBlobFile):
+                    data[label] = value.filename
+                else:
+                    data[label] = json_compatible(value)
             for k in fixed_columns:
                 # add fixed columns values
                 value = item.attrs.get(k, None)
