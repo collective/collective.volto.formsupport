@@ -97,11 +97,11 @@ class FormDataStore(object):
             field_id = field_data.get("field_id", "")
             value = field_data.get("value", "")
             if field_id in fields:
-                record.attrs[field_id] = self.storedValue(
-                    value, fields[field_id]["type"]
-                )
-                fields_labels[field_id] = fields[field_id]
+                field = fields[field_id]
+                record.attrs[field_id] = self.storedValue(value, field["type"])
+                fields_labels[field_id] = field["label"]
                 fields_order.append(field_id)
+            # else: skip the field
         record.attrs["fields_labels"] = fields_labels
         record.attrs["fields_order"] = fields_order
         record.attrs["date"] = datetime.now()

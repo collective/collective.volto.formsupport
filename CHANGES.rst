@@ -4,7 +4,8 @@ Changelog
 2.7.1 (unreleased)
 ------------------
 
-- Save attachments as blobfile in the storage adapater, add a view to download them.
+- Save attachments as blobfile in the storage adapater, add a view to download them, returns
+  attachment info in the restapi @form-data endpoint.
   [mamico]
 - Allow attaching an XML version of the form data to the sent email #22
   [JeffersonBledsoe]
