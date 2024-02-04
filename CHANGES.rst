@@ -7,6 +7,9 @@ Changelog
 - Save attachments as blobfile in the storage adapater, add a view to download them, returns
   attachment info in the restapi @form-data endpoint.
   [mamico]
+- Fix: if there are multiple forms on a page, each csv button downloads the record of all the forms,
+  now if there is a block_id parameter, the csv is filtered on that.
+  [mamico]
 - Allow attaching an XML version of the form data to the sent email #22
   [JeffersonBledsoe]
 - Allow the IDs of fields to be customised for CSV download and XML attaachments #22

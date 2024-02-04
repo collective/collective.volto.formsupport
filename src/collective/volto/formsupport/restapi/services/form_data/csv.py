@@ -4,6 +4,7 @@ from plone.namedfile import NamedBlobFile
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
 from six import StringIO
+from zExceptions import NotFound
 from zope.component import getMultiAdapter
 
 import csv
@@ -17,12 +18,15 @@ class FormDataExportGet(Service):
     def __init__(self, context, request):
         super().__init__(context, request)
         self.form_fields_order = []
-        self.form_block = {}
+        self.form_block = None
+        self.block_id = self.request.get("block_id")
 
         blocks = getattr(context, "blocks", {})
         if not blocks:
-            return
+            raise NotFound("No blocks found")
         for id, block in blocks.items():
+            if self.block_id and id != self.block_id:
+                continue
             block_type = block.get("@type", "")
             if block_type == "form":
                 self.form_block = block
@@ -72,6 +76,8 @@ class FormDataExportGet(Service):
 
         rows = []
         for item in store.search():
+            if self.block_id and item.attrs.get("block_id") != self.block_id:
+                continue
             data = {}
             fields_labels = item.attrs.get("fields_labels", {})
             for k in self.get_ordered_keys(item):
