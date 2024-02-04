@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 
+from base64 import b64decode
 from collective.volto.formsupport import logger
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.utils import get_blocks
 from copy import deepcopy
 from datetime import datetime
 from plone.dexterity.interfaces import IDexterityContent
+from plone.namedfile import NamedBlobFile
 from plone.restapi.deserializer import json_body
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.indexes.field import CatalogFieldIndex
@@ -81,9 +83,13 @@ class FormDataStore(object):
             return None
 
         fields = {
-            x["field_id"]: x.get("custom_field_id", x.get("label", x["field_id"]))
-            for x in form_fields
+            f["field_id"]: {
+                "label": f.get("custom_field_id", f.get("label", f["field_id"])),
+                "type": f.get("field_type", "text"),
+            }
+            for f in form_fields
         }
+
         record = Record()
         fields_labels = {}
         fields_order = []
@@ -91,7 +97,9 @@ class FormDataStore(object):
             field_id = field_data.get("field_id", "")
             value = field_data.get("value", "")
             if field_id in fields:
-                record.attrs[field_id] = value
+                record.attrs[field_id] = self.storedValue(
+                    value, fields[field_id]["type"]
+                )
                 fields_labels[field_id] = fields[field_id]
                 fields_order.append(field_id)
         record.attrs["fields_labels"] = fields_labels
@@ -99,6 +107,22 @@ class FormDataStore(object):
         record.attrs["date"] = datetime.now()
         record.attrs["block_id"] = self.block_id
         return self.soup.add(record)
+
+    def storedValue(self, value, type):
+        if type == "attachment":
+            if value:
+                if value["encoding"] == "base64":
+                    return NamedBlobFile(
+                        data=b64decode(value["data"]),
+                        filename=value["filename"],
+                        contentType=value["content-type"],
+                    )
+                return NamedBlobFile(
+                    data=value["data"],
+                    filename=value["filename"],
+                    contentType=value["content-type"],
+                )
+        return value
 
     def length(self):
         return len([x for x in self.soup.data.values()])

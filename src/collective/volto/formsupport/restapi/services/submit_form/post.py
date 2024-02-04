@@ -1,33 +1,35 @@
 # -*- coding: utf-8 -*-
 
-import codecs
-import logging
-import math
-import os
+from collective.volto.formsupport import _
+from collective.volto.formsupport.interfaces import ICaptchaSupport
+from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.interfaces import IPostEvent
+from collective.volto.formsupport.utils import get_blocks
 from datetime import datetime
 from email.message import EmailMessage
-from xml.etree.ElementTree import Element, ElementTree, SubElement
-
-import six
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
+from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import ElementTree
+from xml.etree.ElementTree import SubElement
 from zExceptions import BadRequest
-from zope.component import getMultiAdapter, getUtility
+from zope.component import getMultiAdapter
+from zope.component import getUtility
 from zope.event import notify
 from zope.i18n import translate
-from zope.interface import alsoProvides, implementer
+from zope.interface import alsoProvides
+from zope.interface import implementer
 
-from collective.volto.formsupport import _
-from collective.volto.formsupport.interfaces import (
-    ICaptchaSupport,
-    IFormDataStore,
-    IPostEvent,
-)
-from collective.volto.formsupport.utils import get_blocks
+import codecs
+import logging
+import math
+import os
+import six
+
 
 logger = logging.getLogger(__name__)
 CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
@@ -119,7 +121,7 @@ class SubmitPost(Service):
                 )
             )
 
-        if not self.form_data.get("data", []):
+        if not self.form_data.get("data") and not self.form_data.get("attachments"):
             raise BadRequest(
                 translate(
                     _(
@@ -410,6 +412,9 @@ class SubmitPost(Service):
 
     def store_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
-        res = store.add(data=self.filter_parameters())
+        data = self.form_data.get("data") or []
+        if self.form_data.get("attachments"):
+            data += self.form_data.get("attachments").values()
+        res = store.add(data=data)
         if not res:
             raise BadRequest("Unable to store data")
