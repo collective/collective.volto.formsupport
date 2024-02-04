@@ -4,6 +4,13 @@ Changelog
 2.7.1 (unreleased)
 ------------------
 
+- Breaking change: clear data method changed from GET to DELETE
+  [mamico]
+- Fix: with multiple block in the same page, the clear all the data. Now if passed a
+  block_id parameter, only the record related to the block are deleted
+  [mamico]
+- Feat: clear data restapi accept a parameter for remove the expired records
+  [mamico]
 - data cleaning script
   [mamico]
 - Allow attaching an XML version of the form data to the sent email #22

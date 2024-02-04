@@ -2,6 +2,8 @@
 
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.utils import get_blocks
+from datetime import datetime
+from datetime import timedelta
 from plone import api
 from plone.memoize import view
 from plone.restapi.interfaces import IExpandableElement
@@ -19,44 +21,72 @@ import six
 @implementer(IExpandableElement)
 @adapter(Interface, Interface)
 class FormData(object):
-    def __init__(self, context, request):
+    def __init__(self, context, request, block_id=None):
         self.context = context
         self.request = request
+        self.block_id = block_id or self.request.get("block_id")
+
+    @view.memoize
+    def get_items(self):
+        block = self.form_block
+        items = []
+        if block:
+            store = getMultiAdapter((self.context, self.request), IFormDataStore)
+            remove_data_after_days = int(block.get("remove_data_after_days") or 0)
+            data = store.search()
+            if remove_data_after_days > 0:
+                expire_date = datetime.now() - timedelta(days=remove_data_after_days)
+            else:
+                expire_date = None
+            for record in data:
+                if not self.block_id or record.attrs.get("block_id") == self.block_id:
+                    expanded = self.expand_records(record)
+                    expanded["__expired"] = (
+                        expire_date and record.attrs["date"] < expire_date
+                    )
+                    items.append(expanded)
+        else:
+            items = []
+        return items
+
+    @view.memoize
+    def get_expired_items(self):
+        return [item for item in self.get_items() if item["__expired"]]
 
     def __call__(self, expand=False):
         if not self.show_component():
             return {}
-
-        result = {
-            "form_data": {"@id": "{}/@form-data".format(self.context.absolute_url())}
-        }
+        if self.block_id:
+            service_id = (
+                f"{self.context.absolute_url()}/@form-data?block_id{self.block_id}"
+            )
+        else:
+            service_id = f"{self.context.absolute_url()}/@form-data"
+        result = {"form_data": {"@id": service_id}}
         if not expand:
             return result
-
-        store = getMultiAdapter((self.context, self.request), IFormDataStore)
-        data = store.search()
-        items = [self.expand_records(x) for x in data]
-        data = {
+        items = self.get_items()
+        expired_total = len(self.get_expired_items())
+        result["form_data"] = {
             "@id": "{}/@form-data".format(self.context.absolute_url()),
             "items": items,
             "items_total": len(items),
+            "expired_total": expired_total,
         }
-
-        result["form_data"] = data
         return result
 
     @property
     @view.memoize
     def form_block(self):
         blocks = get_blocks(self.context)
-
         if isinstance(blocks, six.text_type):
             blocks = json.loads(blocks)
         if not blocks:
             return {}
-        for block in blocks.values():
+        for id, block in blocks.items():
             if block.get("@type", "") == "form" and block.get("store", False):
-                return block
+                if not self.block_id or self.block_id == id:
+                    return block
         return {}
 
     def show_component(self):
@@ -80,5 +110,6 @@ class FormData(object):
 
 class FormDataGet(Service):
     def reply(self):
-        form_data = FormData(self.context, self.request)
+        block_id = self.request.get("block_id")
+        form_data = FormData(self.context, self.request, block_id=block_id)
         return form_data(expand=True).get("form_data", {})
