@@ -80,8 +80,7 @@ class TestMailSend(unittest.TestCase):
 
     def clear_data(self):
         url = "{}/@form-data-clear".format(self.document_url)
-        response = self.api_session.get(url)
-        # transaction.commit()
+        response = self.api_session.delete(url)
         return response
 
     def test_unable_to_store_data(self):
@@ -147,7 +146,7 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(len(data["items"]), 1)
         self.assertEqual(
             sorted(data["items"][0].keys()),
-            ["block_id", "date", "id", "message", "name"],
+            ["__expired", "block_id", "date", "id", "message", "name"],
         )
         self.assertEqual(
             data["items"][0]["message"],
@@ -172,11 +171,11 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(len(data["items"]), 2)
         self.assertEqual(
             sorted(data["items"][0].keys()),
-            ["block_id", "date", "id", "message", "name"],
+            ["__expired", "block_id", "date", "id", "message", "name"],
         )
         self.assertEqual(
             sorted(data["items"][1].keys()),
-            ["block_id", "date", "id", "message", "name"],
+            ["__expired", "block_id", "date", "id", "message", "name"],
         )
         sorted_data = sorted(data["items"], key=lambda x: x["name"]["value"])
         self.assertEqual(sorted_data[0]["name"]["value"], "John")
@@ -247,7 +246,7 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John"])
 
         # check date column. Skip seconds because can change during test
-        now = datetime.utcnow().strftime("%Y-%m-%dT%H:%M")
+        now = datetime.now().strftime("%Y-%m-%dT%H:%M")
         self.assertTrue(sorted_data[0][-1].startswith(now))
         self.assertTrue(sorted_data[1][-1].startswith(now))
 
@@ -307,6 +306,6 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John"])
 
         # check date column. Skip seconds because can change during test
-        now = datetime.utcnow().strftime("%Y-%m-%dT%H:%M")
+        now = datetime.now().strftime("%Y-%m-%dT%H:%M")
         self.assertTrue(sorted_data[0][-1].startswith(now))
         self.assertTrue(sorted_data[1][-1].startswith(now))
