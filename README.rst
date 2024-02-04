@@ -260,20 +260,17 @@ There is a script that implements data cleansing (i.e. for GDPR purpose)::
     bin/instance -OPlone run bin/formsupport_data_cleansing  --help
     Usage: interpreter [OPTIONS]
 
-    bin/instance -OPlone run bin/formsupport_data_cleansing [--dryrun|--no-
-    dryrun]
+    bin/instance -OPlone run bin/formsupport_data_cleansing [--dryrun|--no-dryrun]
 
     Options:
     --dryrun        --dryrun (default) simulate, --no-dryrun actually save the
                     changes
 
-    --days INTEGER  default number of days of data retention (default 180)
     --help          Show this message and exit.
 
 
 If the form block as an integer field `remove_data_after_days`, the retention days can be defined on a single block, 
-If the value is `-1` there is no data cleaning for the specific form,
-otherwise there is an option in the script for a default value.
+If the value is lower or equal to `0` there is no data cleaning for the specific form.
 
 Examples
 ========
