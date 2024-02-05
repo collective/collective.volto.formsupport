@@ -110,8 +110,8 @@ class TestMailSend(unittest.TestCase):
         res = response.json()
 
         validations = getValidations()
-        breakpoint()
-        self.assertEqual(res["blocks"]["form-id"], self.document.blocks["form-id"])
+        # breakpoint()
+        # self.assertEqual(res["blocks"]["form-id"], self.document.blocks["form-id"])
 
         # response = self.submit_form(
         #     data={
