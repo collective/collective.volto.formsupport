@@ -79,10 +79,10 @@ class SubmitPost(Service):
                 if field.get("id", field.get("field_id")) == submitted_field.get(
                     "field_id"
                 ):
-                    validation_ids_to_apply = field.get("validations")
+                    validation_ids_to_apply = field.get("validations", [])
                     validations_for_field = {}
                     for validation_and_setting_id, setting_value in field.get(
-                        "validationSettings"
+                        "validationSettings", {}
                     ).items():
                         validation_id, setting_id = validation_and_setting_id.split("-")
                         if validation_id not in validation_ids_to_apply:
