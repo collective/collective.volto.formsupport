@@ -190,7 +190,7 @@ class TestMailSend(unittest.TestCase):
         response = self.export_csv()
         data = [*csv.reader(StringIO(response.text), delimiter=",")]
         self.assertEqual(len(data), 1)
-        self.assertEqual(data[0], ["date"])
+        self.assertEqual(data[0], ["Message", "Name", "date"])
 
     def test_export_csv(self):
         self.document.blocks = {
