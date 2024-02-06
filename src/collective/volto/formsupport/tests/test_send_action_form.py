@@ -537,7 +537,8 @@ class TestMailSend(unittest.TestCase):
                 ],
                 "block_id": "form-id",
                 "attachments": {
-                    "file": {
+                    "file_1": {
+                        "field_id": "file",
                         "encoding": "base64",
                         "data": base64.b64encode(file_str),
                         "filename": "file.pdf",
@@ -585,7 +586,13 @@ class TestMailSend(unittest.TestCase):
                     {"field_id": "test", "label": "Test", "value": "test text"},
                 ],
                 "block_id": "form-id",
-                "attachments": {"foo": {"data": base64.b64encode(file_str)}},
+                "attachments": {
+                    "foo_1": {
+                        "field_id": "foo",
+                        "data": base64.b64encode(file_str),
+                        "encoding": "base64",
+                    }
+                },
             },
         )
         transaction.commit()

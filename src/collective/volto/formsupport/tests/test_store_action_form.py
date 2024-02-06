@@ -154,12 +154,13 @@ class TestMailSend(unittest.TestCase):
                 "subject": "test subject",
                 "block_id": "form-id",
                 "attachments": {
-                    "file": {
+                    "file_1": {
+                        "field_id": "file",
                         "encoding": "base64",
                         "data": base64.b64encode(file_str),
                         "filename": "file.pdf",
                         "content-type": "application/pdf",
-                    }
+                    },
                 },
             },
         )

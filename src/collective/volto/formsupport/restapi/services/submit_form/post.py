@@ -24,6 +24,7 @@ from zope.i18n import translate
 from zope.interface import alsoProvides
 from zope.interface import implementer
 
+import base64
 import codecs
 import logging
 import math
@@ -141,15 +142,21 @@ class SubmitPost(Service):
             ).verify(self.form_data.get("captcha"))
 
     def validate_attachments(self):
-        # FIXME: size validatione needs to take care of the encoding (base64 or not)
+        """
+        * validate attachments size (total size of all attachments must be less
+          than FORM_ATTACHMENTS_LIMIT)
+        """
         attachments_limit = os.environ.get("FORM_ATTACHMENTS_LIMIT", "")
         if not attachments_limit:
             return
         attachments = self.form_data.get("attachments", {})
         attachments_len = 0
-        for attachment in attachments.values():
-            data = attachment.get("data", "")
-            attachments_len += (len(data) * 3) / 4 - data.count("=", -2)
+        for value in attachments.values():
+            data = value.get("data", "")
+            if value.get("encoding") == "base64":
+                attachments_len += len(base64.b64decode(data))
+            else:
+                attachments_len += len(data)
         if attachments_len > float(attachments_limit) * pow(1024, 2):
             size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
             i = int(math.floor(math.log(attachments_len, 1024)))
@@ -420,8 +427,8 @@ class SubmitPost(Service):
         data = self.form_data.get("data") or []
         if self.form_data.get("attachments"):
             data += [
-                {"field_id": key, "value": value}
-                for key, value in self.form_data.get("attachments").items()
+                {"field_id": a["field_id"], "value": a}
+                for a in self.form_data["attachments"].values()
             ]
         res = store.add(data=data)
         if not res:
