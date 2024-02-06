@@ -111,16 +111,14 @@ class FormDataStore(object):
     def storedValue(self, value, type):
         if type == "attachment":
             if value:
-                if value["encoding"] == "base64":
-                    return NamedBlobFile(
-                        data=b64decode(value["data"]),
-                        filename=value["filename"],
-                        contentType=value["content-type"],
-                    )
+                if value.get("encoding") == "base64":
+                    data = b64decode(value["data"])
+                else:
+                    data = value["data"]
                 return NamedBlobFile(
-                    data=value["data"],
-                    filename=value["filename"],
-                    contentType=value["content-type"],
+                    data=data,
+                    filename=value.get("filename"),
+                    contentType=value.get("content-type", "application/octet-stream"),
                 )
         return value
 

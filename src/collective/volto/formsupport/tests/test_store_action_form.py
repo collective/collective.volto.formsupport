@@ -10,10 +10,13 @@ from plone.app.testing import SITE_OWNER_NAME
 from plone.app.testing import SITE_OWNER_PASSWORD
 from plone.app.testing import TEST_USER_ID
 from plone.restapi.testing import RelativeSession
+from plone.testing.zope import Browser
 from Products.MailHost.interfaces import IMailHost
 from zope.component import getUtility
 
+import base64
 import csv
+import os
 import transaction
 import unittest
 
@@ -25,6 +28,8 @@ class TestMailSend(unittest.TestCase):
         self.app = self.layer["app"]
         self.portal = self.layer["portal"]
         self.portal_url = self.portal.absolute_url()
+        self.browser = Browser(self.layer["app"])
+
         setRoles(self.portal, TEST_USER_ID, ["Manager"])
 
         self.mailhost = getUtility(IMailHost)
@@ -123,11 +128,21 @@ class TestMailSend(unittest.TestCase):
                         "field_id": "name",
                         "field_type": "text",
                     },
+                    {
+                        "label": "Attachment",
+                        "field_id": "file",
+                        "field_type": "attachment",
+                    },
                 ],
             },
         }
         transaction.commit()
 
+        filename = os.path.join(os.path.dirname(__file__), "file.pdf")
+        with open(filename, "rb") as f:
+            file_str = f.read()
+
+        # TODO: test attachments with different content-type, encoding, and filename
         response = self.submit_form(
             data={
                 "from": "john@doe.com",
@@ -138,16 +153,25 @@ class TestMailSend(unittest.TestCase):
                 ],
                 "subject": "test subject",
                 "block_id": "form-id",
+                "attachments": {
+                    "file": {
+                        "encoding": "base64",
+                        "data": base64.b64encode(file_str),
+                        "filename": "file.pdf",
+                        "content-type": "application/pdf",
+                    }
+                },
             },
         )
         transaction.commit()
+
         self.assertEqual(response.status_code, 204)
         response = self.export_data()
         data = response.json()
         self.assertEqual(len(data["items"]), 1)
         self.assertEqual(
             sorted(data["items"][0].keys()),
-            ["block_id", "date", "id", "message", "name"],
+            ["block_id", "date", "file", "id", "message", "name"],
         )
         self.assertEqual(
             data["items"][0]["message"],
@@ -176,13 +200,35 @@ class TestMailSend(unittest.TestCase):
         )
         self.assertEqual(
             sorted(data["items"][1].keys()),
-            ["block_id", "date", "id", "message", "name"],
+            ["block_id", "date", "file", "id", "message", "name"],
         )
-        sorted_data = sorted(data["items"], key=lambda x: x["name"]["value"])
-        self.assertEqual(sorted_data[0]["name"]["value"], "John")
-        self.assertEqual(sorted_data[0]["message"]["value"], "just want to say hi")
-        self.assertEqual(sorted_data[1]["name"]["value"], "Sally")
-        self.assertEqual(sorted_data[1]["message"]["value"], "bye")
+        # sorted_data = sorted(data["items"], key=lambda x: x["name"]["value"])
+        self.assertEqual(data["items"][0]["name"]["value"], "Sally")
+        self.assertEqual(data["items"][0]["message"]["value"], "bye")
+
+        self.assertEqual(data["items"][1]["name"]["value"], "John")
+        self.assertEqual(data["items"][1]["message"]["value"], "just want to say hi")
+
+        self.assertEqual(
+            data["items"][1]["file"]["value"]["contentType"], "application/pdf"
+        )
+        self.assertEqual(data["items"][1]["file"]["value"]["filename"], "file.pdf")
+        self.assertEqual(data["items"][1]["file"]["value"]["size"], 74429)
+        self.assertRegexpMatches(
+            data["items"][1]["file"]["value"]["url"],
+            r"/example-context/saved_data/@@download/[0-9]+/file/file.pdf$",
+        )
+
+        # get file
+        self.browser.addHeader(
+            "Authorization",
+            f"Basic {SITE_OWNER_NAME}:{SITE_OWNER_PASSWORD}",
+        )
+        self.browser.open(
+            data["items"][1]["file"]["value"]["url"],
+        )
+        self.assertEqual(self.browser._response.status, "200 OK")
+        self.assertEqual(self.browser.contents, file_str)
 
         # clear data
         response = self.clear_data()
@@ -247,7 +293,7 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John"])
 
         # check date column. Skip seconds because can change during test
-        now = datetime.utcnow().strftime("%Y-%m-%dT%H:%M")
+        now = datetime.now().strftime("%Y-%m-%dT%H:%M")
         self.assertTrue(sorted_data[0][-1].startswith(now))
         self.assertTrue(sorted_data[1][-1].startswith(now))
 
@@ -307,6 +353,6 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John"])
 
         # check date column. Skip seconds because can change during test
-        now = datetime.utcnow().strftime("%Y-%m-%dT%H:%M")
+        now = datetime.now().strftime("%Y-%m-%dT%H:%M")
         self.assertTrue(sorted_data[0][-1].startswith(now))
         self.assertTrue(sorted_data[1][-1].startswith(now))

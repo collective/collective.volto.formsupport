@@ -141,6 +141,7 @@ class SubmitPost(Service):
             ).verify(self.form_data.get("captcha"))
 
     def validate_attachments(self):
+        # FIXME: size validatione needs to take care of the encoding (base64 or not)
         attachments_limit = os.environ.get("FORM_ATTACHMENTS_LIMIT", "")
         if not attachments_limit:
             return
@@ -333,6 +334,8 @@ class SubmitPost(Service):
     def filter_parameters(self):
         """
         do not send attachments fields.
+
+        Used for email message body, and xml attachment (?)
         """
         skip_fields = [
             x.get("field_id", "")
@@ -352,14 +355,15 @@ class SubmitPost(Service):
         host.send(msg, charset=charset, immediate=True)
 
     def manage_attachments(self, msg):
-        attachments = self.form_data.get("attachments", {})
-
+        """
+        add attachments as mime parts to the message
+        """
         if self.block.get("attachXml", False):
             self.attach_xml(msg=msg)
 
-        if not attachments:
-            return []
-        for key, value in attachments.items():
+        attachments = self.form_data.get("attachments") or {}
+        # TODO: skip attachment if not found in form fields
+        for value in attachments.values():
             content_type = "application/octet-stream"
             filename = None
             if isinstance(value, dict):
@@ -412,9 +416,13 @@ class SubmitPost(Service):
 
     def store_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
+        # XXX: in the future data and attachments could be merged in a single field
         data = self.form_data.get("data") or []
         if self.form_data.get("attachments"):
-            data += self.form_data.get("attachments").values()
+            data += [
+                {"field_id": key, "value": value}
+                for key, value in self.form_data.get("attachments").items()
+            ]
         res = store.add(data=data)
         if not res:
             raise BadRequest("Unable to store data")
