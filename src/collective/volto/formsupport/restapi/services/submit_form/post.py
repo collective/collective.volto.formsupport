@@ -1,33 +1,36 @@
 # -*- coding: utf-8 -*-
 
-import codecs
-import logging
-import math
-import os
+from collective.volto.formsupport import _
+from collective.volto.formsupport.interfaces import ICaptchaSupport
+from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.interfaces import IPostEvent
+from collective.volto.formsupport.utils import get_blocks
 from datetime import datetime
 from email.message import EmailMessage
-from xml.etree.ElementTree import Element, ElementTree, SubElement
-
-import six
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
+from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import ElementTree
+from xml.etree.ElementTree import SubElement
 from zExceptions import BadRequest
-from zope.component import getMultiAdapter, getUtility
+from zope.component import getMultiAdapter
+from zope.component import getUtility
 from zope.event import notify
 from zope.i18n import translate
-from zope.interface import alsoProvides, implementer
+from zope.interface import alsoProvides
+from zope.interface import implementer
 
-from collective.volto.formsupport import _
-from collective.volto.formsupport.interfaces import (
-    ICaptchaSupport,
-    IFormDataStore,
-    IPostEvent,
-)
-from collective.volto.formsupport.utils import get_blocks
+import base64
+import codecs
+import logging
+import math
+import os
+import six
+
 
 logger = logging.getLogger(__name__)
 CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
@@ -119,7 +122,7 @@ class SubmitPost(Service):
                 )
             )
 
-        if not self.form_data.get("data", []):
+        if not self.form_data.get("data") and not self.form_data.get("attachments"):
             raise BadRequest(
                 translate(
                     _(
@@ -139,14 +142,21 @@ class SubmitPost(Service):
             ).verify(self.form_data.get("captcha"))
 
     def validate_attachments(self):
+        """
+        * validate attachments size (total size of all attachments must be less
+          than FORM_ATTACHMENTS_LIMIT)
+        """
         attachments_limit = os.environ.get("FORM_ATTACHMENTS_LIMIT", "")
         if not attachments_limit:
             return
         attachments = self.form_data.get("attachments", {})
         attachments_len = 0
-        for attachment in attachments.values():
-            data = attachment.get("data", "")
-            attachments_len += (len(data) * 3) / 4 - data.count("=", -2)
+        for value in attachments.values():
+            data = value.get("data", "")
+            if value.get("encoding") == "base64":
+                attachments_len += len(base64.b64decode(data))
+            else:
+                attachments_len += len(data)
         if attachments_len > float(attachments_limit) * pow(1024, 2):
             size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
             i = int(math.floor(math.log(attachments_len, 1024)))
@@ -331,6 +341,8 @@ class SubmitPost(Service):
     def filter_parameters(self):
         """
         do not send attachments fields.
+
+        Used for email message body, and xml attachment (?)
         """
         skip_fields = [
             x.get("field_id", "")
@@ -350,14 +362,15 @@ class SubmitPost(Service):
         host.send(msg, charset=charset, immediate=True)
 
     def manage_attachments(self, msg):
-        attachments = self.form_data.get("attachments", {})
-
+        """
+        add attachments as mime parts to the message
+        """
         if self.block.get("attachXml", False):
             self.attach_xml(msg=msg)
 
-        if not attachments:
-            return []
-        for key, value in attachments.items():
+        attachments = self.form_data.get("attachments") or {}
+        # TODO: skip attachment if not found in form fields
+        for value in attachments.values():
             content_type = "application/octet-stream"
             filename = None
             if isinstance(value, dict):
@@ -410,6 +423,13 @@ class SubmitPost(Service):
 
     def store_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
-        res = store.add(data=self.filter_parameters())
+        # XXX: in the future data and attachments could be merged in a single field
+        data = self.form_data.get("data") or []
+        if self.form_data.get("attachments"):
+            data += [
+                {"field_id": a["field_id"], "value": a}
+                for a in self.form_data["attachments"].values()
+            ]
+        res = store.add(data=data)
         if not res:
             raise BadRequest("Unable to store data")
