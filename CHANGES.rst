@@ -16,7 +16,8 @@ Changelog
   [JeffersonBledsoe]
 - Added support for sending emails as a table #31
   [JeffersonBledsoe]
-
+- Add validation for email fields.
+  [cekk]
 
 2.7.0 (2023-04-03)
 ------------------
