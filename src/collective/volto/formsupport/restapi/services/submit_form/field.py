@@ -1,3 +1,10 @@
+from plone.schema.email import _isemail
+from zExceptions import BadRequest
+from zope.i18n import translate
+
+from collective.volto.formsupport import _
+
+
 class Field:
     def __init__(self, field_data):
         def _attribute(attribute_name):
@@ -43,6 +50,9 @@ class Field:
     def send_in_email(self):
         return True
 
+    def validate(self, request):
+        return
+
 
 class YesNoField(Field):
     @property
@@ -61,11 +71,30 @@ class AttachmentField(Field):
         return False
 
 
+class EmailField(Field):
+    def validate(self, request):
+        if _isemail(self._value) is None:
+            raise BadRequest(
+                translate(
+                    _(
+                        "wrong_email",
+                        default='Email not valid in "${field}" field.',
+                        mapping={
+                            "field": self.label,
+                        },
+                    ),
+                    context=request,
+                )
+            )
+
+
 def construct_field(field_data):
     if field_data.get("widget") == "single_choice":
         return YesNoField(field_data)
     elif field_data.get("field_type") == "attachment":
         return AttachmentField(field_data)
+    elif field_data.get("field_type") in ["from", "email"]:
+        return EmailField(field_data)
 
     return Field(field_data)
 
