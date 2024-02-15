@@ -58,10 +58,10 @@ class YesNoField(Field):
     @property
     def display_value(self):
         if not self._display_value_mapping:
-            return self._value
-        if self._value is True:
+            return self.internal_value
+        if self.internal_value is True:
             return self._display_value_mapping.get("yes")
-        elif self._value is False:
+        elif self.internal_value is False:
             return self._display_value_mapping.get("no")
 
 
@@ -73,7 +73,7 @@ class AttachmentField(Field):
 
 class EmailField(Field):
     def validate(self, request):
-        if _isemail(self._value) is None:
+        if _isemail(self.internal_value) is None:
             raise BadRequest(
                 translate(
                     _(
