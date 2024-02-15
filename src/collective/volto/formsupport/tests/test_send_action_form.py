@@ -746,8 +746,8 @@ class TestMailSend(unittest.TestCase):
         self.assertIn(
             """<thead>
       <tr role="row">
-        <th scope="col" role="columnheader">Field</th>
-        <th scope="col" role="columnheader">Value</th>
+        <th align="left" scope="col" role="columnheader">Field</th>
+        <th align="left" scope="col" role="columnheader">Value</th>
       </tr>
     </thead>""",
             msg,
@@ -755,16 +755,16 @@ class TestMailSend(unittest.TestCase):
 
         self.assertIn(
             """<tr role="row">
-          <th scope="row" role="rowheader">Name</th>""",
+          <th align="left" scope="row" role="rowheader">Name</th>""",
             msg,
         )
-        self.assertIn(f"<td>{name}</td>", msg)
+        self.assertIn(f'<td align="left">{name}</td>', msg)
         self.assertIn(
             """<tr role="row">
-          <th scope="row" role="rowheader">""",
+          <th align="left" scope="row" role="rowheader">""",
             msg,
         )
-        self.assertIn(f"<td>{message}</td>", msg)
+        self.assertIn(f'<td align="left">{message}</td>', msg)
 
     def test_email_body_formated_as_list(
         self,
@@ -1035,3 +1035,106 @@ class TestMailSend(unittest.TestCase):
                 custom_field_id if custom_field_id else form_data[index]["label"],
             )
             self.assertEqual(field.text, form_data[index]["value"])
+
+    def test_submit_return_400_if_malformed_email_in_email_field(
+        self,
+    ):
+        """
+        email fields in frontend are set as "from" field_type
+        """
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {
+                "@type": "form",
+                "default_subject": "block subject",
+                "default_from": "john@doe.com",
+                "send": ["recipient"],
+                "subblocks": [
+                    {
+                        "field_id": "contact",
+                        "field_type": "from",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {"field_id": "contact", "label": "Email", "value": "foo"},
+                ],
+                "block_id": "form-id",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.json()["message"], 'Email not valid in "Email" field.'
+        )
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {"field_id": "contact", "label": "Email", "value": "foo@"},
+                ],
+                "block_id": "form-id",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.json()["message"], 'Email not valid in "Email" field.'
+        )
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {"field_id": "contact", "label": "Email", "value": "foo@asd"},
+                ],
+                "block_id": "form-id",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.json()["message"], 'Email not valid in "Email" field.'
+        )
+
+    def test_submit_return_204_if_correct_email_in_email_field(
+        self,
+    ):
+        """
+        email fields in frontend are set as "from" field_type
+        """
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {
+                "@type": "form",
+                "default_subject": "block subject",
+                "default_from": "john@doe.com",
+                "send": ["recipient"],
+                "subblocks": [
+                    {
+                        "field_id": "contact",
+                        "field_type": "from",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {"field_id": "contact", "label": "Email", "value": "foo@plone.org"},
+                ],
+                "block_id": "form-id",
+            },
+        )
+        self.assertEqual(response.status_code, 204)
