@@ -269,7 +269,7 @@ There is a script that implements data cleansing (i.e. for GDPR purpose)::
     --help          Show this message and exit.
 
 
-If the form block as an integer field `remove_data_after_days`, the retention days can be defined on a single block, 
+The form block as an integer field `remove_data_after_days`, the retention days can be defined on a single block, 
 If the value is lower or equal to `0` there is no data cleaning for the specific form.
 
 Examples
