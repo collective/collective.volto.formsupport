@@ -375,9 +375,10 @@ class SubmitPost(Service):
         field_ids = [field.get("field_id") for field in self.block.get("subblocks", [])]
         for field in fields:
             field_id = field.get("field_id", "")
-            field_index = field_ids.index(field_id)
-            if self.block["subblocks"][field_index].get("field_type") == "date":
-                field["value"] = api.portal.get_localized_time(field["value"])
+            if field_id:
+                field_index = field_ids.index(field_id)
+                if self.block["subblocks"][field_index].get("field_type") == "date":
+                    field["value"] = api.portal.get_localized_time(field["value"])
             formatted_fields.append(field)
         return formatted_fields
 

@@ -247,7 +247,7 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John"])
 
         # check date column. Skip seconds because can change during test
-        now = datetime.utcnow().strftime("%Y-%m-%dT%H:%M")
+        now = datetime.now().strftime("%Y-%m-%dT%H:%M")
         self.assertTrue(sorted_data[0][-1].startswith(now))
         self.assertTrue(sorted_data[1][-1].startswith(now))
 
@@ -307,6 +307,6 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John"])
 
         # check date column. Skip seconds because can change during test
-        now = datetime.utcnow().strftime("%Y-%m-%dT%H:%M")
+        now = datetime.now().strftime("%Y-%m-%dT%H:%M")
         self.assertTrue(sorted_data[0][-1].startswith(now))
         self.assertTrue(sorted_data[1][-1].startswith(now))
