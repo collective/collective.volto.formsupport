@@ -3,13 +3,20 @@
   define="parameters python:options.get('parameters', {});
             url python:options.get('url', '');
             title python:options.get('title', '');">
-  <table>
+  <style>
+    th {
+        text-align: start;
+    }
+  </style>
+  <table border="1">
     <caption i18n:translate="send_mail_text_table">Form submission data for ${title}</caption>
     <thead>
       <tr role="row">
-        <th scope="col"
+        <th align="left"
+          scope="col"
           role="columnheader">Field</th>
-        <th scope="col"
+        <th align="left"
+          scope="col"
           role="columnheader">Value</th>
       </tr>
     </thead>
@@ -18,9 +25,10 @@
         <tr role="row"
           tal:define="value field/value|nothing;
                       label field/label|nothing">
-          <th scope="row"
+          <th align="left"
+            scope="row"
             role="rowheader">${label}</th>
-          <td>${value}</td>
+          <td align="left">${value}</td>
         </tr>
       </tal:field>
     </tbody>

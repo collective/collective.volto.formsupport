@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2023-05-24 00:33+0000\n"
+"POT-Creation-Date: 2024-01-10 11:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,11 +21,11 @@ msgstr ""
 msgid "Google ReCaptcha"
 msgstr ""
 
-#: collective/volto/formsupport/captcha/hcaptcha.py:13
+#: collective/volto/formsupport/captcha/hcaptcha.py:14
 msgid "HCaptcha"
 msgstr ""
 
-#: collective/volto/formsupport/captcha/hcaptcha.py:62
+#: collective/volto/formsupport/captcha/hcaptcha.py:63
 msgid "HCaptcha Invisible"
 msgstr ""
 
@@ -37,8 +37,8 @@ msgstr ""
 msgid "Installs the collective.volto.formsupport add-on."
 msgstr ""
 
-#: collective/volto/formsupport/captcha/hcaptcha.py:43
-#: collective/volto/formsupport/captcha/norobots.py:53
+#: collective/volto/formsupport/captcha/hcaptcha.py:44
+#: collective/volto/formsupport/captcha/norobots.py:51
 #: collective/volto/formsupport/captcha/recaptcha.py:42
 msgid "No captcha token provided."
 msgstr ""
@@ -47,8 +47,8 @@ msgstr ""
 msgid "NoRobots ReCaptcha Support"
 msgstr ""
 
-#: collective/volto/formsupport/captcha/hcaptcha.py:55
-#: collective/volto/formsupport/captcha/norobots.py:69
+#: collective/volto/formsupport/captcha/hcaptcha.py:56
+#: collective/volto/formsupport/captcha/norobots.py:67
 #: collective/volto/formsupport/captcha/recaptcha.py:54
 msgid "The code you entered was wrong, please enter the new one."
 msgstr ""
@@ -66,17 +66,17 @@ msgid "Volto: Form support (uninstall)"
 msgstr ""
 
 #. Default: "Attachments too big. You uploaded ${uploaded_str}, but limit is ${max} MB. Try to compress files."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:158
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:185
 msgid "attachments_too_big"
 msgstr ""
 
 #. Default: "Block with @type \"form\" and id \"$block\" not found in this context: $context"
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:99
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:101
 msgid "block_form_not_found_label"
 msgstr ""
 
 #. Default: "Empty form data."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:125
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:127
 msgid "empty_form_data"
 msgstr ""
 
@@ -86,17 +86,17 @@ msgid "honeypot_error"
 msgstr ""
 
 #. Default: "Unable to send confirm email. Please retry later or contact site administator."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:72
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:74
 msgid "mail_send_exception"
 msgstr ""
 
 #. Default: "You need to set at least one form action between \"send\" and \"store\"."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:114
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:116
 msgid "missing_action"
 msgstr ""
 
 #. Default: "Missing block_id"
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:92
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:94
 msgid "missing_blockid_label"
 msgstr ""
 
@@ -106,11 +106,16 @@ msgid "send_mail_text"
 msgstr ""
 
 #. Default: "Form submission data for ${title}"
-#: collective/volto/formsupport/browser/send_mail_template_table.pt:7
+#: collective/volto/formsupport/browser/send_mail_template_table.pt:12
 msgid "send_mail_text_table"
 msgstr ""
 
 #. Default: "Missing required field: subject or from."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:236
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:271
 msgid "send_required_field_missing"
+msgstr ""
+
+#. Default: "Email not valid in \"${field}\" field."
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:157
+msgid "wrong_email"
 msgstr ""

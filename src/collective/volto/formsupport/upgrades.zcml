@@ -20,4 +20,13 @@
         handler=".upgrades.to_1200"
         />
   </genericsetup:upgradeSteps>
+
+  <genericsetup:upgradeStep
+      title="Convert send from a bool into a list of who to send to"
+      profile="collective.volto.formsupport:default"
+      source="*"
+      destination="1300"
+      handler=".upgrades.to_1300"
+      />
+
 </configure>

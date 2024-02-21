@@ -12,13 +12,13 @@ from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
 from six import StringIO
-import xml.etree.ElementTree as ET
 from zope.component import getUtility
 
-import transaction
-import unittest
 import base64
 import os
+import transaction
+import unittest
+import xml.etree.ElementTree as ET
 
 
 class TestMailSend(unittest.TestCase):
@@ -140,7 +140,10 @@ class TestMailSend(unittest.TestCase):
         self,
     ):
         self.document.blocks = {
-            "form-id": {"@type": "form", "send": True},
+            "form-id": {
+                "@type": "form",
+                "send": ["recipient"],
+            },
         }
         transaction.commit()
 
@@ -163,7 +166,10 @@ class TestMailSend(unittest.TestCase):
         self,
     ):
         self.document.blocks = {
-            "form-id": {"@type": "form", "send": True},
+            "form-id": {
+                "@type": "form",
+                "send": ["recipient"],
+            },
         }
         transaction.commit()
 
@@ -186,7 +192,10 @@ class TestMailSend(unittest.TestCase):
         self,
     ):
         self.document.blocks = {
-            "form-id": {"@type": "form", "send": True},
+            "form-id": {
+                "@type": "form",
+                "send": ["recipient"],
+            },
         }
         transaction.commit()
 
@@ -294,7 +303,10 @@ class TestMailSend(unittest.TestCase):
         self,
     ):
         self.document.blocks = {
-            "form-id": {"@type": "form", "send": True},
+            "form-id": {
+                "@type": "form",
+                "send": ["recipient"],
+            },
         }
         transaction.commit()
 
@@ -331,7 +343,7 @@ class TestMailSend(unittest.TestCase):
             "form-id": {
                 "@type": "form",
                 "default_to": "to@block.com",
-                "send": True,
+                "send": ["recipient"],
             },
         }
         transaction.commit()
@@ -368,7 +380,7 @@ class TestMailSend(unittest.TestCase):
             "form-id": {
                 "@type": "form",
                 "default_subject": "block subject",
-                "send": True,
+                "send": ["recipient"],
             },
         }
         transaction.commit()
@@ -406,7 +418,7 @@ class TestMailSend(unittest.TestCase):
                 "@type": "form",
                 "default_subject": "block subject",
                 "default_from": "john@doe.com",
-                "send": True,
+                "send": ["recipient"],
                 "subblocks": [
                     {
                         "field_id": "contact",
@@ -451,7 +463,7 @@ class TestMailSend(unittest.TestCase):
                 "@type": "form",
                 "default_subject": "block subject",
                 "default_from": "john@doe.com",
-                "send": True,
+                "send": ["recipient"],
                 "subblocks": [
                     {
                         "field_id": "contact",
@@ -497,7 +509,7 @@ class TestMailSend(unittest.TestCase):
                 "@type": "form",
                 "default_subject": "block subject",
                 "default_from": "john@doe.com",
-                "send": True,
+                "send": ["recipient"],
                 "subblocks": [
                     {
                         "field_id": "test",
@@ -538,7 +550,7 @@ class TestMailSend(unittest.TestCase):
                 "@type": "form",
                 "default_subject": "block subject",
                 "default_from": "john@doe.com",
-                "send": True,
+                "send": ["recipient"],
                 "subblocks": [
                     {
                         "field_id": "test",
@@ -572,6 +584,121 @@ class TestMailSend(unittest.TestCase):
             response.json()["message"],
         )
         self.assertEqual(len(self.mailhost.messages), 0)
+
+    def test_send_only_acknowledgement(self):
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {
+                "@type": "form",
+                "default_subject": "block subject",
+                "default_from": "john@doe.com",
+                "send": ["acknowledgement"],
+                "acknowledgementFields": "contact",
+                "acknowledgementMessage": {
+                    "data": "<p>This message will be sent to the person filling in the form.</p><p>It is <strong>Rich Text</strong></p>"
+                },
+                "subblocks": [
+                    {
+                        "field_id": "contact",
+                        "field_type": "from",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {"field_id": "contact", "label": "Email", "value": "smith@doe.com"},
+                ],
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+
+        self.assertEqual(response.status_code, 204)
+        msg = self.mailhost.messages[0]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+
+        parsed_msg = Parser().parse(StringIO(msg))
+        self.assertEqual(parsed_msg.get("from"), "john@doe.com")
+        self.assertEqual(parsed_msg.get("to"), "smith@doe.com")
+        self.assertEqual(parsed_msg.get("subject"), "block subject")
+        msg_body = parsed_msg.get_payload(decode=True).decode()
+        self.assertIn(
+            "<p>This message will be sent to the person filling in the form.</p>",
+            msg_body,
+        )
+        self.assertIn("<p>It is <strong>Rich Text</strong></p>", msg_body)
+
+    def test_send_recipient_and_acknowledgement(self):
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {
+                "@type": "form",
+                "default_subject": "block subject",
+                "default_from": "john@doe.com",
+                "send": ["recipient", "acknowledgement"],
+                "acknowledgementFields": "contact",
+                "acknowledgementMessage": {
+                    "data": "<p>This message will be sent to the person filling in the form.</p><p>It is <strong>Rich Text</strong></p>"
+                },
+                "subblocks": [
+                    {
+                        "field_id": "contact",
+                        "field_type": "from",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {"field_id": "contact", "label": "Email", "value": "smith@doe.com"},
+                ],
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+
+        self.assertEqual(response.status_code, 204)
+
+        msg = self.mailhost.messages[0]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+        parsed_msg = Parser().parse(StringIO(msg))
+        self.assertEqual(parsed_msg.get("from"), "john@doe.com")
+        self.assertEqual(parsed_msg.get("to"), "site_addr@plone.com")
+        self.assertEqual(parsed_msg.get("subject"), "block subject")
+        msg_body = parsed_msg.get_payload(decode=True).decode()
+        self.assertIn("<strong>Message:</strong> just want to say hi", msg_body)
+        self.assertIn("<strong>Name:</strong> Smith", msg_body)
+
+        acknowledgement_message = self.mailhost.messages[1]
+        if isinstance(acknowledgement_message, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            acknowledgement_message = acknowledgement_message.decode("utf-8")
+
+        parsed_ack_msg = Parser().parse(StringIO(acknowledgement_message))
+        self.assertEqual(parsed_ack_msg.get("from"), "john@doe.com")
+        self.assertEqual(parsed_ack_msg.get("to"), "smith@doe.com")
+        self.assertEqual(parsed_ack_msg.get("subject"), "block subject")
+        ack_msg_body = parsed_ack_msg.get_payload(decode=True).decode()
+        self.assertIn(
+            "<p>This message will be sent to the person filling in the form.</p>",
+            ack_msg_body,
+        )
+        self.assertIn("<p>It is <strong>Rich Text</strong></p>", ack_msg_body)
 
     def test_email_body_formated_as_table(
         self,
@@ -608,17 +735,16 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("To: site_addr@plone.com", msg)
         self.assertIn("Reply-To: john@doe.com", msg)
 
-        self.assertIn("<table>", msg)
+        self.assertIn("""<table border="1">""", msg)
         self.assertIn("</table>", msg)
-        # TODO: Is the document title the desired behaviour here? Or should it be the subject of the email
         self.assertIn(
             f"<caption>Form submission data for {self.document.title}</caption>", msg
         )
         self.assertIn(
             """<thead>
       <tr role="row">
-        <th scope="col" role="columnheader">Field</th>
-        <th scope="col" role="columnheader">Value</th>
+        <th align="left" scope="col" role="columnheader">Field</th>
+        <th align="left" scope="col" role="columnheader">Value</th>
       </tr>
     </thead>""",
             msg,
@@ -626,16 +752,16 @@ class TestMailSend(unittest.TestCase):
 
         self.assertIn(
             """<tr role="row">
-          <th scope="row" role="rowheader">Name</th>""",
+          <th align="left" scope="row" role="rowheader">Name</th>""",
             msg,
         )
-        self.assertIn(f"<td>{name}</td>", msg)
+        self.assertIn(f'<td align="left">{name}</td>', msg)
         self.assertIn(
             """<tr role="row">
-          <th scope="row" role="rowheader">""",
+          <th align="left" scope="row" role="rowheader">""",
             msg,
         )
-        self.assertIn(f"<td>{message}</td>", msg)
+        self.assertIn(f'<td align="left">{message}</td>', msg)
 
     def test_email_body_formated_as_list(
         self,
@@ -702,3 +828,106 @@ class TestMailSend(unittest.TestCase):
         for index, field in enumerate(xml_tree):
             self.assertEqual(field.get("name"), form_data[index]["label"])
             self.assertEqual(field.text, form_data[index]["value"])
+
+    def test_submit_return_400_if_malformed_email_in_email_field(
+        self,
+    ):
+        """
+        email fields in frontend are set as "from" field_type
+        """
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {
+                "@type": "form",
+                "default_subject": "block subject",
+                "default_from": "john@doe.com",
+                "send": ["recipient"],
+                "subblocks": [
+                    {
+                        "field_id": "contact",
+                        "field_type": "from",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {"field_id": "contact", "label": "Email", "value": "foo"},
+                ],
+                "block_id": "form-id",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.json()["message"], 'Email not valid in "Email" field.'
+        )
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {"field_id": "contact", "label": "Email", "value": "foo@"},
+                ],
+                "block_id": "form-id",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.json()["message"], 'Email not valid in "Email" field.'
+        )
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {"field_id": "contact", "label": "Email", "value": "foo@asd"},
+                ],
+                "block_id": "form-id",
+            },
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.json()["message"], 'Email not valid in "Email" field.'
+        )
+
+    def test_submit_return_204_if_correct_email_in_email_field(
+        self,
+    ):
+        """
+        email fields in frontend are set as "from" field_type
+        """
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {
+                "@type": "form",
+                "default_subject": "block subject",
+                "default_from": "john@doe.com",
+                "send": ["recipient"],
+                "subblocks": [
+                    {
+                        "field_id": "contact",
+                        "field_type": "from",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {"field_id": "contact", "label": "Email", "value": "foo@plone.org"},
+                ],
+                "block_id": "form-id",
+            },
+        )
+        self.assertEqual(response.status_code, 204)
