@@ -5,6 +5,30 @@ from collective.volto.formsupport.validation import getValidations
 validation_message_matcher = re.compile("Validation failed\(([^\)]+)\): ")
 
 
+def always():
+    return True
+
+
+def value_is(value, target_value):
+    if isinstance(target_value, list):
+        return value in target_value
+    return value == target_value
+
+
+def value_is_not(value, target_value):
+    if isinstance(target_value, list):
+        return value not in target_value
+    return value != target_value
+
+
+show_when_validators = {
+    "": always,
+    "always": always,
+    "value_is": value_is,
+    "value_is_not": value_is_not,
+}
+
+
 class Field:
     def __init__(self, field_data):
         def _attribute(attribute_name: str):
@@ -36,6 +60,15 @@ class Field:
     @value.setter
     def value(self, value):
         self._value = value
+
+    def should_show(self, show_when_is, target_value):
+        always_show_validator = show_when_validators['always']
+        if not show_when_is:
+            return always_show_validator()
+        show_when_validator = show_when_validators[show_when_is]
+        if not show_when_validator:
+            return always_show_validator
+        return show_when_validator(value=self.value, target_value=target_value)
 
     @property
     def label(self):

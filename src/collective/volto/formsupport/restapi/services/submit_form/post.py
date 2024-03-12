@@ -105,7 +105,21 @@ class SubmitPost(Service):
 
         errors = {}
         for field in self.fields:
-            field_errors = field.validate()
+            show_when = field.show_when_when
+            should_show = True
+            if show_when and show_when != "always":
+                target_field = [
+                    val for val in self.fields if val.id == field.show_when_when
+                ][0]
+                should_show = (
+                    target_field.should_show(
+                        show_when_is=field.show_when_is, target_value=field.show_when_to
+                    )
+                    if target_field
+                    else True
+                )
+            if should_show:
+                field_errors = field.validate()
 
             if field_errors:
                 errors[field.field_id] = field_errors
