@@ -84,7 +84,10 @@ class SubmitPost(Service):
                     for validation_and_setting_id, setting_value in field.get(
                         "validationSettings", {}
                     ).items():
-                        validation_id, setting_id = validation_and_setting_id.split("-")
+                        split_validation_and_setting_ids = validation_and_setting_id.split("-")
+                        if len(split_validation_and_setting_ids) < 2:
+                            continue
+                        validation_id, setting_id = split_validation_and_setting_ids
                         if validation_id not in validation_ids_to_apply:
                             continue
                         if validation_id not in validations_for_field:
