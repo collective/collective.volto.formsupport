@@ -1,4 +1,5 @@
 import re
+from typing import Any
 
 from collective.volto.formsupport.validation import getValidations
 
@@ -30,7 +31,7 @@ show_when_validators = {
 
 
 class Field:
-    def __init__(self, field_data):
+    def __init__(self, field_data: dict[str, Any]):
         def _attribute(attribute_name: str):
             setattr(self, attribute_name, field_data.get(attribute_name))
 
@@ -40,11 +41,11 @@ class Field:
         _attribute("show_when_is")
         _attribute("show_when_to")
         _attribute("input_values")
-        _attribute("required")
         _attribute("widget")
         _attribute("use_as_reply_to")
         _attribute("use_as_reply_bcc")
-        _attribute("validations")
+        self.required = field_data.get("required")
+        self.validations = field_data.get("validations")
         self._display_value_mapping = field_data.get("dislpay_value_mapping")
         self._value = field_data.get("value", "")
         self._custom_field_id = field_data.get("custom_field_id")
@@ -62,7 +63,7 @@ class Field:
         self._value = value
 
     def should_show(self, show_when_is, target_value):
-        always_show_validator = show_when_validators['always']
+        always_show_validator = show_when_validators["always"]
         if not show_when_is:
             return always_show_validator()
         show_when_validator = show_when_validators[show_when_is]
@@ -94,6 +95,8 @@ class Field:
 
     def validate(self):
         # Making sure we've got a validation that actually exists.
+        if not self._value and not self.required:
+            breakpoint()
         available_validations = [
             validation
             for validationId, validation in getValidations()
