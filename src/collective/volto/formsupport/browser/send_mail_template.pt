@@ -1,6 +1,6 @@
 <tal:root xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-    i18n:domain="collective.volto.formsupport"
-    define="parameters python:options.get('parameters', {});
+  i18n:domain="collective.volto.formsupport"
+  define="parameters python:options.get('parameters', {});
             url python:options.get('url', '');
             title python:options.get('title', '');">
   <p i18n:translate="send_mail_text">
@@ -8,9 +8,9 @@
   </p>
   <ul>
     <tal:field repeat="field parameters">
-      <li tal:define="value field/value|nothing;
+      <li tal:define="value field/display_value|nothing;
                       label field/label|nothing">
-          <strong>${label}:</strong> ${value}
+        <strong>${label}:</strong> ${value}
       </li>
     </tal:field>
   </ul>

@@ -23,7 +23,7 @@
     <tbody>
       <tal:field repeat="field parameters">
         <tr role="row"
-          tal:define="value field/value|nothing;
+          tal:define="value field/display_value|nothing;
                       label field/label|nothing">
           <th align="left"
             scope="row"
