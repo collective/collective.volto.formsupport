@@ -96,7 +96,7 @@ class Field:
     def validate(self):
         # Making sure we've got a validation that actually exists.
         if not self._value and not self.required:
-            breakpoint()
+            return
         available_validations = [
             validation
             for validationId, validation in getValidations()
