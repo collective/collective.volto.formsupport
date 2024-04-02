@@ -97,13 +97,16 @@ class Field:
         # Making sure we've got a validation that actually exists.
         if not self._value and not self.required:
             return
+        errors = {}
+
+        if self.required and not self.internal_value:
+            errors['required'] = 'This field is required'
+
         available_validations = [
             validation
             for validationId, validation in getValidations()
             if validationId in self.validations.keys()
         ]
-
-        errors = {}
         for validation in available_validations:
             error = validation(self._value, **self.validations.get(validation._name))
             if error:
