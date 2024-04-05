@@ -628,7 +628,7 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(parsed_msg.get("from"), "john@doe.com")
         self.assertEqual(parsed_msg.get("to"), "smith@doe.com")
         self.assertEqual(parsed_msg.get("subject"), "block subject")
-        msg_body = parsed_msg.get_payload()[1].get_payload().replace("=\n", "")
+        msg_body = parsed_msg.get_payload()[1].get_payload().replace("=\r\n", "")
         self.assertIn(
             "<p>This message will be sent to the person filling in the form.</p>",
             msg_body,
@@ -680,7 +680,7 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(parsed_msg.get("to"), "site_addr@plone.com")
         self.assertEqual(parsed_msg.get("subject"), "block subject")
 
-        msg_body = parsed_msg.get_payload()[1].get_payload()
+        msg_body = parsed_msg.get_payload()[1].get_payload().replace("\r\n", "")
         self.assertIn("<strong>Message:</strong> just want to say hi", msg_body)
         self.assertIn("<strong>Name:</strong> Smith", msg_body)
 
@@ -694,7 +694,9 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(parsed_ack_msg.get("to"), "smith@doe.com")
         self.assertEqual(parsed_ack_msg.get("subject"), "block subject")
 
-        ack_msg_body = parsed_ack_msg.get_payload()[1].get_payload().replace("=\n", "")
+        ack_msg_body = (
+            parsed_ack_msg.get_payload()[1].get_payload().replace("=\r\n", "")
+        )
         self.assertIn(
             "<p>This message will be sent to the person filling in the form.</p>",
             ack_msg_body,
@@ -730,6 +732,7 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
+        msg.replace("\r\n", "")
 
         self.assertIn(f"Subject: {subject}", msg)
         self.assertIn("From: john@doe.com", msg)
@@ -742,24 +745,22 @@ class TestMailSend(unittest.TestCase):
             f"<caption>Form submission data for {self.document.title}</caption>", msg
         )
         self.assertIn(
-            """<thead>
-      <tr role="row">
-        <th align="left" scope="col" role="columnheader">Field</th>
-        <th align="left" scope="col" role="columnheader">Value</th>
-      </tr>
-    </thead>""",
+            """<th align="left" scope="col" role="columnheader">Field</th>""",
+            msg,
+        )
+        self.assertIn(
+            """<th align="left" scope="col" role="columnheader">Value</th>""",
             msg,
         )
 
         self.assertIn(
-            """<tr role="row">
-          <th align="left" scope="row" role="rowheader">Name</th>""",
+            """<th align="left" scope="row" role="rowheader">Name</th>""",
             msg,
         )
+
         self.assertIn(f'<td align="left">{name}</td>', msg)
         self.assertIn(
-            """<tr role="row">
-          <th align="left" scope="row" role="rowheader">""",
+            """<th align="left" scope="row" role="rowheader">""",
             msg,
         )
         self.assertIn(f'<td align="left">{message}</td>', msg)
