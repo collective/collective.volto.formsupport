@@ -8,6 +8,7 @@ import six
 
 from datetime import datetime
 from email.message import EmailMessage
+from email import policy
 from xml.etree.ElementTree import Element, ElementTree, SubElement
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
@@ -42,6 +43,7 @@ class PostEventService(object):
 
 
 class SubmitPost(Service):
+
     def __init__(self, context, request):
         super(SubmitPost, self).__init__(context, request)
 
@@ -296,7 +298,7 @@ class SubmitPost(Service):
                 .getData()
                 .strip()
             )
-            msg = EmailMessage()
+            msg = EmailMessage(policy=policy.SMTP)
             msg.set_content(text_message)
             msg.add_alternative(message, subtype="html")
             msg["Subject"] = subject
@@ -328,7 +330,7 @@ class SubmitPost(Service):
         if acknowledgement_message and "acknowledgement" in self.block.get("send", []):
             acknowledgement_address = self.get_acknowledgement_field_value()
             if acknowledgement_address:
-                acknowledgement_mail = EmailMessage()
+                acknowledgement_mail = EmailMessage(policy=policy.SMTP)
                 acknowledgement_mail["Subject"] = subject
                 acknowledgement_mail["From"] = mfrom
                 acknowledgement_mail["To"] = acknowledgement_address
