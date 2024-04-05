@@ -11,7 +11,6 @@ from plone.app.testing import TEST_USER_ID
 from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
-from six import StringIO
 from zope.component import getUtility
 
 import base64
