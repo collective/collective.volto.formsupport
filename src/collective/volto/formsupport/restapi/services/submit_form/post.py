@@ -9,7 +9,6 @@ import six
 from datetime import datetime
 from email.message import EmailMessage
 from xml.etree.ElementTree import Element, ElementTree, SubElement
-
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
@@ -289,16 +288,21 @@ class SubmitPost(Service):
 
         should_send = self.block.get("send", [])
         if should_send:
+            portal_transforms = api.portal.get_tool(name="portal_transforms")
             mto = self.block.get("default_to", mail_settings.email_from_address)
             message = self.prepare_message()
-
+            text_message = (
+                portal_transforms.convertTo("text/plain", message, mimetype="text/html")
+                .getData()
+                .strip()
+            )
             msg = EmailMessage()
-            msg.set_content(message, charset=charset, subtype="html", cte=CTE)
+            msg.set_content(text_message)
+            msg.add_alternative(message, subtype="html")
             msg["Subject"] = subject
             msg["From"] = mfrom
             msg["To"] = mto
             msg["Reply-To"] = mreply_to
-            msg.replace_header("Content-Type", 'text/html; charset="utf-8"')
 
             headers_to_forward = self.block.get("httpHeaders", [])
             for header in headers_to_forward:
@@ -328,9 +332,16 @@ class SubmitPost(Service):
                 acknowledgement_mail["Subject"] = subject
                 acknowledgement_mail["From"] = mfrom
                 acknowledgement_mail["To"] = acknowledgement_address
-                acknowledgement_mail.set_content(
-                    acknowledgement_message.get("data"), subtype="html", charset="utf-8"
+                ack_msg = acknowledgement_message.get("data")
+                ack_msg_text = (
+                    portal_transforms.convertTo(
+                        "text/plain", ack_msg, mimetype="text/html"
+                    )
+                    .getData()
+                    .strip()
                 )
+                acknowledgement_mail.set_content(ack_msg_text)
+                acknowledgement_mail.add_alternative(ack_msg, subtype="html")
                 self.send_mail(msg=acknowledgement_mail, charset=charset)
 
     def prepare_message(self):

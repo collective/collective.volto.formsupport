@@ -625,11 +625,11 @@ class TestMailSend(unittest.TestCase):
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
 
-        parsed_msg = Parser().parse(StringIO(msg))
+        parsed_msg = Parser().parsestr(msg)
         self.assertEqual(parsed_msg.get("from"), "john@doe.com")
         self.assertEqual(parsed_msg.get("to"), "smith@doe.com")
         self.assertEqual(parsed_msg.get("subject"), "block subject")
-        msg_body = parsed_msg.get_payload(decode=True).decode()
+        msg_body = parsed_msg.get_payload()[1].get_payload().replace("=\n", "")
         self.assertIn(
             "<p>This message will be sent to the person filling in the form.</p>",
             msg_body,
@@ -676,11 +676,12 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
-        parsed_msg = Parser().parse(StringIO(msg))
+        parsed_msg = Parser().parsestr(msg)
         self.assertEqual(parsed_msg.get("from"), "john@doe.com")
         self.assertEqual(parsed_msg.get("to"), "site_addr@plone.com")
         self.assertEqual(parsed_msg.get("subject"), "block subject")
-        msg_body = parsed_msg.get_payload(decode=True).decode()
+
+        msg_body = parsed_msg.get_payload()[1].get_payload()
         self.assertIn("<strong>Message:</strong> just want to say hi", msg_body)
         self.assertIn("<strong>Name:</strong> Smith", msg_body)
 
@@ -689,11 +690,12 @@ class TestMailSend(unittest.TestCase):
             # Python 3 with Products.MailHost 4.10+
             acknowledgement_message = acknowledgement_message.decode("utf-8")
 
-        parsed_ack_msg = Parser().parse(StringIO(acknowledgement_message))
+        parsed_ack_msg = Parser().parsestr(acknowledgement_message)
         self.assertEqual(parsed_ack_msg.get("from"), "john@doe.com")
         self.assertEqual(parsed_ack_msg.get("to"), "smith@doe.com")
         self.assertEqual(parsed_ack_msg.get("subject"), "block subject")
-        ack_msg_body = parsed_ack_msg.get_payload(decode=True).decode()
+
+        ack_msg_body = parsed_ack_msg.get_payload()[1].get_payload().replace("=\n", "")
         self.assertIn(
             "<p>This message will be sent to the person filling in the form.</p>",
             ack_msg_body,
@@ -821,9 +823,10 @@ class TestMailSend(unittest.TestCase):
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
 
-        parsed_msgs = Parser().parse(StringIO(msg))
+        parsed_msgs = Parser().parsestr(msg)
         # 1st index is the XML attachment
         msg_contents = parsed_msgs.get_payload()[1].get_payload(decode=True)
+
         xml_tree = ET.fromstring(msg_contents)
         for index, field in enumerate(xml_tree):
             self.assertEqual(field.get("name"), form_data[index]["label"])
