@@ -121,11 +121,12 @@ class SubmitPost(Service):
                     if target_field
                     else True
                 )
+
             if should_show:
                 field_errors = field.validate()
 
-            if field_errors:
-                errors[field.field_id] = field_errors
+                if field_errors:
+                    errors[field.field_id] = field_errors
 
         if errors:
             self.request.response.setStatus(400)
