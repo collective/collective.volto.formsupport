@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
-from collective.volto.formsupport.testing import (  # noqa: E501,
-    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
-)
+import csv
+import unittest
 from datetime import datetime
 from io import StringIO
+
+import transaction
 from plone import api
-from plone.app.testing import setRoles
-from plone.app.testing import SITE_OWNER_NAME
-from plone.app.testing import SITE_OWNER_PASSWORD
-from plone.app.testing import TEST_USER_ID
+from plone.app.testing import (
+    SITE_OWNER_NAME,
+    SITE_OWNER_PASSWORD,
+    TEST_USER_ID,
+    setRoles,
+)
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
 from zope.component import getUtility
 
-import csv
-import transaction
-import unittest
+from collective.volto.formsupport.testing import (  # noqa: E501,
+    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
+)
 
 
 class TestMailSend(unittest.TestCase):
@@ -121,6 +124,7 @@ class TestMailSend(unittest.TestCase):
                         "label": "Name",
                         "field_id": "name",
                         "field_type": "text",
+                        "display_values": "Custom name",
                     },
                 ],
             },
@@ -299,8 +303,69 @@ class TestMailSend(unittest.TestCase):
         response = self.export_csv()
         data = [*csv.reader(StringIO(response.text), delimiter=",")]
         self.assertEqual(len(data), 3)
-        # Check that 'test-field' got renamed
-        self.assertEqual(data[0], ["Message", "renamed-field", "date"])
+        # Check that 'test-field' got correctly mapped to it's label
+        self.assertEqual(data[0], ["Message", "Test field", "date"])
+        sorted_data = sorted(data[1:])
+        self.assertEqual(sorted_data[0][:-1], ["bye", "Sally"])
+        self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John"])
+
+        # check date column. Skip seconds because can change during test
+        now = datetime.utcnow().strftime("%Y-%m-%dT%H:%M")
+        self.assertTrue(sorted_data[0][-1].startswith(now))
+        self.assertTrue(sorted_data[1][-1].startswith(now))
+
+    def test_display_values(self):
+        self.document.blocks = {
+            "form-id": {
+                "@type": "form",
+                "store": True,
+                "test-field": "renamed-field",
+                "subblocks": [
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "field_type": "text",
+                    },
+                    {
+                        "field_id": "test-field",
+                        "label": "Test field",
+                        "field_type": "text",
+                        "display_values": {"John": "Paul", "Sally": "Jack"},
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": [
+                    {"field_id": "message", "value": "just want to say hi"},
+                    {"field_id": "test-field", "value": "John"},
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+
+        response = self.submit_form(
+            data={
+                "from": "sally@doe.com",
+                "data": [
+                    {"field_id": "message", "value": "bye"},
+                    {"field_id": "test-field", "value": "Sally"},
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+
+        self.assertEqual(response.status_code, 204)
+        response = self.export_csv()
+        data = [*csv.reader(StringIO(response.text), delimiter=",")]
+        self.assertEqual(len(data), 3)
+        # Check that 'test-field' got correctly mapped to it's label
+        self.assertEqual(data[0], ["Message", "Test field", "date"])
         sorted_data = sorted(data[1:])
         self.assertEqual(sorted_data[0][:-1], ["bye", "Sally"])
         self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John"])

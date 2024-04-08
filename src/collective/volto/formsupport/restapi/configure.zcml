@@ -4,6 +4,7 @@
 
   <include package="plone.restapi"  />
 
+  <include package=".deserializer" />
   <include package=".services" />
   <include package=".serializer" />
 

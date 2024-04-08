@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 import codecs
 import logging
 import math
@@ -14,6 +15,7 @@ from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
+from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
 from plone.schema.email import _isemail
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
@@ -29,6 +31,9 @@ from collective.volto.formsupport.interfaces import (
     IFormDataStore,
     IPostEvent,
 )
+from collective.volto.formsupport.restapi.services.submit_form.field import (
+    construct_fields,
+)
 from collective.volto.formsupport.utils import get_blocks
 
 logger = logging.getLogger(__name__)
@@ -43,6 +48,8 @@ class PostEventService(object):
 
 
 class SubmitPost(Service):
+    fields = []
+
     def __init__(self, context, request):
         super(SubmitPost, self).__init__(context, request)
 
@@ -62,6 +69,77 @@ class SubmitPost(Service):
         alsoProvides(self.request, IDisableCSRFProtection)
 
         notify(PostEventService(self.context, self.form_data))
+
+        # Construct self.fieldss
+        fields_data = []
+        for submitted_field in self.form_data.get("data", []):
+            # TODO: Review if fields submitted without a field_id should be included. Is breaking change if we remove it
+            if submitted_field.get("field_id") is None:
+                fields_data.append(submitted_field)
+                continue
+            for field in self.block.get("subblocks", []):
+                if field.get("id", field.get("field_id")) == submitted_field.get(
+                    "field_id"
+                ):
+                    validation_ids_to_apply = field.get("validations", [])
+                    validations_for_field = {}
+                    for validation_and_setting_id, setting_value in field.get(
+                        "validationSettings", {}
+                    ).items():
+                        split_validation_and_setting_ids = validation_and_setting_id.split("-")
+                        if len(split_validation_and_setting_ids) < 2:
+                            continue
+                        validation_id, setting_id = split_validation_and_setting_ids
+                        if validation_id not in validation_ids_to_apply:
+                            continue
+                        if validation_id not in validations_for_field:
+                            validations_for_field[validation_id] = {}
+                        validations_for_field[validation_id][setting_id] = setting_value
+                    fields_data.append(
+                        {
+                            **field,
+                            **submitted_field,
+                            "display_value_mapping": field.get("display_values"),
+                            "custom_field_id": self.block.get(field["field_id"]),
+                            # We're straying from how validations are serialized and deserialized here to make our lives easier.
+                            #   Let's use a dictionary of {'validation_id': {'setting_id': 'setting_value'}} when working inside fields for simplicity.
+                            "validations": validations_for_field,
+                        }
+                    )
+        self.fields = construct_fields(fields_data)
+
+        errors = {}
+        for field in self.fields:
+            show_when = field.show_when_when
+            should_show = True
+            if show_when and show_when != "always":
+                target_field = [
+                    val for val in self.fields if val.id == field.show_when_when
+                ][0]
+                should_show = (
+                    target_field.should_show(
+                        show_when_is=field.show_when_is, target_value=field.show_when_to
+                    )
+                    if target_field
+                    else True
+                )
+
+            if should_show:
+                field_errors = field.validate()
+
+                if field_errors:
+                    errors[field.field_id] = field_errors
+
+        if errors:
+            self.request.response.setStatus(400)
+            return json_compatible(
+                {
+                    "error": {
+                        "type": "Invalid",
+                        "errors": errors,
+                    }
+                }
+            )
 
         if send_action:
             try:
@@ -359,16 +437,7 @@ class SubmitPost(Service):
         """
         do not send attachments fields.
         """
-        skip_fields = [
-            x.get("field_id", "")
-            for x in self.block.get("subblocks", [])
-            if x.get("field_type", "") == "attachment"
-        ]
-        return [
-            x
-            for x in self.form_data.get("data", [])
-            if x.get("field_id", "") not in skip_fields
-        ]
+        return [field for field in self.fields if field.send_in_email]
 
     def send_mail(self, msg, charset):
         host = api.portal.get_tool(name="MailHost")
@@ -421,9 +490,7 @@ class SubmitPost(Service):
         xmlRoot = Element("form")
 
         for field in self.filter_parameters():
-            SubElement(
-                xmlRoot, "field", name=field.get("custom_field_id", field["label"])
-            ).text = str(field.get("value", ""))
+            SubElement(xmlRoot, "field", name=field.field_id).text = str(field._value)
 
         doc = ElementTree(xmlRoot)
         doc.write(output, encoding="utf-8", xml_declaration=True)

@@ -1,15 +1,18 @@
 # -*- coding: utf-8 -*-
-from collective.volto.formsupport.interfaces import ICaptchaSupport
-from collective.volto.formsupport.interfaces import ICollectiveVoltoFormsupportLayer
+import os
+
 from plone import api
 from plone.restapi.behaviors import IBlocks
 from plone.restapi.interfaces import IBlockFieldSerializationTransformer
 from Products.CMFPlone.interfaces import IPloneSiteRoot
-from zope.component import adapter
-from zope.component import getMultiAdapter
+from zope.component import adapter, getMultiAdapter
 from zope.interface import implementer
 
-import os
+from collective.volto.formsupport.interfaces import (
+    ICaptchaSupport,
+    ICollectiveVoltoFormsupportLayer,
+)
+from collective.volto.formsupport.validation import get_validation_information
 
 
 class FormSerializer(object):
@@ -37,6 +40,11 @@ class FormSerializer(object):
         attachments_limit = os.environ.get("FORM_ATTACHMENTS_LIMIT", "")
         if attachments_limit:
             value["attachments_limit"] = attachments_limit
+
+        # Add information on the settings for validations to the response
+        validation_settings = get_validation_information()
+        value["validationSettings"] = validation_settings
+
         if api.user.has_permission("Modify portal content", obj=self.context):
             return value
         return {k: v for k, v in value.items() if not k.startswith("default_")}
