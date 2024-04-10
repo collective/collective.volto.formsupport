@@ -9,6 +9,15 @@ Changelog
   [mamico]
 - Fix: if there are multiple forms on a page, each csv button downloads the record of all the forms,
   now if there is a block_id parameter, the csv is filtered on that.
+- Breaking change: clear data method changed from GET to DELETE
+  [mamico]
+- Fix: with multiple blocks on the same page, all data is deleted. 
+  Now, if you pass a parameter block_id, only the records related to the 
+  block are deleted.
+  [mamico]
+- Feat: clear data restapi accept a parameter for remove the expired records
+  [mamico]
+- data cleaning script
   [mamico]
 - Allow attaching an XML version of the form data to the sent email #22
   [JeffersonBledsoe]
@@ -22,7 +31,8 @@ Changelog
   [JeffersonBledsoe]
 - Added support for sending emails as a table #31
   [JeffersonBledsoe]
-
+- Add validation for email fields.
+  [cekk]
 
 2.7.0 (2023-04-03)
 ------------------

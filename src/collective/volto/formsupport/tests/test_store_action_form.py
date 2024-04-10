@@ -85,8 +85,7 @@ class TestMailSend(unittest.TestCase):
 
     def clear_data(self):
         url = "{}/@form-data-clear".format(self.document_url)
-        response = self.api_session.get(url)
-        # transaction.commit()
+        response = self.api_session.delete(url)
         return response
 
     def test_unable_to_store_data(self):
@@ -172,7 +171,7 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(len(data["items"]), 1)
         self.assertEqual(
             sorted(data["items"][0].keys()),
-            ["block_id", "date", "file", "id", "message", "name"],
+            ["__expired", "block_id", "date", "id", "message", "name"],
         )
         self.assertEqual(
             data["items"][0]["message"],
@@ -197,7 +196,7 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(len(data["items"]), 2)
         self.assertEqual(
             sorted(data["items"][0].keys()),
-            ["block_id", "date", "id", "message", "name"],
+            ["__expired", "block_id", "date", "id", "message", "name"],
         )
         self.assertEqual(
             sorted(data["items"][1].keys()),

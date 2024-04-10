@@ -33,5 +33,6 @@ report.html
 .tox/
 reports/
 pyvenv.cfg
+__pycache__
 # excludes
 *~

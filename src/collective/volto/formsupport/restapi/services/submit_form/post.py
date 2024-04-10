@@ -7,11 +7,17 @@ from collective.volto.formsupport.interfaces import IPostEvent
 from collective.volto.formsupport.utils import get_blocks
 from datetime import datetime
 from email.message import EmailMessage
+
+from datetime import datetime
+from email.message import EmailMessage
+from xml.etree.ElementTree import Element, ElementTree, SubElement
+
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
+from plone.schema.email import _isemail
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import ElementTree
@@ -140,6 +146,31 @@ class SubmitPost(Service):
                 ICaptchaSupport,
                 name=self.block["captcha"],
             ).verify(self.form_data.get("captcha"))
+
+        self.validate_email_fields()
+
+    def validate_email_fields(self):
+        email_fields = [
+            x.get("field_id", "")
+            for x in self.block.get("subblocks", [])
+            if x.get("field_type", "") == "from"
+        ]
+        for form_field in self.form_data.get("data", []):
+            if form_field.get("field_id", "") not in email_fields:
+                continue
+            if _isemail(form_field.get("value", "")) is None:
+                raise BadRequest(
+                    translate(
+                        _(
+                            "wrong_email",
+                            default='Email not valid in "${field}" field.',
+                            mapping={
+                                "field": form_field.get("label", ""),
+                            },
+                        ),
+                        context=self.request,
+                    )
+                )
 
     def validate_attachments(self):
         """
