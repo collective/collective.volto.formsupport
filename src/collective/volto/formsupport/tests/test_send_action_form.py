@@ -482,7 +482,12 @@ class TestMailSend(unittest.TestCase):
                 "data": [
                     {"label": "Message", "value": "just want to say hi"},
                     {"label": "Name", "value": "Smith"},
-                    {"field_id": "contact", "label": "Email", "value": "smith@doe.com"},
+                    {
+                        "field_id": "contact",
+                        "label": "Email",
+                        "value": "smith@doe.com",
+                        "token": "blahblahblah",
+                    },
                 ],
                 "block_id": "form-id",
             },
