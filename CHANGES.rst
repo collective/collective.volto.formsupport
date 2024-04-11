@@ -4,6 +4,8 @@ Changelog
 2.7.1 (unreleased)
 ------------------
 
+- Add functionality to check the user iserted email by an OTP.
+  [folix-01]
 - Breaking change: clear data method changed from GET to DELETE
   [mamico]
 - Fix: with multiple blocks on the same page, all data is deleted. 
