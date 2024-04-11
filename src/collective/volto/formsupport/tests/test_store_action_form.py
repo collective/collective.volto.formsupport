@@ -18,7 +18,7 @@ import transaction
 import unittest
 
 
-class TestMailSend(unittest.TestCase):
+class TestMailStore(unittest.TestCase):
     layer = VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING
 
     def setUp(self):
@@ -86,7 +86,10 @@ class TestMailSend(unittest.TestCase):
     def test_unable_to_store_data(self):
         """form schema not defined, unable to store data"""
         self.document.blocks = {
-            "form-id": {"@type": "form", "store": True},
+            "form-id": {
+                "@type": "form",
+                "store": True,
+            },
         }
         transaction.commit()
 
@@ -94,8 +97,12 @@ class TestMailSend(unittest.TestCase):
             data={
                 "from": "john@doe.com",
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
-                    {"label": "Name", "value": "John"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
+                    {"field_id": "name", "label": "Name", "value": "John"},
                 ],
                 "subject": "test subject",
                 "block_id": "form-id",
@@ -103,7 +110,7 @@ class TestMailSend(unittest.TestCase):
         )
         transaction.commit()
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "Unable to store data")
+        self.assertEqual(response.json()["message"], "Empty form data.")
         response = self.export_csv()
 
     def test_store_data(self):
@@ -140,7 +147,7 @@ class TestMailSend(unittest.TestCase):
             },
         )
         transaction.commit()
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         response = self.export_data()
         data = response.json()
         self.assertEqual(len(data["items"]), 1)
@@ -165,7 +172,7 @@ class TestMailSend(unittest.TestCase):
             },
         )
         transaction.commit()
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         response = self.export_data()
         data = response.json()
         self.assertEqual(len(data["items"]), 2)
@@ -236,7 +243,7 @@ class TestMailSend(unittest.TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         response = self.export_csv()
         data = [*csv.reader(StringIO(response.text), delimiter=",")]
         self.assertEqual(len(data), 3)
@@ -295,7 +302,7 @@ class TestMailSend(unittest.TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         response = self.export_csv()
         data = [*csv.reader(StringIO(response.text), delimiter=",")]
         self.assertEqual(len(data), 3)

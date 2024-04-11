@@ -30,6 +30,10 @@ Changelog
   [cekk]
 - Better compose email message with plain and html text.
   [cekk]
+- Prevent XSS applying safe_html transform to all string values passed on form.
+  [cekk]
+- Discard fields submitted that are not defined in form schema.
+  [cekk]
 
 2.7.0 (2023-04-03)
 ------------------
