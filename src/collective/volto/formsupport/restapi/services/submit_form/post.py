@@ -29,7 +29,7 @@ from collective.volto.formsupport.interfaces import (
     IFormDataStore,
     IPostEvent,
 )
-from collective.volto.formsupport.utils import get_blocks
+from collective.volto.formsupport.utils import get_blocks, generate_email_token
 
 logger = logging.getLogger(__name__)
 CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
@@ -141,6 +141,7 @@ class SubmitPost(Service):
             ).verify(self.form_data.get("captcha"))
 
         self.validate_email_fields()
+        self.validate_bcc()
 
     def validate_email_fields(self):
         email_fields = [
@@ -194,6 +195,27 @@ class SubmitPost(Service):
                     context=self.request,
                 )
             )
+
+    def validate_bcc(self):
+        bcc_fields = []
+        for field in self.block.get("subblocks", []):
+            if field.get("use_as_bcc", False):
+                field_id = field.get("field_id", "")
+                if field_id not in bcc_fields:
+                    bcc_fields.append(field_id)
+
+        for data in self.form_data.get("data", []):
+            value = data.get("value", "")
+            if not value:
+                continue
+            if data.get("field_id", "") in bcc_fields:
+                if (
+                    generate_email_token(self.block.get("block_id", ""), data["value"])
+                    != data["token"]
+                ):
+                    raise BadRequest(
+                        _("{email}'s token is wrong").format(email=data["value"])
+                    )
 
     def get_block_data(self, block_id):
         blocks = get_blocks(self.context)

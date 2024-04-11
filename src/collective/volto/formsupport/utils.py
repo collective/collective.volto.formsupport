@@ -4,6 +4,10 @@ from collections import deque
 
 import six
 
+from collections import deque
+from hashlib import md5
+from plone.keyring.interfaces import IKeyManager
+
 
 def flatten_block_hierachy(blocks):
     """Given some blocks, return all contained blocks, including "subblocks"
@@ -37,3 +41,12 @@ def get_blocks(context):
     flat = list(flatten_block_hierachy(blocks))
 
     return dict(flat)
+
+
+def generate_email_token(uid, email)
+    """Generates the email verification token"""
+    from zope.component import getUtility
+
+    manager = getUtility(IKeyManager)
+
+    return md5((uid + email + manager.secret()).encode()).hexdigest()[:10]
