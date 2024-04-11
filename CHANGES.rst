@@ -34,6 +34,8 @@ Changelog
   [cekk]
 - Discard fields submitted that are not defined in form schema.
   [cekk]
+- On form submit, reply with a 200 with submitted data (eventually cleaned) for confirm message.
+  [cekk]
 
 2.7.0 (2023-04-03)
 ------------------
