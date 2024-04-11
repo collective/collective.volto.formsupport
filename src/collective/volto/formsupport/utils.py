@@ -1,12 +1,11 @@
 import copy
 import json
-from collections import deque
-
 import six
 import pyotp
 import base64
 
 from collections import deque
+
 
 EMAIL_OTP_LIFETIME = 5 * 60
 

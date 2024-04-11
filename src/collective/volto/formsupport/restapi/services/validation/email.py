@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import logging
-
-from email.utils import parseaddr
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import parseaddr
 
 from plone import api
+from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
 from zExceptions import BadRequest
-from plone.restapi.deserializer import json_body
 
 from collective.volto.formsupport import _
 from collective.volto.formsupport.utils import (

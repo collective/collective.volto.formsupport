@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from Products.Five.browser import BrowserView
 from plone import api
+from Products.Five.browser import BrowserView
 
 
 class EmailConfirmView(BrowserView):

@@ -11,7 +11,6 @@ from email import policy
 from email.message import EmailMessage
 from xml.etree.ElementTree import Element, ElementTree, SubElement
 
-
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
@@ -31,10 +30,7 @@ from collective.volto.formsupport.interfaces import (
     IFormDataStore,
     IPostEvent,
 )
-from collective.volto.formsupport.utils import (
-    get_blocks,
-    validate_email_token,
-)
+from collective.volto.formsupport.utils import get_blocks, validate_email_token
 
 logger = logging.getLogger(__name__)
 CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
