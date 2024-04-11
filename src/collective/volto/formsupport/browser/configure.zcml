@@ -26,8 +26,6 @@
       name="send_mail_template"
       for="*"
       template="send_mail_template.pt"
-<<<<<<< HEAD
-=======
       permission="zope2.View"
       />
   <browser:page
@@ -36,21 +34,6 @@
       template="send_mail_template_table.pt"
       permission="zope2.View"
       />
-  <browser:page
-      name="email-confirm-view"
-      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
-      class=".email_confirm_view.EmailConfirmView"
-      template="templates/email_confirm_view.pt"
->>>>>>> cc2f480 (Formatting)
-      permission="zope2.View"
-      />
-  <browser:page
-      name="send_mail_template_table"
-      for="*"
-      template="send_mail_template_table.pt"
-      permission="zope2.View"
-      />
-
   <browser:page
     name="email-confirm-view"
     for="Products.CMFPlone.interfaces.IPloneSiteRoot"
