@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 
-import json
-from datetime import datetime, timedelta
-
-import six
+from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.utils import get_blocks
+from datetime import datetime
+from datetime import timedelta
 from plone import api
 from plone.memoize import view
 from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
-from zope.component import adapter, getMultiAdapter
-from zope.interface import Interface, implementer
+from zope.component import adapter
+from zope.component import getMultiAdapter
+from zope.interface import implementer
+from zope.interface import Interface
 
-from collective.volto.formsupport.interfaces import IFormDataStore
-from collective.volto.formsupport.utils import get_blocks
+import json
+import six
 
 
 @implementer(IExpandableElement)

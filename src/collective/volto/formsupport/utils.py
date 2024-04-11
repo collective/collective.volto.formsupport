@@ -1,7 +1,7 @@
-import copy
-import json
 from collections import deque
 
+import copy
+import json
 import six
 
 
