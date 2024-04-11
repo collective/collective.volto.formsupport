@@ -212,7 +212,7 @@ class SubmitPost(Service):
             if data.get("field_id", "") in bcc_fields:
                 if (
                     generate_email_token(self.block.get("block_id", ""), data["value"])
-                    != data["token"]
+                    != data["token"]  # noqa
                 ):
                     raise BadRequest(
                         _("{email}'s token is wrong").format(email=data["value"])
