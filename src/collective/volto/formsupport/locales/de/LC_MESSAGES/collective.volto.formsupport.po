@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-01-10 11:00+0000\n"
+"POT-Creation-Date: 2024-04-11 13:22+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -13,6 +13,10 @@ msgstr ""
 "Language-Name: English\n"
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: DOMAIN\n"
+
+#: collective/volto/formsupport/restapi/services/validation/email.py:42
+msgid "Codice della conferma email"
+msgstr ""
 
 #: collective/volto/formsupport/captcha/recaptcha.py:12
 msgid "Google ReCaptcha"
@@ -50,6 +54,26 @@ msgstr ""
 msgid "The code you entered was wrong, please enter the new one."
 msgstr "Der eingegebene Code war falsch. Bitte geben Sie den neuen Code ein."
 
+#: collective/volto/formsupport/restapi/services/validation/email.py:55
+msgid "The email field is missing"
+msgstr ""
+
+#: collective/volto/formsupport/restapi/services/validation/email.py:58
+msgid "The provided email address is not valid"
+msgstr ""
+
+#: collective/volto/formsupport/restapi/services/validation/email.py:79
+msgid "The token field is missing"
+msgstr ""
+
+#: collective/volto/formsupport/restapi/services/validation/email.py:61
+msgid "The uid field is missing"
+msgstr ""
+
+#: collective/volto/formsupport/restapi/services/validation/email.py:85
+msgid "Token is wrong"
+msgstr ""
+
 #: collective/volto/formsupport/configure.zcml:42
 msgid "Uninstalls the collective.volto.formsupport add-on."
 msgstr ""
@@ -63,7 +87,7 @@ msgid "Volto: Form support (uninstall)"
 msgstr ""
 
 #. Default: "Attachments too big. You uploaded ${uploaded_str}, but limit is ${max} MB. Try to compress files."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:185
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:186
 msgid "attachments_too_big"
 msgstr "Anhang ist zu groß (${uploaded_str}). Die Größe darf ${max} MB nicht überschreiten. Versuchen Sie Dateien zu komprimieren."
 
@@ -108,11 +132,15 @@ msgid "send_mail_text_table"
 msgstr ""
 
 #. Default: "Missing required field: subject or from."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:271
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:294
 msgid "send_required_field_missing"
 msgstr "Erforderliches Feld fehlt: Betreff oder Absender"
 
 #. Default: "Email not valid in \"${field}\" field."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:157
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:158
 msgid "wrong_email"
+msgstr ""
+
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:218
+msgid "{email}'s token is wrong"
 msgstr ""
