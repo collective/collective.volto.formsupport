@@ -28,6 +28,8 @@ Changelog
   [JeffersonBledsoe]
 - Add validation for email fields.
   [cekk]
+- Better compose email message with plain and html text.
+  [cekk]
 
 2.7.0 (2023-04-03)
 ------------------
