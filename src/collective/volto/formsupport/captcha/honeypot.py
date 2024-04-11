@@ -1,10 +1,12 @@
-from . import CaptchaSupport
 from collective.honeypot.config import HONEYPOT_FIELD
 from collective.honeypot.utils import found_honeypot
-from collective.volto.formsupport import _
 from plone.restapi.deserializer import json_body
 from zExceptions import BadRequest
 from zope.i18n import translate
+
+from collective.volto.formsupport import _
+
+from . import CaptchaSupport
 
 
 class HoneypotSupport(CaptchaSupport):
