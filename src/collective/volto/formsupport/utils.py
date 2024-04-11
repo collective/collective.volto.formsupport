@@ -43,7 +43,7 @@ def get_blocks(context):
     return dict(flat)
 
 
-def generate_email_token(uid, email)
+def generate_email_token(uid, email):
     """Generates the email verification token"""
     from zope.component import getUtility
 
