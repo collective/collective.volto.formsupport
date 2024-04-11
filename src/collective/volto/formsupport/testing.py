@@ -8,9 +8,9 @@ from plone.app.testing import quickInstallProduct
 from plone.restapi.testing import PloneRestApiDXLayer
 from plone.testing import z2
 
+import collective.honeypot
 import collective.MockMailHost
 import collective.volto.formsupport
-import collective.honeypot
 import plone.restapi
 
 

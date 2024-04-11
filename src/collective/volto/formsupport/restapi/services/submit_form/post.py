@@ -45,7 +45,6 @@ class PostEventService(object):
 
 
 class SubmitPost(Service):
-
     def __init__(self, context, request):
         super(SubmitPost, self).__init__(context, request)
 

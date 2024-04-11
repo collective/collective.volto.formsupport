@@ -12,9 +12,9 @@ from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
 from zope.component import getUtility
 
+import json
 import transaction
 import unittest
-import json
 
 
 class TestHoneypot(unittest.TestCase):
