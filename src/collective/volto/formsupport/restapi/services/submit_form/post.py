@@ -4,12 +4,14 @@ import codecs
 import logging
 import math
 import os
+import six
+
 from datetime import datetime
 from email import policy
 from email.message import EmailMessage
 from xml.etree.ElementTree import Element, ElementTree, SubElement
 
-import six
+
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
@@ -29,7 +31,10 @@ from collective.volto.formsupport.interfaces import (
     IFormDataStore,
     IPostEvent,
 )
-from collective.volto.formsupport.utils import get_blocks, generate_email_token
+from collective.volto.formsupport.utils import (
+    get_blocks,
+    validate_email_token,
+)
 
 logger = logging.getLogger(__name__)
 CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
@@ -210,10 +215,10 @@ class SubmitPost(Service):
                 continue
 
             if data.get("field_id", "") in bcc_fields:
-                if (
-                    generate_email_token(self.block.get("block_id", ""), data["value"])
-                    != data["token"]  # noqa
+                if validate_email_token(
+                    self.block.get("block_id", ""), data["value"], data["token"]
                 ):
+
                     raise BadRequest(
                         _("{email}'s token is wrong").format(email=data["value"])
                     )

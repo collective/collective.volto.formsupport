@@ -3,10 +3,12 @@ import json
 from collections import deque
 
 import six
+import pyotp
+import base64
 
 from collections import deque
-from hashlib import md5
-from plone.keyring.interfaces import IKeyManager
+
+EMAIL_OTP_LIFETIME = 5 * 60
 
 
 def flatten_block_hierachy(blocks):
@@ -43,10 +45,16 @@ def get_blocks(context):
     return dict(flat)
 
 
-def generate_email_token(uid, email):
+def generate_email_token(uid="", email=""):
     """Generates the email verification token"""
-    from zope.component import getUtility
 
-    manager = getUtility(IKeyManager)
+    totp = pyotp.TOTP(base64.b32encode((uid + email).encode()))
 
-    return md5((uid + email + manager.secret()).encode()).hexdigest()[:10]
+    return totp.now()
+
+
+def validate_email_token(uid="", email="", token=""):
+
+    totp = pyotp.TOTP(base64.b32encode((uid + email).encode()))
+
+    return totp.verify(token, valid_window=EMAIL_OTP_LIFETIME)

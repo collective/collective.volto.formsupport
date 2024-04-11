@@ -12,7 +12,10 @@ from zExceptions import BadRequest
 from plone.restapi.deserializer import json_body
 
 from collective.volto.formsupport import _
-from collective.volto.formsupport.utils import generate_email_token
+from collective.volto.formsupport.utils import (
+    generate_email_token,
+    validate_email_token,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -81,5 +84,5 @@ class ValidateEmailToken(Service):
         if "uid" not in data:
             raise BadRequest(_("The uid field is missing"))
 
-        if data["token"] != generate_email_token(data["uid"], data["email"]):
+        if not validate_email_token(data["uid"], data["email"], data["token"]):
             raise BadRequest(_("Token is wrong"))

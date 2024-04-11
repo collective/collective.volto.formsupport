@@ -56,6 +56,7 @@ setup(
         "plone.app.dexterity",
         "souper.plone",
         "click",
+        "pyotp",
     ],
     extras_require={
         "hcaptcha": [
