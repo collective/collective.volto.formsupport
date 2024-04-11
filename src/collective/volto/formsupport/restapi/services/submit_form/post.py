@@ -208,6 +208,7 @@ class SubmitPost(Service):
             value = data.get("value", "")
             if not value:
                 continue
+
             if data.get("field_id", "") in bcc_fields:
                 if (
                     generate_email_token(self.block.get("block_id", ""), data["value"])

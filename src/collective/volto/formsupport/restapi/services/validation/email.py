@@ -78,5 +78,8 @@ class ValidateEmailToken(Service):
         if "token" not in data:
             raise BadRequest(_("The token field is missing"))
 
+        if "uid" not in data:
+            raise BadRequest(_("The uid field is missing"))
+
         if data["token"] != generate_email_token(data["uid"], data["email"]):
             raise BadRequest(_("Token is wrong"))

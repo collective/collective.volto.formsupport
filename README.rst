@@ -112,6 +112,7 @@ Returns a HTTP 204 in case of success or HTTP 400 in case if the email is badly 
 paramaters:
 
 * `email` email address.
+* `uid` uid related to email field
 
 @validate-email-token
 ---------------------
@@ -124,6 +125,7 @@ Returns HTTP 204 in case of success or HTTP 400 in case of failure ::
 paramaters:
 
 * `email` email address
+* `uid` uid used to generate the OTP
 * `token` OTP code
 
 Form actions
