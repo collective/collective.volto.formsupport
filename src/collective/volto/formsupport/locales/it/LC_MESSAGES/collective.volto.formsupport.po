@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-04-11 13:22+0000\n"
+"POT-Creation-Date: 2024-04-11 15:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -14,33 +14,33 @@ msgstr ""
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: DOMAIN\n"
 
-#: collective/volto/formsupport/restapi/services/validation/email.py:42
-msgid "Codice della conferma email"
-msgstr ""
+#: collective/volto/formsupport/restapi/services/validation/email.py:44
+msgid "Email confirmation code"
+msgstr "Codice di conferma dell'email"
 
-#: collective/volto/formsupport/captcha/recaptcha.py:12
+#: collective/volto/formsupport/captcha/recaptcha.py:14
 msgid "Google ReCaptcha"
 msgstr "Google ReCaptcha"
 
-#: collective/volto/formsupport/captcha/hcaptcha.py:14
+#: collective/volto/formsupport/captcha/hcaptcha.py:16
 msgid "HCaptcha"
 msgstr "HCaptcha"
 
-#: collective/volto/formsupport/captcha/hcaptcha.py:63
+#: collective/volto/formsupport/captcha/hcaptcha.py:65
 msgid "HCaptcha Invisible"
 msgstr "HCaptcha Invisible"
 
-#: collective/volto/formsupport/captcha/honeypot.py:11
+#: collective/volto/formsupport/captcha/honeypot.py:13
 msgid "Honeypot Support"
 msgstr "Honeypot"
 
-#: collective/volto/formsupport/configure.zcml:33
+#: collective/volto/formsupport/configure.zcml:34
 msgid "Installs the collective.volto.formsupport add-on."
 msgstr "Install collective.volto.formsupport"
 
-#: collective/volto/formsupport/captcha/hcaptcha.py:44
+#: collective/volto/formsupport/captcha/hcaptcha.py:46
 #: collective/volto/formsupport/captcha/norobots.py:51
-#: collective/volto/formsupport/captcha/recaptcha.py:42
+#: collective/volto/formsupport/captcha/recaptcha.py:44
 msgid "No captcha token provided."
 msgstr "Nessun token captcha fornito."
 
@@ -48,43 +48,47 @@ msgstr "Nessun token captcha fornito."
 msgid "NoRobots ReCaptcha Support"
 msgstr "NoRobots"
 
-#: collective/volto/formsupport/captcha/hcaptcha.py:56
+#: collective/volto/formsupport/captcha/hcaptcha.py:58
 #: collective/volto/formsupport/captcha/norobots.py:67
-#: collective/volto/formsupport/captcha/recaptcha.py:54
+#: collective/volto/formsupport/captcha/recaptcha.py:56
 msgid "The code you entered was wrong, please enter the new one."
 msgstr "Il codice che hai inserito è sbagliato, per favore prova con un altro."
 
-#: collective/volto/formsupport/restapi/services/validation/email.py:55
+#: collective/volto/formsupport/restapi/services/validation/email.py:57
 msgid "The email field is missing"
 msgstr "Campo email è mancante"
 
-#: collective/volto/formsupport/restapi/services/validation/email.py:58
+#: collective/volto/formsupport/restapi/services/validation/email.py:60
 msgid "The provided email address is not valid"
 msgstr "L'email usato non è valido"
 
-#: collective/volto/formsupport/restapi/services/validation/email.py:79
+#: collective/volto/formsupport/restapi/services/validation/email.py:81
 msgid "The token field is missing"
 msgstr "Campo token è mancante"
 
-#: collective/volto/formsupport/restapi/services/validation/email.py:61
+#: collective/volto/formsupport/restapi/services/validation/email.py:63
 msgid "The uid field is missing"
 msgstr "Campo uid è mancante"
 
-#: collective/volto/formsupport/restapi/services/validation/email.py:85
+#: collective/volto/formsupport/restapi/services/validation/email.py:87
 msgid "Token is wrong"
 msgstr "Token non è valido"
 
-#: collective/volto/formsupport/configure.zcml:42
+#: collective/volto/formsupport/configure.zcml:43
 msgid "Uninstalls the collective.volto.formsupport add-on."
 msgstr "Disinstalla collective.volto.formsupport."
 
-#: collective/volto/formsupport/configure.zcml:33
+#: collective/volto/formsupport/configure.zcml:34
 msgid "Volto: Form support"
 msgstr "Volto: Form support"
 
-#: collective/volto/formsupport/configure.zcml:42
+#: collective/volto/formsupport/configure.zcml:43
 msgid "Volto: Form support (uninstall)"
 msgstr "Volto: Form support (uninstall)"
+
+#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:344
+msgid "Your code to validate the email address:"
+msgstr "Il tuo codice per la conferma dell'indirizzo email:"
 
 #. Default: "Attachments too big. You uploaded ${uploaded_str}, but limit is ${max} MB. Try to compress files."
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:186
@@ -102,7 +106,7 @@ msgid "empty_form_data"
 msgstr "Form senza dati."
 
 #. Default: "Error submitting form."
-#: collective/volto/formsupport/captcha/honeypot.py:28
+#: collective/volto/formsupport/captcha/honeypot.py:30
 msgid "honeypot_error"
 msgstr "Errore nella sottomissione del form."
 

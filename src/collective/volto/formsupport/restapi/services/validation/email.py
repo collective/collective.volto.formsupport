@@ -41,7 +41,7 @@ class ValidateEmailMessage(Service):
         host = api.portal.get_tool("MailHost")
         msg = MIMEMultipart()
         msg.attach(MIMEText(content, "html"))
-        msg["Subject"] = _("Codice della conferma email")
+        msg["Subject"] = _("Email confirmation code")
         msg["From"] = mfrom
         msg["To"] = email
 
