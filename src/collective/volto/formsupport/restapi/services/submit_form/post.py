@@ -211,7 +211,7 @@ class SubmitPost(Service):
                 continue
 
             if data.get("field_id", "") in bcc_fields:
-                if validate_email_token(
+                if not validate_email_token(
                     self.block.get("block_id", ""), data["value"], data["otp"]
                 ):
 
