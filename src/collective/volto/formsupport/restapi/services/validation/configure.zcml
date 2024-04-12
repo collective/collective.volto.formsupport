@@ -10,7 +10,7 @@
       for="*"
       permission="zope2.View"
       layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
-      name="@validate-email-message"
+      name="@validate-email-address"
       />
   <plone:service
       method="POST"
