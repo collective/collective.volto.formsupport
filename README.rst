@@ -107,7 +107,7 @@ Optional parameters could be passed in the payload:
 Send an message to the passed email wit OTP code to verify the address.
 Returns a HTTP 204 in case of success or HTTP 400 in case the email is badly composed.::
 
-> curl -i -X POST http://localhost:8080/Plone/my-form/@validate-email-address --data-raw '{"email": "email@email.com"}' -H 'Accept: application/json' -H 'Content-Type: application/json'
+> curl -i -X POST http://localhost:8080/Plone/my-form/@validate-email-address --data-raw '{"email": "email@email.com", "uid": "ffffffff"}' -H 'Accept: application/json' -H 'Content-Type: application/json'
 
 parameters:
 
@@ -120,13 +120,13 @@ parameters:
 Supposed to validate the OTP code received by the user via email.
 Returns HTTP 204 in case of success or HTTP 400 in case of failure ::
 
-> curl -i -X POST http://localhost:8080/Plone/my-form/@validate-email-token --data-raw '{"email": "email@email.com", "token": "blahblahblah"}' -H 'Accept: application/json' -H 'Content-Type: application/json'
+> curl -i -X POST http://localhost:8080/Plone/my-form/@validate-email-token --data-raw '{"email": "email@email.com", "otp": "blahblahblah"}' -H 'Accept: application/json' -H 'Content-Type: application/json'
 
 parameters:
 
 * `email` email address
 * `uid` uid used to generate the OTP
-* `token` OTP code
+* `otp` OTP code
 
 Form actions
 ============

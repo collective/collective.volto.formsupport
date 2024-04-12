@@ -77,11 +77,11 @@ class ValidateEmailToken(Service):
         if "email" not in data:
             raise BadRequest(_("The email field is missing"))
 
-        if "token" not in data:
-            raise BadRequest(_("The token field is missing"))
+        if "otp" not in data:
+            raise BadRequest(_("The otp field is missing"))
 
         if "uid" not in data:
             raise BadRequest(_("The uid field is missing"))
 
-        if not validate_email_token(data["uid"], data["email"], data["token"]):
-            raise BadRequest(_("Token is wrong"))
+        if not validate_email_token(data["uid"], data["email"], data["otp"]):
+            raise BadRequest(_("OTP is wrong"))

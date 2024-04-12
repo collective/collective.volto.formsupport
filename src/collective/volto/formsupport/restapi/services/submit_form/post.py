@@ -212,11 +212,11 @@ class SubmitPost(Service):
 
             if data.get("field_id", "") in bcc_fields:
                 if validate_email_token(
-                    self.block.get("block_id", ""), data["value"], data["token"]
+                    self.block.get("block_id", ""), data["value"], data["otp"]
                 ):
 
                     raise BadRequest(
-                        _("{email}'s token is wrong").format(email=data["value"])
+                        _("{email}'s OTP is wrong").format(email=data["value"])
                     )
 
     def get_block_data(self, block_id):
