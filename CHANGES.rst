@@ -36,6 +36,8 @@ Changelog
   [cekk]
 - On form submit, reply with a 200 with submitted data (eventually cleaned) for confirm message.
   [cekk]
+- Fix label in send_mail_template.
+  [cekk]
 
 2.7.0 (2023-04-03)
 ------------------
