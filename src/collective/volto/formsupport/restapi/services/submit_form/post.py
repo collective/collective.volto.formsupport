@@ -1,28 +1,4 @@
 # -*- coding: utf-8 -*-
-
-import codecs
-import logging
-import math
-import os
-from datetime import datetime
-from email import policy
-from email.message import EmailMessage
-from xml.etree.ElementTree import Element, ElementTree, SubElement
-
-import six
-from plone import api
-from plone.protect.interfaces import IDisableCSRFProtection
-from plone.registry.interfaces import IRegistry
-from plone.restapi.deserializer import json_body
-from plone.restapi.services import Service
-from plone.schema.email import _isemail
-from Products.CMFPlone.interfaces.controlpanel import IMailSchema
-from zExceptions import BadRequest
-from zope.component import getMultiAdapter, getUtility
-from zope.event import notify
-from zope.i18n import translate
-from zope.interface import alsoProvides, implementer
-
 from collective.volto.formsupport import _
 from collective.volto.formsupport.interfaces import (
     ICaptchaSupport,
@@ -30,6 +6,32 @@ from collective.volto.formsupport.interfaces import (
     IPostEvent,
 )
 from collective.volto.formsupport.utils import get_blocks
+from copy import deepcopy
+from datetime import datetime
+from email import policy
+from email.message import EmailMessage
+from plone import api
+from plone.protect.interfaces import IDisableCSRFProtection
+from plone.registry.interfaces import IRegistry
+from plone.restapi.deserializer import json_body
+from plone.restapi.services import Service
+from plone.schema.email import _isemail
+from Products.CMFPlone.interfaces.controlpanel import IMailSchema
+from Products.PortalTransforms.transforms.safe_html import SafeHTML
+from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import ElementTree
+from xml.etree.ElementTree import SubElement
+from zExceptions import BadRequest
+from zope.component import getMultiAdapter, getUtility
+from zope.event import notify
+from zope.i18n import translate
+from zope.interface import alsoProvides, implementer
+
+import codecs
+import logging
+import math
+import os
+import six
 
 logger = logging.getLogger(__name__)
 CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
@@ -47,7 +49,7 @@ class SubmitPost(Service):
         super(SubmitPost, self).__init__(context, request)
 
         self.block = {}
-        self.form_data = json_body(self.request)
+        self.form_data = self.cleanup_data()
         self.block_id = self.form_data.get("block_id", "")
         if self.block_id:
             self.block = self.get_block_data(block_id=self.block_id)
@@ -82,7 +84,33 @@ class SubmitPost(Service):
         if store_action:
             self.store_data()
 
-        return self.reply_no_content()
+        return {"data": self.form_data.get("data", [])}
+
+    def cleanup_data(self):
+        """
+        Avoid XSS injections and other attacks.
+
+        - cleanup HTML with plone transform
+        - remove from data, fields not defined in form schema
+        """
+        form_data = json_body(self.request)
+        fixed_fields = []
+        transform = SafeHTML()
+        block = self.get_block_data(block_id=form_data.get("block_id", ""))
+        block_fields = [x.get("field_id", "") for x in block.get("subblocks", [])]
+
+        for form_field in form_data.get("data", []):
+            if form_field.get("field_id", "") not in block_fields:
+                # unknown field, skip it
+                continue
+            new_field = deepcopy(form_field)
+            value = new_field.get("value", "")
+            if not isinstance(value, str):
+                continue
+            new_field["value"] = transform.scrub_html(value)
+            fixed_fields.append(new_field)
+        form_data["data"] = fixed_fields
+        return form_data
 
     def validate_form(self):
         """

@@ -106,6 +106,10 @@ class TestEvent(unittest.TestCase):
                         "field_type": "from",
                         "use_as_bcc": True,
                     },
+                    {
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
                 ],
             },
         }
@@ -114,14 +118,18 @@ class TestEvent(unittest.TestCase):
         response = self.submit_form(
             data={
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
                 ],
                 "block_id": "form-id",
             },
         )
         transaction.commit()
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(len(self.mailhost.messages), 1)
         msg = self.mailhost.messages[0]
         if isinstance(msg, bytes) and bytes is not str:
