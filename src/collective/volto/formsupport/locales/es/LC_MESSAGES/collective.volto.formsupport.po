@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: collective.volto.formsupport\n"
-"POT-Creation-Date: 2024-04-16 14:37+0000\n"
+"POT-Creation-Date: 2024-04-16 14:46+0000\n"
 "PO-Revision-Date: 2023-05-11 10:11-0400\n"
 "Last-Translator: Leonardo J. Caballero G. <leonardocaballero@gmail.com>\n"
 "Language-Team: ES <LL@li.org>\n"
@@ -67,8 +67,8 @@ msgstr "El código que ingresaste es incorrecto, ingresa el nuevo."
 msgid "The email field is missing"
 msgstr ""
 
-#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:358
-msgid "The form on this"
+#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:363
+msgid "The form on our site was compiled with this email address, if it was not you, ignore the message."
 msgstr ""
 
 #: collective/volto/formsupport/restapi/services/validation/email.py:92
@@ -95,7 +95,7 @@ msgstr "Volto: Soporte a formularios"
 msgid "Volto: Form support (uninstall)"
 msgstr "Volto: Soporte a formularios (Desinstalar)"
 
-#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:344
+#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:349
 msgid "Your code to validate the email address:"
 msgstr ""
 
@@ -149,12 +149,8 @@ msgstr ""
 msgid "send_required_field_missing"
 msgstr "Campo obligatorio no presente: Asunto o remitente."
 
-#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:358
+#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:364
 msgid "site"
-msgstr ""
-
-#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:358
-msgid "was compiled with this email address, if it was not you, ignore the message."
 msgstr ""
 
 #. Default: "Email not valid in \"${field}\" field."

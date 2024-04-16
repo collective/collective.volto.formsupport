@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-04-16 14:37+0000\n"
+"POT-Creation-Date: 2024-04-16 14:46+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -62,9 +62,9 @@ msgstr "Il codice che hai inserito è sbagliato, per favore prova con un altro."
 msgid "The email field is missing"
 msgstr "Campo email è mancante"
 
-#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:358
-msgid "The form on this"
-msgstr "E' stato compilato un form su questo "
+#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:363
+msgid "The form on our site was compiled with this email address, if it was not you, ignore the message."
+msgstr "E' stato compilato un form sul nostro sito con questo indirizzo email. Per favore inserisci questo codice di conferma per verificare che sei stato tu. Se non sei stato tu, ignora questa mail."
 
 #: collective/volto/formsupport/restapi/services/validation/email.py:92
 msgid "The otp field is missing"
@@ -90,7 +90,7 @@ msgstr "Volto: Form support"
 msgid "Volto: Form support (uninstall)"
 msgstr "Volto: Form support (uninstall)"
 
-#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:344
+#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:349
 msgid "Your code to validate the email address:"
 msgstr "Il tuo codice per la conferma dell'indirizzo email:"
 
@@ -144,13 +144,9 @@ msgstr "Dati inviati per ${title}"
 msgid "send_required_field_missing"
 msgstr "Campo obbligatorio mancante: subject o from."
 
-#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:358
+#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:364
 msgid "site"
 msgstr "sito"
-
-#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:358
-msgid "was compiled with this email address, if it was not you, ignore the message."
-msgstr " con questo indirizzo email. Per favore inserisci questo codice di conferma per verificare che sei stato tu. Se non sei stato tu, ignora questa mail."
 
 #. Default: "Email not valid in \"${field}\" field."
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:185
