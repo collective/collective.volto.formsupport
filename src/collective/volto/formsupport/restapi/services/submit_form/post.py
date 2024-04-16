@@ -240,7 +240,6 @@ class SubmitPost(Service):
                 if not validate_email_token(
                     self.form_data.get("block_id", ""), data["value"], data["otp"]
                 ):
-
                     raise BadRequest(
                         _("{email}'s OTP is wrong").format(email=data["value"])
                     )
