@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 
 class ValidateEmailMessage(Service):
     def reply(self):
-        data = data = self.validate()
+        data = self.validate()
 
         self.send_token(generate_email_token(data["uid"], data["email"]), data["email"])
 
@@ -38,9 +38,9 @@ class ValidateEmailMessage(Service):
         mail_view = api.content.get_view(
             context=api.portal.get(), name="email-confirm-view"
         )
+
         content = mail_view(token=token)
         mfrom = api.portal.get_registry_record("plone.email_from_address")
-
         host = api.portal.get_tool("MailHost")
         msg = EmailMessage(policy=policy.SMTP)
 
