@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-04-16 14:18+0000\n"
+"POT-Creation-Date: 2024-04-16 14:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -13,10 +13,6 @@ msgstr ""
 "Language-Name: English\n"
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: DOMAIN\n"
-
-#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:356
-msgid " with this email address. If it was not you, ignore this email"
-msgstr " con questo indirizzo email. Per favore inserisci questo codice di conferma per verificare che sei stato tu."
 
 #: collective/volto/formsupport/restapi/services/validation/email.py:55
 msgid "Email confirmation code"
@@ -66,10 +62,6 @@ msgstr "Il codice che hai inserito è sbagliato, per favore prova con un altro."
 msgid "The email field is missing"
 msgstr "Campo email è mancante"
 
-#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:356
-msgid "The form was compiled on this "
-msgstr "E' stato compilato un form "
-
 #: collective/volto/formsupport/restapi/services/validation/email.py:92
 msgid "The otp field is missing"
 msgstr "Manca il campo OTP."
@@ -107,6 +99,15 @@ msgstr "Allegati troppo grandi. Hai caricato ${uploaded_str}, ma il limite è di
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:128
 msgid "block_form_not_found_label"
 msgstr "Blocco con @type \"form\" e id \"$block\" non trovato nel contesto: $context"
+
+#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:356
+msgid "email_help_text_1"
+msgstr "E' stato compilato un form sul "
+
+#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:356
+msgid "email_help_text_2"
+msgstr " con questo indirizzo email. Per favore inserisci questo codice di conferma per verificare che sei stato tu.
+Se non sei stato tu, ignora questa mail.""
 
 #. Default: "Empty form data."
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:154

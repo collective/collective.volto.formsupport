@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-04-16 14:18+0000\n"
+"POT-Creation-Date: 2024-04-16 14:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,10 +16,6 @@ msgstr ""
 "Language-Name: English\n"
 "Preferred-Encodings: utf-8 latin1\n"
 "Domain: collective.volto.formsupport\n"
-
-#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:356
-msgid " with this email address. If it was not you, ignore this email"
-msgstr ""
 
 #: collective/volto/formsupport/restapi/services/validation/email.py:55
 msgid "Email confirmation code"
@@ -69,10 +65,6 @@ msgstr ""
 msgid "The email field is missing"
 msgstr ""
 
-#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:356
-msgid "The form was compiled on this "
-msgstr ""
-
 #: collective/volto/formsupport/restapi/services/validation/email.py:92
 msgid "The otp field is missing"
 msgstr ""
@@ -110,6 +102,14 @@ msgstr ""
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:128
 msgid "block_form_not_found_label"
 msgstr ""
+
+#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:356
+msgid "email_help_text_1"
+msgstr "In the form on this "
+
+#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:356
+msgid "email_help_text_2"
+msgstr " was inserted this email address. If it is not your action, ignore this email."
 
 #. Default: "Empty form data."
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:154

@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-04-16 14:18+0000\n"
+"POT-Creation-Date: 2024-04-16 14:24+0000\n"
 "PO-Revision-Date: 2021-05-11 18:49-0300\n"
 "Last-Translator: Érico Andrei <ericof@plone.org>, 2021\n"
 "Language-Team: Portuguese (https://www.transifex.com/plone/teams/14552/pt/)\n"
@@ -15,10 +15,6 @@ msgstr ""
 "Domain: collective.volto.formsupport\n"
 "Language: pt_BR\n"
 "X-Generator: Poedit 2.4.3\n"
-
-#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:356
-msgid " with this email address. If it was not you, ignore this email"
-msgstr ""
 
 #: collective/volto/formsupport/restapi/services/validation/email.py:55
 msgid "Email confirmation code"
@@ -68,10 +64,6 @@ msgstr ""
 msgid "The email field is missing"
 msgstr ""
 
-#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:356
-msgid "The form was compiled on this "
-msgstr ""
-
 #: collective/volto/formsupport/restapi/services/validation/email.py:92
 msgid "The otp field is missing"
 msgstr ""
@@ -109,6 +101,14 @@ msgstr ""
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:128
 msgid "block_form_not_found_label"
 msgstr "Bloco com @type \"form\" e id \"${block}\" não encontrado no contexto: $context."
+
+#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:356
+msgid "email_help_text_1"
+msgstr ""
+
+#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:356
+msgid "email_help_text_2"
+msgstr ""
 
 #. Default: "Empty form data."
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:154
