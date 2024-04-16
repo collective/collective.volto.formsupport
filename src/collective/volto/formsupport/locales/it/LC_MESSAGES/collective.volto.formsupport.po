@@ -102,12 +102,11 @@ msgstr "Blocco con @type \"form\" e id \"$block\" non trovato nel contesto: $con
 
 #: collective/volto/formsupport/browser/templates/email_confirm_view.pt:356
 msgid "email_help_text_1"
-msgstr "E' stato compilato un form sul "
+msgstr ""
 
 #: collective/volto/formsupport/browser/templates/email_confirm_view.pt:356
 msgid "email_help_text_2"
-msgstr " con questo indirizzo email. Per favore inserisci questo codice di conferma per verificare che sei stato tu.
-Se non sei stato tu, ignora questa mail.""
+msgstr ""
 
 #. Default: "Empty form data."
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:154
