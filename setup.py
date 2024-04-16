@@ -52,7 +52,7 @@ setup(
         "setuptools",
         "z3c.jbot",
         "plone.api>=1.8.4",
-        "plone.restapi",
+        "plone.restapi>=8.36.0",
         "plone.app.dexterity",
         "souper.plone",
         "click",
