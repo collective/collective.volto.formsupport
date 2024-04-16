@@ -312,9 +312,13 @@
         font-size: 24px;
       }
 
-      .mail_help_text div {
-        display:inline;
-        font-size:12px;
+       .mail_help_text div {
+        margin-top: 40px;
+       }
+
+      .mail_help_text div p, a {
+        font-size:9px;
+        text-align: center;
       }
 
     </style>
@@ -361,7 +365,7 @@
                       <td>
                         <div>
                           <p i18n:translate="">The form on our site was compiled with this email address, if it was not you, ignore the message.</p>
-                          <a href="${portal_url}" i18n:translate="">site</a>
+                          <p><a href="${portal_url}" i18n:translate="">site</a></p>
                         </div>
                       </td>
                     </tr>
