@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import os
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email import policy
+from email.message import EmailMessage
 from email.utils import parseaddr
 
 from plone import api
@@ -15,6 +18,8 @@ from collective.volto.formsupport.utils import (
     generate_email_token,
     validate_email_token,
 )
+
+CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +36,7 @@ class ValidateEmailMessage(Service):
         """
         Send token to recipient
         """
-
+        portal_transforms = api.portal.get_tool(name="portal_transforms")
         mail_view = api.content.get_view(
             context=api.portal.get(), name="email-confirm-view"
         )
@@ -39,8 +44,16 @@ class ValidateEmailMessage(Service):
         mfrom = api.portal.get_registry_record("plone.email_from_address")
 
         host = api.portal.get_tool("MailHost")
-        msg = MIMEMultipart()
-        msg.attach(MIMEText(content, "html"))
+        msg = EmailMessage(policy=policy.SMTP)
+
+        msg.set_content(
+            portal_transforms.convertTo("text/plain", content, mimetype="text/html")
+            .getData()
+            .strip(),
+            cte=CTE,
+        )
+        msg.add_alternative(content, subtype="html", cte=CTE)
+
         msg["Subject"] = _("Email confirmation code")
         msg["From"] = mfrom
         msg["To"] = email
