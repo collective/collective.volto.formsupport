@@ -43,7 +43,7 @@ where:
 - ``block_id`` is the id of the block
 - ``data`` contains the submitted form data
 
-Calling this endpoint, it will do some actions (based on block settings) and returns a ``204`` response.
+Calling this endpoint, it will do some actions (based on block settings) and returns a ``200`` response with the submitted data.
 
 
 @form-data

@@ -32,6 +32,16 @@ Changelog
   [cekk]
 - Better compose email message with plain and html text.
   [cekk]
+- Prevent XSS applying safe_html transform to all string values passed on form.
+  [cekk]
+- Discard fields submitted that are not defined in form schema.
+  [cekk]
+- On form submit, reply with a 200 with submitted data (eventually cleaned) for confirm message.
+  [cekk]
+- Fix label in send_mail_template.
+  [cekk]
+- Prevent XSS also in send_message field.
+  [cekk]
 
 2.7.0 (2023-04-03)
 ------------------

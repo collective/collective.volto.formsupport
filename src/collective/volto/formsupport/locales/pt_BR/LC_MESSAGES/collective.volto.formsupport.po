@@ -127,7 +127,7 @@ msgstr "Você deve selecionar pelo menos uma ação entre \"salvar\" e \"enviar\
 msgid "missing_blockid_label"
 msgstr "Campo  block_id não informado"
 
-#. Default: "A new form has been submitted from ${url}:"
+#. Default: "A new form has been submitted from <a href=\"${url}\">${url}</a>"
 #: collective/volto/formsupport/browser/send_mail_template.pt:7
 msgid "send_mail_text"
 msgstr "Um novo formulário foi preenchido em ${url}:"

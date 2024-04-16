@@ -3,9 +3,6 @@
     define="parameters python:options.get('parameters', {});
             url python:options.get('url', '');
             title python:options.get('title', '');">
-  <p i18n:translate="send_mail_text">
-    A new form has been submitted from <strong i18n:name="url">${title}</strong>:
-  </p>
   <ul>
     <tal:field repeat="field parameters">
       <li tal:define="value field/value|nothing;
@@ -14,4 +11,7 @@
       </li>
     </tal:field>
   </ul>
+  <p i18n:translate="send_mail_text">
+    A new form has been submitted from <a href="${url}"><strong i18n:name="url">${url}</strong></a>
+  </p>
 </tal:root>
