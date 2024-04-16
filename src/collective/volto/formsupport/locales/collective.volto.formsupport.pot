@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-04-16 13:55+0000\n"
+"POT-Creation-Date: 2024-04-16 14:18+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -136,10 +136,6 @@ msgstr ""
 msgid "missing_blockid_label"
 msgstr ""
 
-#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:356
-msgid "page"
-msgstr ""
-
 #. Default: "A new form has been submitted from <a href=\"${url}\">${url}</a>"
 #: collective/volto/formsupport/browser/send_mail_template.pt:15
 msgid "send_mail_text"
@@ -153,6 +149,10 @@ msgstr ""
 #. Default: "Missing required field: subject or from."
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:320
 msgid "send_required_field_missing"
+msgstr ""
+
+#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:356
+msgid "site"
 msgstr ""
 
 #. Default: "Email not valid in \"${field}\" field."
