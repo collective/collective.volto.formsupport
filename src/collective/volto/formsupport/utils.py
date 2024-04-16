@@ -1,14 +1,12 @@
+import base64
 import copy
 import json
-import six
-import pyotp
-import base64
-
-from plone.keyring.interfaces import IKeyManager
-from zope.component import getUtility
-
 from collections import deque
 
+import pyotp
+import six
+from plone.keyring.interfaces import IKeyManager
+from zope.component import getUtility
 
 EMAIL_OTP_LIFETIME = 5 * 60
 

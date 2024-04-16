@@ -661,7 +661,6 @@ class TestMailSend(unittest.TestCase):
         response = self.submit_form(
             data={
                 "data": [
-<<<<<<< HEAD
                     {"label": "Message", "value": "just want to say hi"},
                     {"label": "Name", "value": "Smith"},
                     {
@@ -672,15 +671,6 @@ class TestMailSend(unittest.TestCase):
                             uid="form-id", email="smith@doe.com"
                         ),
                     },
-=======
-                    {
-                        "field_id": "message",
-                        "label": "Message",
-                        "value": "just want to say hi",
-                    },
-                    {"field_id": "name", "label": "Name", "value": "Smith"},
-                    {"field_id": "contact", "label": "Email", "value": "smith@doe.com"},
->>>>>>> main
                 ],
                 "block_id": "form-id",
             },
