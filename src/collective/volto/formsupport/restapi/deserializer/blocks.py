@@ -22,9 +22,6 @@ class FormBlockDeserializerBase:
         """
         Do not store html but only plaintext
         """
-        import pdb
-
-        pdb.set_trace()
         if value.get("send_message", ""):
             transform = SafeHTML()
             value["send_message"] = transform.scrub_html(value["send_message"])
