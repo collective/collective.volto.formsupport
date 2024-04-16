@@ -1,4 +1,3 @@
-from plone import api
 from plone.dexterity.interfaces import IDexterityContent
 from plone.restapi.bbb import IPloneSiteRoot
 from plone.restapi.interfaces import IBlockFieldDeserializationTransformer
