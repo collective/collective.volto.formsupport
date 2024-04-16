@@ -486,7 +486,7 @@ class TestMailSend(unittest.TestCase):
                         "field_id": "contact",
                         "label": "Email",
                         "value": "smith@doe.com",
-                        "token": "blahblahblah",
+                        "otp": "blahblahblah",
                     },
                 ],
                 "block_id": "form-id",
