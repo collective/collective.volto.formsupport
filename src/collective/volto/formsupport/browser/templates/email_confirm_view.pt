@@ -312,7 +312,7 @@
 
     </style>
   </head>
-  <body tal:define="portal view/get_portal; token view/get_token">
+  <body tal:define="portal view/get_portal; token view/get_token; context view/context">
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
       <tr>
         <td>&nbsp;</td>
@@ -349,6 +349,13 @@
                           <p class="token_text">${token}</p>
                         <div>
                       </td>
+                    </tr>
+                    <tr>
+                      <div>
+                        <p class="mail_help_text">
+                          <span i18n:translate="The form was compiled on this "></span><a href="${context/get_absolute_url}" i18n:translate="page"></a><span i18n:translate=" with this email address. If it was not you, ignore this email"></span>
+                        </p>
+                      </div>
                     </tr>
                   </table>
                 </td>
