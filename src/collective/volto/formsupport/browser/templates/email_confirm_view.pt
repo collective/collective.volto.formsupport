@@ -312,6 +312,11 @@
         font-size: 24px;
       }
 
+      .mail_help_text div {
+        display:inline;
+        font-size:12px;
+      }
+
     </style>
   </head>
   <body tal:define="portal view/get_portal; token view/get_token; portal_url view/context/portal_url">
@@ -355,7 +360,8 @@
                     <tr class="mail_help_text">
                       <td>
                         <div>
-                          <h5 i18n:translate="">The form on this </h5><a href="${portal_url}" i18n:translate="">site</a><h5 i18n:translate=""> was compiled with this email address, if it was not you, ignore the message.</h5>
+                          <p i18n:translate="">The form on our site was compiled with this email address, if it was not you, ignore the message.</p>
+                          <a href="${portal_url}" i18n:translate="">site</a>
                         </div>
                       </td>
                     </tr>
