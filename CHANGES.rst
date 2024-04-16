@@ -38,6 +38,8 @@ Changelog
   [cekk]
 - Fix label in send_mail_template.
   [cekk]
+- Prevent XSS also in send_message field.
+  [cekk]
 
 2.7.0 (2023-04-03)
 ------------------
