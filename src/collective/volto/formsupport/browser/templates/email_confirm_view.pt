@@ -355,7 +355,7 @@
                     <tr class="mail_help_text">
                       <td>
                         <div>
-                          <h5 i18n:translate="">E' stato compilato un form sul </h5><a href="${portal_url}" i18n:translate="">site</a><h5 i18n:translate=""> con questo indirizzo email. Per favore inserisci questo codice di conferma per verificare che sei stato tu. Se non sei stato tu, ignora questa mail.</h5>
+                          <h5 i18n:translate="">The form on this </h5><a href="${portal_url}" i18n:translate="">site</a><h5 i18n:translate=""> was compiled with this email address, if it was not you, ignore the message.</h5>
                         </div>
                       </td>
                     </tr>
