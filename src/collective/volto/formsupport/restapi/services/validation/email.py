@@ -10,7 +10,6 @@ from plone import api
 from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
 from zExceptions import BadRequest
-from zope.i18n import translate
 
 from collective.volto.formsupport import _
 from collective.volto.formsupport.utils import (
@@ -53,7 +52,7 @@ class ValidateEmailMessage(Service):
         )
         msg.add_alternative(content, subtype="html", cte=CTE)
 
-        msg["Subject"] = translate(_("Email confirmation code"), context=self.context)
+        msg["Subject"] = api.portal.translate(_("Email confirmation code"))
         msg["From"] = mfrom
         msg["To"] = email
 
