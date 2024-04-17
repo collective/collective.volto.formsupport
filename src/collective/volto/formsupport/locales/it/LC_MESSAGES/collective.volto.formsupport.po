@@ -64,7 +64,7 @@ msgstr "Campo email è mancante"
 
 #: collective/volto/formsupport/browser/templates/email_confirm_view.pt:367
 msgid "The form on ${page} was compiled with this email address, if it was not you, ignore the message."
-msgstr ""
+msgstr "E' stato compilato un form nella pagina ${page}. Per favore inserisci questo codice di conferma per verificare che sei stato tu. Se non sei stato tu, ignora questa mail."
 
 #: collective/volto/formsupport/restapi/services/validation/email.py:92
 msgid "The otp field is missing"

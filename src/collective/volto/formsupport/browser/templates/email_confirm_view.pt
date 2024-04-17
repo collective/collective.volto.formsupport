@@ -365,7 +365,6 @@
                       <td>
                         <div>
                           <p i18n:translate="">The form on <a href="${context_url}" i18n:name="page">${view/context/Title}</a> was compiled with this email address, if it was not you, ignore the message.</p>
-                          <p></p>
                         </div>
                       </td>
                     </tr>
