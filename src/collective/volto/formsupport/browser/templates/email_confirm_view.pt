@@ -317,7 +317,7 @@
        }
 
       .mail_help_text div p, a {
-        font-size:9px;
+        font-size:12px;
         text-align: center;
       }
 
