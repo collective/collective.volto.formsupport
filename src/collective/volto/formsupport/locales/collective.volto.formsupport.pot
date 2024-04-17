@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-04-17 08:44+0000\n"
+"POT-Creation-Date: 2024-04-17 10:34+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -66,7 +66,7 @@ msgid "The email field is missing"
 msgstr ""
 
 #: collective/volto/formsupport/browser/templates/email_confirm_view.pt:367
-msgid "The form on the page below was compiled with this email address, if it was not you, ignore the message."
+msgid "The form on ${page} was compiled with this email address, if it was not you, ignore the message."
 msgstr ""
 
 #: collective/volto/formsupport/restapi/services/validation/email.py:92
@@ -130,10 +130,6 @@ msgstr ""
 #. Default: "Missing block_id"
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:121
 msgid "missing_blockid_label"
-msgstr ""
-
-#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:368
-msgid "page"
 msgstr ""
 
 #. Default: "A new form has been submitted from <a href=\"${url}\">${url}</a>"

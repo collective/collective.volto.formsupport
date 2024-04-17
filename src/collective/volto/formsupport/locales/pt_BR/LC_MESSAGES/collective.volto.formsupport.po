@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-04-17 08:44+0000\n"
+"POT-Creation-Date: 2024-04-17 10:34+0000\n"
 "PO-Revision-Date: 2021-05-11 18:49-0300\n"
 "Last-Translator: Érico Andrei <ericof@plone.org>, 2021\n"
 "Language-Team: Portuguese (https://www.transifex.com/plone/teams/14552/pt/)\n"
@@ -65,7 +65,7 @@ msgid "The email field is missing"
 msgstr ""
 
 #: collective/volto/formsupport/browser/templates/email_confirm_view.pt:367
-msgid "The form on the page below was compiled with this email address, if it was not you, ignore the message."
+msgid "The form on ${page} was compiled with this email address, if it was not you, ignore the message."
 msgstr ""
 
 #: collective/volto/formsupport/restapi/services/validation/email.py:92
@@ -130,10 +130,6 @@ msgstr "Você deve selecionar pelo menos uma ação entre \"salvar\" e \"enviar\
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:121
 msgid "missing_blockid_label"
 msgstr "Campo  block_id não informado"
-
-#: collective/volto/formsupport/browser/templates/email_confirm_view.pt:368
-msgid "page"
-msgstr ""
 
 #. Default: "A new form has been submitted from <a href=\"${url}\">${url}</a>"
 #: collective/volto/formsupport/browser/send_mail_template.pt:15
