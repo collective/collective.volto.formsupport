@@ -323,7 +323,7 @@
 
     </style>
   </head>
-  <body tal:define="portal view/get_portal; token view/get_token; portal_url view/context/portal_url">
+  <body tal:define="portal view/get_portal; token view/get_token; context_url view/context_url">
     <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
       <tr>
         <td>&nbsp;</td>
@@ -364,8 +364,8 @@
                     <tr class="mail_help_text">
                       <td>
                         <div>
-                          <p i18n:translate="">The form on our site was compiled with this email address, if it was not you, ignore the message.</p>
-                          <p><a href="${portal_url}" i18n:translate="">site</a></p>
+                          <p i18n:translate="">The form on the page below was compiled with this email address, if it was not you, ignore the message.</p>
+                          <p><a href="${context_url}" i18n:translate="">page</a></p>
                         </div>
                       </td>
                     </tr>

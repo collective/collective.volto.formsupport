@@ -14,3 +14,6 @@ class EmailConfirmView(BrowserView):
 
     def get_portal(self):
         return api.portal.get()
+
+    def context_url(self):
+        return self.context.absolute_url()
