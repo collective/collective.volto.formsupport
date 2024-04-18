@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.7.1 (unreleased)
+3.0.0 (2024-04-18)
 ------------------
 
 - Add functionality to check the user inserted email by an OTP.
