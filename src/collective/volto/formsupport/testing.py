@@ -32,6 +32,14 @@ class VoltoFormsupportLayer(PloneSandboxLayer):
         applyProfile(portal, "plone.restapi:blocks")
         applyProfile(portal, "collective.volto.formsupport:default")
 
+        # Mock the validate email tocken function
+        def validate_email_token_mock(*args, **kwargs):
+            return True
+
+        from collective.volto.formsupport import utils
+
+        utils.validate_email_token = validate_email_token_mock
+
 
 VOLTO_FORMSUPPORT_FIXTURE = VoltoFormsupportLayer()
 

@@ -4,10 +4,12 @@ Changelog
 2.7.1 (unreleased)
 ------------------
 
+- Add functionality to check the user inserted email by an OTP.
+  [folix-01]
 - Breaking change: clear data method changed from GET to DELETE
   [mamico]
-- Fix: with multiple blocks on the same page, all data is deleted. 
-  Now, if you pass a parameter block_id, only the records related to the 
+- Fix: with multiple blocks on the same page, all data is deleted.
+  Now, if you pass a parameter block_id, only the records related to the
   block are deleted.
   [mamico]
 - Feat: clear data restapi accept a parameter for remove the expired records

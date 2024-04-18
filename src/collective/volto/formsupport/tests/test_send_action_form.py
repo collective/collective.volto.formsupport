@@ -21,6 +21,7 @@ from zope.component import getUtility
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
+from collective.volto.formsupport.utils import generate_email_token
 
 
 class TestMailSend(unittest.TestCase):
@@ -54,6 +55,7 @@ class TestMailSend(unittest.TestCase):
             "form-id": {"@type": "form"},
         }
         self.document_url = self.document.absolute_url()
+
         transaction.commit()
 
     def tearDown(self):
@@ -659,13 +661,16 @@ class TestMailSend(unittest.TestCase):
         response = self.submit_form(
             data={
                 "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
                     {
-                        "field_id": "message",
-                        "label": "Message",
-                        "value": "just want to say hi",
+                        "field_id": "contact",
+                        "label": "Email",
+                        "value": "smith@doe.com",
+                        "otp": generate_email_token(
+                            uid="form-id", email="smith@doe.com"
+                        ),
                     },
-                    {"field_id": "name", "label": "Name", "value": "Smith"},
-                    {"field_id": "contact", "label": "Email", "value": "smith@doe.com"},
                 ],
                 "block_id": "form-id",
             },

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import unittest
-import transaction
-
 from copy import deepcopy
+
+import transaction
 from plone import api
 from plone.app.testing import (
     SITE_OWNER_NAME,

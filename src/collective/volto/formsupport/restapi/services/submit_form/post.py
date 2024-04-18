@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
-from collective.volto.formsupport import _
-from collective.volto.formsupport.interfaces import (
-    ICaptchaSupport,
-    IFormDataStore,
-    IPostEvent,
-)
-from collective.volto.formsupport.utils import get_blocks
+import codecs
+import logging
+import math
+import os
 from copy import deepcopy
 from datetime import datetime
 from email import policy
 from email.message import EmailMessage
+from xml.etree.ElementTree import Element, ElementTree, SubElement
+
+import six
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
@@ -18,20 +18,19 @@ from plone.restapi.services import Service
 from plone.schema.email import _isemail
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
 from Products.PortalTransforms.transforms.safe_html import SafeHTML
-from xml.etree.ElementTree import Element
-from xml.etree.ElementTree import ElementTree
-from xml.etree.ElementTree import SubElement
 from zExceptions import BadRequest
 from zope.component import getMultiAdapter, getUtility
 from zope.event import notify
 from zope.i18n import translate
 from zope.interface import alsoProvides, implementer
 
-import codecs
-import logging
-import math
-import os
-import six
+from collective.volto.formsupport import _
+from collective.volto.formsupport.interfaces import (
+    ICaptchaSupport,
+    IFormDataStore,
+    IPostEvent,
+)
+from collective.volto.formsupport.utils import get_blocks, validate_email_token
 
 logger = logging.getLogger(__name__)
 CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
@@ -169,6 +168,7 @@ class SubmitPost(Service):
             ).verify(self.form_data.get("captcha"))
 
         self.validate_email_fields()
+        self.validate_bcc()
 
     def validate_email_fields(self):
         email_fields = [
@@ -222,6 +222,27 @@ class SubmitPost(Service):
                     context=self.request,
                 )
             )
+
+    def validate_bcc(self):
+        bcc_fields = []
+        for field in self.block.get("subblocks", []):
+            if field.get("use_as_bcc", False):
+                field_id = field.get("field_id", "")
+                if field_id not in bcc_fields:
+                    bcc_fields.append(field_id)
+
+        for data in self.form_data.get("data", []):
+            value = data.get("value", "")
+            if not value:
+                continue
+
+            if data.get("field_id", "") in bcc_fields:
+                if not validate_email_token(
+                    self.form_data.get("block_id", ""), data["value"], data["otp"]
+                ):
+                    raise BadRequest(
+                        _("{email}'s OTP is wrong").format(email=data["value"])
+                    )
 
     def get_block_data(self, block_id):
         blocks = get_blocks(self.context)

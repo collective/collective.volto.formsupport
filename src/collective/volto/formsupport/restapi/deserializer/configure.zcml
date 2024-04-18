@@ -11,4 +11,4 @@
       factory=".blocks.FormBlockDeserializerRoot"
       provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
       />
-  </configure>
+</configure>
