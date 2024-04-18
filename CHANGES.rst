@@ -4,7 +4,8 @@ Changelog
 3.0.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix README.
+  [cekk]
 
 
 3.0.0 (2024-04-18)
