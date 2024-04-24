@@ -17,7 +17,6 @@ from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
 from plone.schema.email import _isemail
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
-from Products.PortalTransforms.transforms.html_to_text import html_to_text
 from zExceptions import BadRequest
 from zope.component import getMultiAdapter, getUtility
 from zope.event import notify
