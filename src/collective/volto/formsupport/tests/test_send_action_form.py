@@ -1302,7 +1302,7 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> John", msg)
 
-    def test_cleanup_nasy_html_tags_with_portal_transforms(self):
+    def test_cleanup_html_in_submitted_data(self):
         """
         This is needed for confirm message
         """
@@ -1346,7 +1346,6 @@ class TestMailSend(unittest.TestCase):
         transaction.commit()
         self.assertEqual(response.status_code, 200)
         res = response.json()
-
         self.assertEqual(
             res,
             {
@@ -1354,12 +1353,12 @@ class TestMailSend(unittest.TestCase):
                     {
                         "field_id": "message",
                         "label": "Message",
-                        "value": "<b>click here</b><p><i>keep tags</i></p>",
+                        "value": "click here keep tags",
                     },
                     {
                         "field_id": "name",
                         "label": "Name",
-                        "value": " foo",
+                        "value": "alert(‘XSS’)  foo",
                     },
                 ]
             },
@@ -1369,7 +1368,7 @@ class TestMailSend(unittest.TestCase):
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
         self.assertIn(
-            "<strong>Message:</strong> &lt;b&gt;click here&lt;/b&gt;&lt;p&gt;&lt=\r\n;i&gt;keep tags&lt;/i&gt;&lt;/p&gt;",
+            "<strong>Message:</strong> click here keep tags",
             msg,
         )
-        self.assertIn("<strong>Name:</strong>  foo", msg)
+        self.assertIn("<strong>Name:</strong> alert(=E2=80=98XSS=E2=80=99)  foo", msg)

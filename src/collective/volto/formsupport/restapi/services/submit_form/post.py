@@ -17,7 +17,6 @@ from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
 from plone.schema.email import _isemail
 from Products.CMFPlone.interfaces.controlpanel import IMailSchema
-from Products.PortalTransforms.transforms.safe_html import SafeHTML
 from zExceptions import BadRequest
 from zope.component import getMultiAdapter, getUtility
 from zope.event import notify
@@ -94,7 +93,8 @@ class SubmitPost(Service):
         """
         form_data = json_body(self.request)
         fixed_fields = []
-        transform = SafeHTML()
+        transforms = api.portal.get_tool(name="portal_transforms")
+
         block = self.get_block_data(block_id=form_data.get("block_id", ""))
         block_fields = [x.get("field_id", "") for x in block.get("subblocks", [])]
 
@@ -104,9 +104,9 @@ class SubmitPost(Service):
                 continue
             new_field = deepcopy(form_field)
             value = new_field.get("value", "")
-            if not isinstance(value, str):
-                continue
-            new_field["value"] = transform.scrub_html(value)
+            if isinstance(value, str):
+                stream = transforms.convertTo("text/plain", value, mimetype="text/html")
+                new_field["value"] = stream.getData().strip()
             fixed_fields.append(new_field)
         form_data["data"] = fixed_fields
         return form_data
