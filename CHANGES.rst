@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.2 (unreleased)
+3.0.2 (2024-05-05)
 ------------------
 
 - Cleanup all possible HTML in user formitted data and convert it to plain text.
