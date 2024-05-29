@@ -2,7 +2,12 @@
     i18n:domain="collective.volto.formsupport"
     define="parameters python:options.get('parameters', {});
             url python:options.get('url', '');
-            title python:options.get('title', '');">
+            title python:options.get('title', '');
+            block python:options.get('block', '');
+            ">
+  <header>
+    <tal:element tal:replace="structure python:block.get('mail_header', '')"></tal:element>
+  </header>
   <ul>
     <tal:field repeat="field parameters">
       <li tal:define="value field/value|nothing;
@@ -11,7 +16,12 @@
       </li>
     </tal:field>
   </ul>
-  <p i18n:translate="send_mail_text">
-    A new form has been submitted from <a href="${url}"><strong i18n:name="url">${url}</strong></a>
-  </p>
+  <tal:element tal:condition="python:not block.get('mail_footer', '')">
+    <p i18n:translate="send_mail_text">
+      A new form has been submitted from <a href="${url}"><strong i18n:name="url">${url}</strong></a>
+    </p>
+  </tal:element>
+  <footer>
+    <tal:element tal:replace="structure python:block.get('mail_footer', '')"></tal:element>
+  </footer>
 </tal:root>

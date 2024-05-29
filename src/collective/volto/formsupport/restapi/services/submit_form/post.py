@@ -413,6 +413,7 @@ class SubmitPost(Service):
             "parameters": self.filter_parameters(),
             "url": self.context.absolute_url(),
             "title": self.context.Title(),
+            "block": self.block,
         }
         return message_template(**parameters)
 
