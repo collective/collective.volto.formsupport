@@ -4,7 +4,8 @@ Changelog
 3.0.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Configurable header and footer for email message.
+  [folix-01]
 
 
 3.0.2 (2024-05-05)
