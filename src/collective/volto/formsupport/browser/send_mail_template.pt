@@ -3,10 +3,11 @@
     define="parameters python:options.get('parameters', {});
             url python:options.get('url', '');
             title python:options.get('title', '');
-            block python:options.get('block', '');
+            mail_header python:options.get('mail_header', '');
+            mail_footer python:options.get('mail_footer', '');
             ">
   <header>
-    <tal:element tal:replace="structure python:block.get('mail_header', '')"></tal:element>
+    <tal:element tal:replace="structure mail_header"></tal:element>
   </header>
   <ul>
     <tal:field repeat="field parameters">
@@ -16,12 +17,12 @@
       </li>
     </tal:field>
   </ul>
-  <tal:element tal:condition="python:not block.get('mail_footer', '')">
-    <p i18n:translate="send_mail_text">
-      A new form has been submitted from <a href="${url}"><strong i18n:name="url">${url}</strong></a>
-    </p>
-  </tal:element>
   <footer>
-    <tal:element tal:replace="structure python:block.get('mail_footer', '')"></tal:element>
+    <tal:element tal:replace="structure mail_footer"></tal:element>
+    <tal:element tal:condition="python:not mail_footer ">
+      <p i18n:translate="send_mail_text">
+        A new form has been submitted from <a href="${url}"><strong i18n:name="url">${url}</strong></a>
+      </p>
+    </tal:element>
   </footer>
 </tal:root>

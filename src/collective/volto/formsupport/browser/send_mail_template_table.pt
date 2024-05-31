@@ -3,7 +3,8 @@
   define="parameters python:options.get('parameters', {});
             url python:options.get('url', '');
             title python:options.get('title', '');
-            block python:options.get('block', '');
+            mail_header python:options.get('mail_header', '');
+            mail_footer python:options.get('mail_footer', '');
             ">
   <style>
     th {
@@ -11,12 +12,12 @@
     }
   </style>
   <header>
-    <tal:element tal:replace="structure python:block.get('mail_header', '')"></tal:element>
-  </header>
-  <table border="1">
-    <tal:element tal:condition="python:not block.get('mail_header', '')">
+    <tal:element tal:replace="structure mail_header"></tal:element>
+    <tal:element tal:condition="python:not mail_footer">
       <caption i18n:translate="send_mail_text_table">Form submission data for ${title}</caption>
     <tal:element>
+  </header>
+  <table border="1">
     <thead>
       <tr role="row">
         <th align="left"
@@ -41,7 +42,7 @@
     </tbody>
   </table>
   <footer>
-    <tal:element tal:replace="structure python:block.get('mail_footer', '')"></tal:element>
+    <tal:element tal:replace="structure mail_footer"></tal:element>
   </footer>
 </tal:root>
 
