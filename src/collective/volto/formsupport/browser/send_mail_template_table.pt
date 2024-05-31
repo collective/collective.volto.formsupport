@@ -2,14 +2,22 @@
   i18n:domain="collective.volto.formsupport"
   define="parameters python:options.get('parameters', {});
             url python:options.get('url', '');
-            title python:options.get('title', '');">
+            title python:options.get('title', '');
+            mail_header python:options.get('mail_header', '');
+            mail_footer python:options.get('mail_footer', '');
+            ">
   <style>
     th {
         text-align: start;
     }
   </style>
+  <header>
+    <tal:element tal:replace="structure mail_header"></tal:element>
+    <tal:element tal:condition="python:not mail_footer">
+      <caption i18n:translate="send_mail_text_table">Form submission data for ${title}</caption>
+    <tal:element>
+  </header>
   <table border="1">
-    <caption i18n:translate="send_mail_text_table">Form submission data for ${title}</caption>
     <thead>
       <tr role="row">
         <th align="left"
@@ -33,6 +41,9 @@
       </tal:field>
     </tbody>
   </table>
+  <footer>
+    <tal:element tal:replace="structure mail_footer"></tal:element>
+  </footer>
 </tal:root>
 
 
