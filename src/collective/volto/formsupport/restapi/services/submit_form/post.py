@@ -8,13 +8,14 @@ from copy import deepcopy
 from datetime import datetime
 from email import policy
 from email.message import EmailMessage
+from io import BytesIO
 from plone import api
+from plone.base.interfaces.controlpanel import IMailSchema
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
 from plone.schema.email import _isemail
-from Products.CMFPlone.interfaces.controlpanel import IMailSchema
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import SubElement
@@ -30,7 +31,6 @@ import codecs
 import logging
 import math
 import os
-import six
 
 
 logger = logging.getLogger(__name__)
@@ -480,7 +480,7 @@ class SubmitPost(Service):
             .replace(":", "")
         )
         filename = f"formdata_{now}.xml"
-        output = six.BytesIO()
+        output = BytesIO()
         xmlRoot = Element("form")
 
         for field in self.filter_parameters():
