@@ -83,7 +83,12 @@ Zope = [
   'Products.CMFCore', 'Products.CMFDynamicViewFTI',
 ]
 python-dateutil = ['dateutil']
-'souper.plone' = ['souper']
+'souper.plone' = ['souper', 'repoze.catalog']
+# extra packages
+ignore-packages = [
+  'collective.honeypot', 'plone.formwidget.hcaptcha', 'plone.formwidget.recaptcha',
+  'collective.volto.blocksfield', 'collective.z3cform.norobots',
+]
 
 ##
 # Add extra configuration options in .meta.toml:
