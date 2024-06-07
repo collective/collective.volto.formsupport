@@ -16,7 +16,7 @@ long_description = "\n\n".join(
 
 setup(
     name="collective.volto.formsupport",
-    version="2.7.1.dev0",
+    version="3.0.3.dev0",
     description="Add support for customizable forms in Volto",
     long_description=long_description,
     # Get more from https://pypi.org/classifiers/
@@ -52,10 +52,11 @@ setup(
         "setuptools",
         "z3c.jbot",
         "plone.api>=1.8.4",
-        "plone.restapi",
+        "plone.restapi>=8.36.0",
         "plone.app.dexterity",
         "souper.plone",
         "click",
+        "pyotp",
     ],
     extras_require={
         "hcaptcha": [

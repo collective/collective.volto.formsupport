@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.7.1 (unreleased)
+3.0.3 (unreleased)
 ------------------
 
 - Save attachments as blobfile in the storage adapater, add a view to download them, returns
@@ -9,10 +9,31 @@ Changelog
   [mamico]
 - Fix: if there are multiple forms on a page, each csv button downloads the record of all the forms,
   now if there is a block_id parameter, the csv is filtered on that.
+
+
+3.0.2 (2024-05-05)
+------------------
+
+- Cleanup all possible HTML in user formitted data and convert it to plain text.
+  [cekk]
+
+
+3.0.1 (2024-04-18)
+------------------
+
+- Fix README.
+  [cekk]
+
+
+3.0.0 (2024-04-18)
+------------------
+
+- Add functionality to check the user inserted email by an OTP.
+  [folix-01]
 - Breaking change: clear data method changed from GET to DELETE
   [mamico]
-- Fix: with multiple blocks on the same page, all data is deleted. 
-  Now, if you pass a parameter block_id, only the records related to the 
+- Fix: with multiple blocks on the same page, all data is deleted.
+  Now, if you pass a parameter block_id, only the records related to the
   block are deleted.
   [mamico]
 - Feat: clear data restapi accept a parameter for remove the expired records
@@ -32,6 +53,18 @@ Changelog
 - Added support for sending emails as a table #31
   [JeffersonBledsoe]
 - Add validation for email fields.
+  [cekk]
+- Better compose email message with plain and html text.
+  [cekk]
+- Prevent XSS applying safe_html transform to all string values passed on form.
+  [cekk]
+- Discard fields submitted that are not defined in form schema.
+  [cekk]
+- On form submit, reply with a 200 with submitted data (eventually cleaned) for confirm message.
+  [cekk]
+- Fix label in send_mail_template.
+  [cekk]
+- Prevent XSS also in send_message field.
   [cekk]
 
 2.7.0 (2023-04-03)

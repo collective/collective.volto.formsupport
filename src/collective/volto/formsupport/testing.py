@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
+import collective.honeypot
+import collective.MockMailHost
+import plone.restapi
 from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE
-from plone.app.testing import applyProfile
-from plone.app.testing import FunctionalTesting
-from plone.app.testing import IntegrationTesting
-from plone.app.testing import PloneSandboxLayer
-from plone.app.testing import quickInstallProduct
+from plone.app.testing import (
+    FunctionalTesting,
+    IntegrationTesting,
+    PloneSandboxLayer,
+    applyProfile,
+    quickInstallProduct,
+)
 from plone.restapi.testing import PloneRestApiDXLayer
 from plone.testing import z2
 
-import collective.MockMailHost
 import collective.volto.formsupport
-import collective.honeypot
-import plone.restapi
 
 
 class VoltoFormsupportLayer(PloneSandboxLayer):
@@ -29,6 +31,14 @@ class VoltoFormsupportLayer(PloneSandboxLayer):
     def setUpPloneSite(self, portal):
         applyProfile(portal, "plone.restapi:blocks")
         applyProfile(portal, "collective.volto.formsupport:default")
+
+        # Mock the validate email tocken function
+        def validate_email_token_mock(*args, **kwargs):
+            return True
+
+        from collective.volto.formsupport import utils
+
+        utils.validate_email_token = validate_email_token_mock
 
 
 VOLTO_FORMSUPPORT_FIXTURE = VoltoFormsupportLayer()

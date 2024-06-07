@@ -43,7 +43,7 @@ where:
 - ``block_id`` is the id of the block
 - ``data`` contains the submitted form data
 
-Calling this endpoint, it will do some actions (based on block settings) and returns a ``204`` response.
+Calling this endpoint, it will do some actions (based on block settings) and returns a ``200`` response with the submitted data.
 
 
 @form-data
@@ -96,10 +96,37 @@ Reset the store (only for users that have **Modify portal content** permission):
 
 > curl -i -X DELETE http://localhost:8080/Plone/my-form/@form-data-clear --data-raw '{block_id: bbb}' -H 'Accept: application/json' -H 'Content-Type: application/json' --user admin:admin
 
-Optional paramaters could be passed in the payload: 
+Optional parameters could be passed in the payload:
 
 * `block_id` to delete only data related to a specific block on the page, otherwise data from all form blocks on the page will be deleted
 * `expired` a boolean that, if `true`, removes only records older than the value of days specified in the block configuration (the above `block_id` parameter is required)
+
+@validate-email-address
+-----------------------
+
+Send an message to the passed email wit OTP code to verify the address.
+Returns a HTTP 204 in case of success or HTTP 400 in case the email is badly composed.::
+
+> curl -i -X POST http://localhost:8080/Plone/my-form/@validate-email-address --data-raw '{"email": "email@email.com", "uid": "ffffffff"}' -H 'Accept: application/json' -H 'Content-Type: application/json'
+
+parameters:
+
+* `email` email address.
+* `uid` uid related to email field
+
+@validate-email-token
+---------------------
+
+Supposed to validate the OTP code received by the user via email.
+Returns HTTP 204 in case of success or HTTP 400 in case of failure ::
+
+> curl -i -X POST http://localhost:8080/Plone/my-form/@validate-email-token --data-raw '{"email": "email@email.com", "otp": "blahblahblah"}' -H 'Accept: application/json' -H 'Content-Type: application/json'
+
+parameters:
+
+* `email` email address
+* `uid` uid used to generate the OTP
+* `otp` OTP code
 
 Form actions
 ============
@@ -128,7 +155,7 @@ The sent XML follows the same format as the feature in [collective.easyform](htt
 The field names in the XML will utilise the Data ID Mapping feature if it is used. Read more about this feature in the following Store section of the documentation.
 
 Acknowledgement email
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^
 
 It is possible to also send an email to the user who filled in the form.
 
@@ -276,7 +303,7 @@ There is a script that implements data cleansing (i.e. for GDPR purpose)::
     --help          Show this message and exit.
 
 
-The form block as an integer field `remove_data_after_days`, the retention days can be defined on a single block, 
+The form block as an integer field `remove_data_after_days`, the retention days can be defined on a single block,
 If the value is lower or equal to `0` there is no data cleaning for the specific form.
 
 Examples

@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
-from collective.volto.formsupport.testing import (  # noqa: E501,
-    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
-)
+import csv
+import unittest
 from datetime import datetime
 from io import StringIO
+
+import transaction
 from plone import api
-from plone.app.testing import setRoles
-from plone.app.testing import SITE_OWNER_NAME
-from plone.app.testing import SITE_OWNER_PASSWORD
-from plone.app.testing import TEST_USER_ID
+from plone.app.testing import (
+    SITE_OWNER_NAME,
+    SITE_OWNER_PASSWORD,
+    TEST_USER_ID,
+    setRoles,
+)
 from plone.restapi.testing import RelativeSession
 from plone.testing.zope import Browser
 from Products.MailHost.interfaces import IMailHost
@@ -20,8 +23,12 @@ import os
 import transaction
 import unittest
 
+from collective.volto.formsupport.testing import (  # noqa: E501,
+    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
+)
 
-class TestMailSend(unittest.TestCase):
+
+class TestMailStore(unittest.TestCase):
     layer = VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING
 
     def setUp(self):
@@ -91,7 +98,10 @@ class TestMailSend(unittest.TestCase):
     def test_unable_to_store_data(self):
         """form schema not defined, unable to store data"""
         self.document.blocks = {
-            "form-id": {"@type": "form", "store": True},
+            "form-id": {
+                "@type": "form",
+                "store": True,
+            },
         }
         transaction.commit()
 
@@ -99,8 +109,12 @@ class TestMailSend(unittest.TestCase):
             data={
                 "from": "john@doe.com",
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
-                    {"label": "Name", "value": "John"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
+                    {"field_id": "name", "label": "Name", "value": "John"},
                 ],
                 "subject": "test subject",
                 "block_id": "form-id",
@@ -108,7 +122,7 @@ class TestMailSend(unittest.TestCase):
         )
         transaction.commit()
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "Unable to store data")
+        self.assertEqual(response.json()["message"], "Empty form data.")
         response = self.export_csv()
 
     def test_store_data(self):
@@ -164,8 +178,8 @@ class TestMailSend(unittest.TestCase):
             },
         )
         transaction.commit()
-
         self.assertEqual(response.status_code, 204)
+
         response = self.export_data()
         data = response.json()
         self.assertEqual(len(data["items"]), 1)
@@ -190,7 +204,7 @@ class TestMailSend(unittest.TestCase):
             },
         )
         transaction.commit()
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         response = self.export_data()
         data = response.json()
         self.assertEqual(len(data["items"]), 2)
@@ -283,7 +297,7 @@ class TestMailSend(unittest.TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         response = self.export_csv()
         data = [*csv.reader(StringIO(response.text), delimiter=",")]
         self.assertEqual(len(data), 3)
@@ -342,7 +356,7 @@ class TestMailSend(unittest.TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         response = self.export_csv()
         data = [*csv.reader(StringIO(response.text), delimiter=",")]
         self.assertEqual(len(data), 3)
