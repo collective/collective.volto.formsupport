@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
-import csv
-
-import six
+from collective.volto.formsupport.interfaces import IFormDataStore
+from io import StringIO
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
-from six import StringIO
 from zope.component import getMultiAdapter
 
-from collective.volto.formsupport.interfaces import IFormDataStore
+import csv
+
 
 SKIP_ATTRS = ["block_id", "fields_labels", "fields_order"]
 
@@ -55,11 +53,11 @@ class FormDataExportGet(Service):
 
         self.request.response.setHeader(
             "Content-Disposition",
-            'attachment; filename="{0}.csv"'.format(self.__name__),
+            f'attachment; filename="{self.__name__}.csv"',
         )
         self.request.response.setHeader("Content-Type", "text/comma-separated-values")
         data = self.get_data()
-        if isinstance(data, six.text_type):
+        if isinstance(data, str):
             data = data.encode("utf-8")
         self.request.response.write(data)
 
