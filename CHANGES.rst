@@ -4,7 +4,8 @@ Changelog
 3.0.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Handle the edge cases where the `blocks` attribute is not set.
+  [mamico]
 
 
 3.0.2 (2024-05-05)

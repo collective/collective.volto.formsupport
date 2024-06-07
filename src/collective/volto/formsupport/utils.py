@@ -40,7 +40,7 @@ def get_blocks(context):
     if isinstance(blocks, six.text_type):
         blocks = json.loads(blocks)
 
-    flat = list(flatten_block_hierachy(blocks))
+    flat = list(flatten_block_hierachy(blocks)) if blocks else []
 
     return dict(flat)
 
