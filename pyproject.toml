@@ -88,6 +88,7 @@ python-dateutil = ['dateutil']
 ignore-packages = [
   'collective.honeypot', 'plone.formwidget.hcaptcha', 'plone.formwidget.recaptcha',
   'collective.volto.blocksfield', 'collective.z3cform.norobots',
+  'plone.app.iterate',
 ]
 
 ##

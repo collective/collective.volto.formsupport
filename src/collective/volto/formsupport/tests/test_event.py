@@ -12,6 +12,7 @@ from Products.MailHost.interfaces import IMailHost
 from zope.component import getUtility
 from zope.configuration import xmlconfig
 
+import re
 import transaction
 import unittest
 
@@ -131,6 +132,7 @@ class TestEvent(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
+        msg = re.sub(r"\s+", " ", msg)
         self.assertIn("To: site_addr@plone.com", msg)
         self.assertNotIn("To: smith@doe.com", msg)
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
