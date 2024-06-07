@@ -5,20 +5,10 @@ from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.interfaces import IPostEvent
 from collective.volto.formsupport.utils import get_blocks
 from collective.volto.formsupport.utils import validate_email_token
-from datetime import datetime
-from email.message import EmailMessage
-
-import codecs
-import logging
-import math
-import os
 from copy import deepcopy
 from datetime import datetime
 from email import policy
 from email.message import EmailMessage
-from xml.etree.ElementTree import Element, ElementTree, SubElement
-
-import six
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry

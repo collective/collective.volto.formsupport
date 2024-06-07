@@ -6,20 +6,18 @@ from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.utils import get_blocks
 from copy import deepcopy
 from datetime import datetime
-
 from plone.dexterity.interfaces import IDexterityContent
 from plone.namedfile import NamedBlobFile
 from plone.restapi.deserializer import json_body
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.indexes.field import CatalogFieldIndex
 from souper.interfaces import ICatalogFactory
-from souper.soup import NodeAttributeIndexer, Record, get_soup
+from souper.soup import get_soup
+from souper.soup import NodeAttributeIndexer
+from souper.soup import Record
 from zope.component import adapter
-from zope.interface import Interface, implementer
-
-from collective.volto.formsupport import logger
-from collective.volto.formsupport.interfaces import IFormDataStore
-from collective.volto.formsupport.utils import get_blocks
+from zope.interface import implementer
+from zope.interface import Interface
 
 
 @implementer(ICatalogFactory)
