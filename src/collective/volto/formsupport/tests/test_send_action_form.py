@@ -5,7 +5,6 @@ import unittest
 import xml.etree.ElementTree as ET
 from email.parser import Parser
 
-from six import StringIO
 import transaction
 from plone import api
 from plone.app.testing import (
@@ -17,6 +16,7 @@ from plone.app.testing import (
 from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
+from six import StringIO
 from zope.component import getUtility
 
 from collective.volto.formsupport.testing import (  # noqa: E501,
@@ -1304,7 +1304,7 @@ class TestMailSend(unittest.TestCase):
             custom_field_id = form_data[index].get("custom_field_id")
             self.assertEqual(
                 field.get("name"),
-                custom_field_id if custom_field_id else form_data[index]["label"],
+                custom_field_id if custom_field_id else form_data[index]["field_id"],
             )
             self.assertEqual(field.text, form_data[index]["value"])
 
