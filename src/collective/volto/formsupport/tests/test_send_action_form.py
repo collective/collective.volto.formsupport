@@ -5,6 +5,7 @@ import unittest
 import xml.etree.ElementTree as ET
 from email.parser import Parser
 
+from six import StringIO
 import transaction
 from plone import api
 from plone.app.testing import (
