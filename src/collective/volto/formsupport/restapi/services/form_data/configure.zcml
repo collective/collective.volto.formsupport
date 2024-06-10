@@ -1,34 +1,38 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:plone="http://namespaces.plone.org/plone"
-    xmlns:zcml="http://namespaces.zope.org/zcml">
+    xmlns:zcml="http://namespaces.zope.org/zcml"
+    >
 
   <plone:service
-    method="GET"
-    name="@form-data"
-    for="plone.restapi.behaviors.IBlocks"
-    factory=".form_data.FormDataGet"
-    permission="cmf.ModifyPortalContent"
-    layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
-    />
-  <adapter factory=".form_data.FormData" name="form-data"/>
+      method="GET"
+      factory=".form_data.FormDataGet"
+      for="plone.restapi.behaviors.IBlocks"
+      permission="cmf.ModifyPortalContent"
+      layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
+      name="@form-data"
+      />
+  <adapter
+      factory=".form_data.FormData"
+      name="form-data"
+      />
 
   <plone:service
-    method="GET"
-    name="@form-data-clear"
-    for="plone.restapi.behaviors.IBlocks"
-    factory=".clear.FormDataClear"
-    permission="cmf.ModifyPortalContent"
-    layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
-    />
+      method="DELETE"
+      factory=".clear.FormDataClear"
+      for="plone.restapi.behaviors.IBlocks"
+      permission="cmf.ModifyPortalContent"
+      layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
+      name="@form-data-clear"
+      />
 
   <plone:service
-    method="GET"
-    name="@form-data-export"
-    for="plone.restapi.behaviors.IBlocks"
-    factory=".csv.FormDataExportGet"
-    permission="cmf.ModifyPortalContent"
-    layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
-    />
+      method="GET"
+      factory=".csv.FormDataExportGet"
+      for="plone.restapi.behaviors.IBlocks"
+      permission="cmf.ModifyPortalContent"
+      layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
+      name="@form-data-export"
+      />
 
 </configure>

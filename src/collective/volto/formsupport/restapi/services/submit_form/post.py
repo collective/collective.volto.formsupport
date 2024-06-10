@@ -1,16 +1,15 @@
 # -*- coding: utf-8 -*-
-
-
 import codecs
 import logging
 import math
 import os
-import six
-
+from copy import deepcopy
 from datetime import datetime
+from email import policy
 from email.message import EmailMessage
 from xml.etree.ElementTree import Element, ElementTree, SubElement
 
+import six
 from plone import api
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
@@ -32,7 +31,7 @@ from collective.volto.formsupport.interfaces import (
 from collective.volto.formsupport.restapi.services.submit_form.field import (
     construct_fields,
 )
-from collective.volto.formsupport.utils import get_blocks
+from collective.volto.formsupport.utils import get_blocks, validate_email_token
 
 logger = logging.getLogger(__name__)
 CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
@@ -52,7 +51,7 @@ class SubmitPost(Service):
         super(SubmitPost, self).__init__(context, request)
 
         self.block = {}
-        self.form_data = json_body(self.request)
+        self.form_data = self.cleanup_data()
         self.block_id = self.form_data.get("block_id", "")
         if self.block_id:
             self.block = self.get_block_data(block_id=self.block_id)
@@ -110,7 +109,34 @@ class SubmitPost(Service):
         if store_action:
             self.store_data()
 
-        return self.reply_no_content()
+        return {"data": self.form_data.get("data", [])}
+
+    def cleanup_data(self):
+        """
+        Avoid XSS injections and other attacks.
+
+        - cleanup HTML with plone transform
+        - remove from data, fields not defined in form schema
+        """
+        form_data = json_body(self.request)
+        fixed_fields = []
+        transforms = api.portal.get_tool(name="portal_transforms")
+
+        block = self.get_block_data(block_id=form_data.get("block_id", ""))
+        block_fields = [x.get("field_id", "") for x in block.get("subblocks", [])]
+
+        for form_field in form_data.get("data", []):
+            if form_field.get("field_id", "") not in block_fields:
+                # unknown field, skip it
+                continue
+            new_field = deepcopy(form_field)
+            value = new_field.get("value", "")
+            if isinstance(value, str):
+                stream = transforms.convertTo("text/plain", value, mimetype="text/html")
+                new_field["value"] = stream.getData().strip()
+            fixed_fields.append(new_field)
+        form_data["data"] = fixed_fields
+        return form_data
 
     def validate_form(self):
         """
@@ -167,6 +193,29 @@ class SubmitPost(Service):
                 ICaptchaSupport,
                 name=self.block["captcha"],
             ).verify(self.form_data.get("captcha"))
+
+        self.validate_bcc()
+
+    def validate_bcc(self):
+        bcc_fields = []
+        for field in self.block.get("subblocks", []):
+            if field.get("use_as_bcc", False):
+                field_id = field.get("field_id", "")
+                if field_id not in bcc_fields:
+                    bcc_fields.append(field_id)
+
+        for data in self.form_data.get("data", []):
+            value = data.get("value", "")
+            if not value:
+                continue
+
+            if data.get("field_id", "") in bcc_fields:
+                if not validate_email_token(
+                    self.form_data.get("block_id", ""), data["value"], data["otp"]
+                ):
+                    raise BadRequest(
+                        _("{email}'s OTP is wrong").format(email=data["value"])
+                    )
 
     def validate_attachments(self):
         attachments_limit = os.environ.get("FORM_ATTACHMENTS_LIMIT", "")
@@ -292,16 +341,21 @@ class SubmitPost(Service):
 
         should_send = self.block.get("send", [])
         if should_send:
+            portal_transforms = api.portal.get_tool(name="portal_transforms")
             mto = self.block.get("default_to", mail_settings.email_from_address)
             message = self.prepare_message()
-
-            msg = EmailMessage()
-            msg.set_content(message, charset=charset, subtype="html", cte=CTE)
+            text_message = (
+                portal_transforms.convertTo("text/plain", message, mimetype="text/html")
+                .getData()
+                .strip()
+            )
+            msg = EmailMessage(policy=policy.SMTP)
+            msg.set_content(text_message, cte=CTE)
+            msg.add_alternative(message, subtype="html", cte=CTE)
             msg["Subject"] = subject
             msg["From"] = mfrom
             msg["To"] = mto
             msg["Reply-To"] = mreply_to
-            msg.replace_header("Content-Type", 'text/html; charset="utf-8"')
 
             headers_to_forward = self.block.get("httpHeaders", [])
             for header in headers_to_forward:
@@ -327,13 +381,20 @@ class SubmitPost(Service):
         if acknowledgement_message and "acknowledgement" in self.block.get("send", []):
             acknowledgement_address = self.get_acknowledgement_field_value()
             if acknowledgement_address:
-                acknowledgement_mail = EmailMessage()
+                acknowledgement_mail = EmailMessage(policy=policy.SMTP)
                 acknowledgement_mail["Subject"] = subject
                 acknowledgement_mail["From"] = mfrom
                 acknowledgement_mail["To"] = acknowledgement_address
-                acknowledgement_mail.set_content(
-                    acknowledgement_message.get("data"), subtype="html", charset="utf-8"
+                ack_msg = acknowledgement_message.get("data")
+                ack_msg_text = (
+                    portal_transforms.convertTo(
+                        "text/plain", ack_msg, mimetype="text/html"
+                    )
+                    .getData()
+                    .strip()
                 )
+                acknowledgement_mail.set_content(ack_msg_text, cte=CTE)
+                acknowledgement_mail.add_alternative(ack_msg, subtype="html", cte=CTE)
                 self.send_mail(msg=acknowledgement_mail, charset=charset)
 
     def prepare_message(self):

@@ -73,6 +73,8 @@ class AttachmentField(Field):
 
 class EmailField(Field):
     def validate(self, request):
+        super().validate(request=request)
+
         if _isemail(self.internal_value) is None:
             raise BadRequest(
                 translate(
