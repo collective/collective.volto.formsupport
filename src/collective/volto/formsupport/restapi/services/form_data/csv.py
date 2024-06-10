@@ -15,6 +15,7 @@ SKIP_ATTRS = ["block_id", "fields_labels", "fields_order"]
 class FormDataExportGet(Service):
     def __init__(self, context, request):
         super().__init__(context, request)
+
         self.form_fields_order = []
         self.form_block = {}
 

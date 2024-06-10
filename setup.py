@@ -92,5 +92,6 @@ setup(
     [console_scripts]
     update_locale = collective.volto.formsupport.locales.update:update_locale
     formsupport_data_cleansing = collective.volto.formsupport.scripts.cleansing:main
+    send_exported_forms = collective.volto.formsupport.scripts.send_exported_forms:main
     """,
 )

@@ -337,6 +337,28 @@ Install collective.volto.formsupport by adding it to your buildout::
 
 and then running ``bin/buildout``
 
+Periodic export job
+-------------------
+
+The script is supposed send the periodic form export to the recipients.
+
+Usage::
+
+    bin/instance1 -OPlone run bin/send_exported_forms
+
+Buildout config example::
+
+    [buildout]
+    # You can change it in according to your policy
+    cron_instance = instance1
+    parts +=
+        send_exported_forms
+
+    [send_exported_forms]
+    recipe = z3c.recipe.usercrontab
+    times = 0 3 * * *
+    command = flock -n ${buildout:directory}/var/send_exported_forms.lock ${buildout:directory}/bin/${buildout:cron_instance} -OPlone run bin/send_exported_forms >> ${buildout:directory}/var/log/send_exported_forms.log 2>&1
+
 
 Contribute
 ==========
