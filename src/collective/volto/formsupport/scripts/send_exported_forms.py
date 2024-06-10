@@ -86,6 +86,8 @@ def main(dryrun):
         )
 
         for recipient in recipients:
+            if not recipient:
+                continue
             msg = MIMEMultipart()
             msg.attach(
                 MIMEText(
