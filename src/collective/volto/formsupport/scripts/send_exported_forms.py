@@ -26,7 +26,7 @@ from Products.CMFCore.interfaces import IContentish
 from collective.volto.formsupport.restapi.services.form_data.form_data import FormData
 from collective.volto.formsupport import _
 
-LAST_SENDING_DATE_KEY = "collvectie.volto.formsupport.LAST_SENDING_DATE"
+LAST_SENDING_DATE_KEY = "collvective.volto.formsupport.LAST_SENDING_DATE"
 
 logger = getLogger(__name__)
 
