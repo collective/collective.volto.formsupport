@@ -101,7 +101,9 @@ def main(dryrun):
                     "html",
                 )
             )
-            msg["Subject"] = _("Periodic export of compiled forms")
+            msg["Subject"] = api.portal.translate(
+                _("Periodic export of compiled forms")
+            )
             msg["From"] = mfrom
             msg["To"] = recipient
             msg.attach(mail_attachment)
