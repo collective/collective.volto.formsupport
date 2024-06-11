@@ -1,30 +1,26 @@
 # -*- coding: utf-8 -*-
-import sys
-import click
-import transaction
-import csv
-
-from io import StringIO
+from AccessControl.SecurityManagement import newSecurityManager
+from collective.volto.formsupport import _
 from datetime import datetime
-from logging import getLogger
+from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.application import MIMEApplication
-
-
+from io import StringIO
+from logging import getLogger
 from plone import api
 from plone.registry.interfaces import IRegistry
 from plone.volto.interfaces import IVoltoSettings
+from Products.CMFCore.interfaces import IContentish
+from zope.annotation.interfaces import IAnnotations
+from zope.component import getUtility
 from zope.component import queryMultiAdapter
 from zope.globalrequest import getRequest
-from zope.component import getUtility
-from zope.annotation.interfaces import IAnnotations
-from AccessControl.SecurityManagement import newSecurityManager
-from Products.CMFCore.interfaces import IContentish
 
+import click
+import csv
+import sys
+import transaction
 
-from collective.volto.formsupport.restapi.services.form_data.form_data import FormData
-from collective.volto.formsupport import _
 
 LAST_SENDING_DATE_KEY = "collvective.volto.formsupport.LAST_SENDING_DATE"
 
@@ -45,7 +41,6 @@ logger = getLogger(__name__)
     help="--dryrun (default) simulate, --no-dryrun actually save the changes",
 )
 def main(dryrun):
-
     def send_csv_email(context, csv_file, recipients):
         host = api.portal.get_tool("MailHost")
         portal_state = api.content.get_view(
