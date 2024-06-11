@@ -93,7 +93,7 @@ def main(dryrun):
                 MIMEText(
                     api.portal.translate(
                         _(
-                            "Your forms esxport from {url} , until the {date}",
+                            "Your forms export from {url} , until the {date}",
                         )
                     ).format(
                         url=portal_url

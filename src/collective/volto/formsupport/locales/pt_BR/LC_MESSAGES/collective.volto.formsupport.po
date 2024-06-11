@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-04-17 10:34+0000\n"
+"POT-Creation-Date: 2024-06-11 10:19+0000\n"
 "PO-Revision-Date: 2021-05-11 18:49-0300\n"
 "Last-Translator: Érico Andrei <ericof@plone.org>, 2021\n"
 "Language-Team: Portuguese (https://www.transifex.com/plone/teams/14552/pt/)\n"
@@ -54,6 +54,10 @@ msgstr ""
 msgid "OTP is wrong"
 msgstr ""
 
+#: collective/volto/formsupport/scripts/send_exported_forms.py:107
+msgid "Periodic export of compiled forms"
+msgstr ""
+
 #: collective/volto/formsupport/captcha/hcaptcha.py:58
 #: collective/volto/formsupport/captcha/norobots.py:67
 #: collective/volto/formsupport/captcha/recaptcha.py:56
@@ -96,6 +100,10 @@ msgstr "Volto: Suporte a formulários (Desinstalar)"
 msgid "Your code to validate the email address:"
 msgstr ""
 
+#: collective/volto/formsupport/scripts/send_exported_forms.py:93
+msgid "Your forms export from {url} , until the {date}"
+msgstr ""
+
 #. Default: "Attachments too big. You uploaded ${uploaded_str}, but limit is ${max} MB. Try to compress files."
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:213
 msgid "attachments_too_big"
@@ -117,7 +125,7 @@ msgid "honeypot_error"
 msgstr ""
 
 #. Default: "Unable to send confirm email. Please retry later or contact site administator."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:75
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:74
 msgid "mail_send_exception"
 msgstr ""
 

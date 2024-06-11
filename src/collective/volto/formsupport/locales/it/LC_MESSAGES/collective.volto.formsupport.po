@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-04-17 10:34+0000\n"
+"POT-Creation-Date: 2024-06-11 10:19+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,6 +52,10 @@ msgstr "NoRobots"
 msgid "OTP is wrong"
 msgstr "Il codice OTP è errato."
 
+#: collective/volto/formsupport/scripts/send_exported_forms.py:107
+msgid "Periodic export of compiled forms"
+msgstr "Export periodico dei form compilati"
+
 #: collective/volto/formsupport/captcha/hcaptcha.py:58
 #: collective/volto/formsupport/captcha/norobots.py:67
 #: collective/volto/formsupport/captcha/recaptcha.py:56
@@ -94,6 +98,10 @@ msgstr "Volto: Form support (uninstall)"
 msgid "Your code to validate the email address:"
 msgstr "Il tuo codice per la conferma dell'indirizzo email:"
 
+#: collective/volto/formsupport/scripts/send_exported_forms.py:93
+msgid "Your forms export from {url} , until the {date}"
+msgstr "Export dei form compilati nella pagina {url}, fino {date}"
+
 #. Default: "Attachments too big. You uploaded ${uploaded_str}, but limit is ${max} MB. Try to compress files."
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:213
 msgid "attachments_too_big"
@@ -115,7 +123,7 @@ msgid "honeypot_error"
 msgstr "Errore nella sottomissione del form."
 
 #. Default: "Unable to send confirm email. Please retry later or contact site administator."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:75
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:74
 msgid "mail_send_exception"
 msgstr "Impossibile inviare la mail di conferma. Per favore riprova più tardi o contatta l'amministratore del sito."
 
