@@ -4,6 +4,8 @@ Changelog
 3.0.3 (unreleased)
 ------------------
 
+- Remove otp logics (moved to collective.volto.otp)
+  [folix-01]
 - Handle the edge cases where the `blocks` attribute is not set.
   [mamico]
 
