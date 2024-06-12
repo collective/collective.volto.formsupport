@@ -5,6 +5,5 @@
 
   <include package=".submit_form" />
   <include package=".form_data" />
-  <include package=".validation" />
 
 </configure>

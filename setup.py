@@ -67,7 +67,7 @@ setup(
         "Products.PortalTransforms",
         "souper.plone",
         "click",
-        "pyotp",
+        "collective.volto.otp",
     ],
     extras_require={
         "hcaptcha": [
