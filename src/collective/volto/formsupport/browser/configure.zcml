@@ -34,13 +34,5 @@
       template="send_mail_template_table.pt"
       permission="zope2.View"
       />
-  <browser:page
-      name="email-confirm-view"
-      for="*"
-      class=".email_confirm_view.EmailConfirmView"
-      template="templates/email_confirm_view.pt"
-      permission="zope2.View"
-      layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
-      />
 
 </configure>

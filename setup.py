@@ -69,7 +69,7 @@ setup(
         "souper.plone",
         "click",
         "beautifulsoup4",
-        "pyotp",
+        "collective.volto.otp",
     ],
     extras_require={
         "hcaptcha": [
