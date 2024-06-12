@@ -1,19 +1,16 @@
-# -*- coding: utf-8 -*-
-import collective.honeypot
-import collective.MockMailHost
-import plone.restapi
 from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE
-from plone.app.testing import (
-    FunctionalTesting,
-    IntegrationTesting,
-    PloneSandboxLayer,
-    applyProfile,
-    quickInstallProduct,
-)
+from plone.app.testing import applyProfile
+from plone.app.testing import FunctionalTesting
+from plone.app.testing import IntegrationTesting
+from plone.app.testing import PloneSandboxLayer
+from plone.app.testing import quickInstallProduct
 from plone.restapi.testing import PloneRestApiDXLayer
 from plone.testing import z2
 
+import collective.honeypot
+import collective.MockMailHost
 import collective.volto.formsupport
+import plone.restapi
 
 
 class VoltoFormsupportLayer(PloneSandboxLayer):
@@ -60,7 +57,7 @@ class VoltoFormsupportRestApiLayer(PloneRestApiDXLayer):
     defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
-        super(VoltoFormsupportRestApiLayer, self).setUpZope(app, configurationContext)
+        super().setUpZope(app, configurationContext)
         self.loadZCML(package=collective.MockMailHost)
         self.loadZCML(package=plone.restapi)
         self.loadZCML(package=collective.honeypot)

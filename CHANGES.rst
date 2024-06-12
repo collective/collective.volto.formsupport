@@ -123,7 +123,7 @@ Changelog
 2.2.0 (2022-04-07)
 ------------------
 
-- Notify an event on sumbit.
+- Notify an event on submit.
   [mamico]
 
 

@@ -8,5 +8,5 @@
 
 domain=collective.volto.formsupport
 
-i18ndude rebuild-pot --pot $domain.pot --create $domain ../
-i18ndude sync --pot $domain.pot */LC_MESSAGES/$domain.po
+pipx run i18ndude rebuild-pot --pot $domain.pot --create $domain ../
+pipx run i18ndude sync --pot $domain.pot */LC_MESSAGES/$domain.po

@@ -1,17 +1,20 @@
 <!doctype HTML>
-<html
-      xmlns="http://www.w3.org/1999/xhtml"
+<html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:i18n="http://xml.zope.org/namespaces/i18n"
       xmlns:metal="http://xml.zope.org/namespaces/metal"
       xmlns:tal="http://xml.zope.org/namespaces/tal"
       lang="en"
       xml:lang="en"
       i18n:domain="collective.volto.formsupport"
-  >
+>
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>Simple Transactional Email</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0"
+    />
+    <meta http-equiv="Content-Type"
+          content="text/html; charset=UTF-8"
+    />
+    <title i18n:translate="">Simple Transactional Email</title>
     <style>
       /* -------------------------------------
           GLOBAL RESETS
@@ -323,20 +326,35 @@
 
     </style>
   </head>
-  <body tal:define="portal view/get_portal; token view/get_token; context_url view/context_url">
-    <table role="presentation" border="0" cellpadding="0" cellspacing="0" class="body">
+  <body tal:define="
+          portal view/get_portal;
+          token view/get_token;
+          context_url view/context_url;
+        ">
+    <table class="body"
+           border="0"
+           cellpadding="0"
+           cellspacing="0"
+           role="presentation"
+    >
       <tr>
         <td>&nbsp;</td>
         <td class="container">
           <div class="content">
 
             <!-- START CENTERED WHITE CONTAINER -->
-            <table role="presentation" class="main">
+            <table class="main"
+                   role="presentation"
+            >
 
               <!-- START MAIN CONTENT AREA -->
               <tr>
                 <td class="wrapper">
-                  <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                  <table border="0"
+                         cellpadding="0"
+                         cellspacing="0"
+                         role="presentation"
+                  >
                     <tr class="portal_title">
                       <td>
                         <h2>${portal/title}</h2>
@@ -351,20 +369,24 @@
                       <td>
                         <div class="token_header">
                           <h4 i18n:translate="">Your code to validate the email address:</h4>
-                        <div>
-                      </td>
+                          <div>
+                          </div></div></td>
                     </tr>
                     <tr class="mail_content">
                       <td>
                         <div class="token_content">
                           <p class="token_text">${token}</p>
-                        <div>
-                      </td>
+                          <div>
+                          </div></div></td>
                     </tr>
                     <tr class="mail_help_text">
                       <td>
                         <div>
-                          <p i18n:translate="">The form on <a href="${context_url}" i18n:name="page">${view/context/Title}</a> was compiled with this email address, if it was not you, ignore the message.</p>
+                          <p i18n:translate="">The form on
+                            <a href="${context_url}"
+                               i18n:name="page"
+                            >${view/context/Title}</a>
+                            was compiled with this email address, if it was not you, ignore the message.</p>
                         </div>
                       </td>
                     </tr>
@@ -372,7 +394,7 @@
                 </td>
               </tr>
 
-            <!-- END MAIN CONTENT AREA -->
+              <!-- END MAIN CONTENT AREA -->
             </table>
             <!-- END CENTERED WHITE CONTAINER -->
 
@@ -383,4 +405,3 @@
     </table>
   </body>
 </html>
-

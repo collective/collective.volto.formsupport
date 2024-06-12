@@ -1,42 +1,44 @@
-# -*- coding: utf-8 -*-
-import codecs
-import logging
-import math
-import os
+from collective.volto.formsupport import _
+from collective.volto.formsupport.interfaces import ICaptchaSupport
+from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.interfaces import IPostEvent
+from collective.volto.formsupport.utils import get_blocks
+from collective.volto.formsupport.utils import validate_email_token
 from copy import deepcopy
 from datetime import datetime
 from email import policy
 from email.message import EmailMessage
-from xml.etree.ElementTree import Element, ElementTree, SubElement
-
-import six
+from io import BytesIO
 from plone import api
+from plone.base.interfaces.controlpanel import IMailSchema
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
 from plone.schema.email import _isemail
-from Products.CMFPlone.interfaces.controlpanel import IMailSchema
+from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import ElementTree
+from xml.etree.ElementTree import SubElement
 from zExceptions import BadRequest
-from zope.component import getMultiAdapter, getUtility
+from zope.component import getMultiAdapter
+from zope.component import getUtility
 from zope.event import notify
 from zope.i18n import translate
-from zope.interface import alsoProvides, implementer
+from zope.interface import alsoProvides
+from zope.interface import implementer
 
-from collective.volto.formsupport import _
-from collective.volto.formsupport.interfaces import (
-    ICaptchaSupport,
-    IFormDataStore,
-    IPostEvent,
-)
-from collective.volto.formsupport.utils import get_blocks, validate_email_token
+import codecs
+import logging
+import math
+import os
+
 
 logger = logging.getLogger(__name__)
 CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
 
 
 @implementer(IPostEvent)
-class PostEventService(object):
+class PostEventService:
     def __init__(self, context, data):
         self.context = context
         self.data = data
@@ -44,7 +46,7 @@ class PostEventService(object):
 
 class SubmitPost(Service):
     def __init__(self, context, request):
-        super(SubmitPost, self).__init__(context, request)
+        super().__init__(context, request)
 
         self.block = {}
         self.form_data = self.cleanup_data()
@@ -73,7 +75,7 @@ class SubmitPost(Service):
                 message = translate(
                     _(
                         "mail_send_exception",
-                        default="Unable to send confirm email. Please retry later or contact site administator.",
+                        default="Unable to send confirm email. Please retry later or contact site administrator.",
                     ),
                     context=self.request,
                 )
@@ -207,7 +209,7 @@ class SubmitPost(Service):
             i = int(math.floor(math.log(attachments_len, 1024)))
             p = math.pow(1024, i)
             s = round(attachments_len / p, 2)
-            uploaded_str = "{} {}".format(s, size_name[i])
+            uploaded_str = f"{s} {size_name[i]}"
             raise BadRequest(
                 translate(
                     _(
@@ -454,11 +456,11 @@ class SubmitPost(Service):
                     continue
                 content_type = value.get("content-type", content_type)
                 filename = value.get("filename", filename)
-                if isinstance(file_data, six.text_type):
+                if isinstance(file_data, str):
                     file_data = file_data.encode("utf-8")
                 if "encoding" in value:
                     file_data = codecs.decode(file_data, value["encoding"])
-                if isinstance(file_data, six.text_type):
+                if isinstance(file_data, str):
                     file_data = file_data.encode("utf-8")
             else:
                 file_data = value
@@ -478,7 +480,7 @@ class SubmitPost(Service):
             .replace(":", "")
         )
         filename = f"formdata_{now}.xml"
-        output = six.BytesIO()
+        output = BytesIO()
         xmlRoot = Element("form")
 
         for field in self.filter_parameters():

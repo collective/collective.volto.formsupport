@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from zope.interface import Interface
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
 
@@ -34,7 +33,7 @@ class IPostEvent(Interface):
 
 class ICaptchaSupport(Interface):
     def __init__(context, request):
-        """Initialize adpater"""
+        """Initialize adapter"""
 
     def is_enabled():
         """Captcha method enabled

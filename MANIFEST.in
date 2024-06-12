@@ -1,7 +1,14 @@
 graft src/collective
 graft docs
+graft news
 include *.rst
 include *.GPL
 include *.txt
 global-exclude *.pyc
 exclude coverage.json
+exclude .coveragerc
+exclude .isort.cfg
+exclude base.cfg
+exclude buildout.cfg
+exclude test_plone52.cfg
+exclude test_plone60.cfg
