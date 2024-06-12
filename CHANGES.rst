@@ -13,6 +13,7 @@ Changelog
 - Configurable header and footer for email message.
   [folix-01]
 - Subject templating
+- Remove otp logics (moved to collective.volto.otp)
   [folix-01]
 - Handle the edge cases where the `blocks` attribute is not set.
   [mamico]
