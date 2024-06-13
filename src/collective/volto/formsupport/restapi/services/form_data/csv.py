@@ -60,11 +60,11 @@ class FormDataExportGet(Service):
 
         self.request.response.setHeader(
             "Content-Disposition",
-            'attachment; filename="{0}.csv"'.format(self.__name__),
+            f'attachment; filename="{self.__name__}.csv"',
         )
         self.request.response.setHeader("Content-Type", "text/comma-separated-values")
         data = self.get_data()
-        if isinstance(data, six.text_type):
+        if isinstance(data, str):
             data = data.encode("utf-8")
         self.request.response.write(data)
 

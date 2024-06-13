@@ -65,7 +65,7 @@ class TestMailStore(unittest.TestCase):
         transaction.commit()
 
     def submit_form(self, data):
-        url = "{}/@submit-form".format(self.document_url)
+        url = f"{self.document_url}/@submit-form"
         response = self.api_session.post(
             url,
             json=data,
@@ -74,17 +74,17 @@ class TestMailStore(unittest.TestCase):
         return response
 
     def export_data(self):
-        url = "{}/@form-data".format(self.document_url)
+        url = f"{self.document_url}/@form-data"
         response = self.api_session.get(url)
         return response
 
     def export_csv(self):
-        url = "{}/@form-data-export".format(self.document_url)
+        url = f"{self.document_url}/@form-data-export"
         response = self.api_session.get(url)
         return response
 
     def clear_data(self):
-        url = "{}/@form-data-clear".format(self.document_url)
+        url = f"{self.document_url}/@form-data-clear"
         response = self.api_session.delete(url)
         return response
 

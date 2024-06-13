@@ -9,6 +9,8 @@ Changelog
   [mamico]
 - Fix: if there are multiple forms on a page, each csv button downloads the record of all the forms,
   now if there is a block_id parameter, the csv is filtered on that.
+- Handle the edge cases where the `blocks` attribute is not set.
+  [mamico]
 
 
 3.0.2 (2024-05-05)
@@ -126,7 +128,7 @@ Changelog
 2.2.0 (2022-04-07)
 ------------------
 
-- Notify an event on sumbit.
+- Notify an event on submit.
   [mamico]
 
 

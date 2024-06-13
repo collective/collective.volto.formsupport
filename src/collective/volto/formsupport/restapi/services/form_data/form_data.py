@@ -1,25 +1,24 @@
-# -*- coding: utf-8 -*-
-
-import json
-from datetime import datetime, timedelta
-
-import six
+from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.utils import get_blocks
+from datetime import datetime
+from datetime import timedelta
 from plone import api
 from plone.memoize import view
 from plone.namedfile import NamedBlobFile
 from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
-from zope.component import adapter, getMultiAdapter
-from zope.interface import Interface, implementer
+from zope.component import adapter
+from zope.component import getMultiAdapter
+from zope.interface import implementer
+from zope.interface import Interface
 
-from collective.volto.formsupport.interfaces import IFormDataStore
-from collective.volto.formsupport.utils import get_blocks
+import json
 
 
 @implementer(IExpandableElement)
 @adapter(Interface, Interface)
-class FormData(object):
+class FormData:
     def __init__(self, context, request, block_id=None):
         self.context = context
         self.request = request
@@ -67,7 +66,7 @@ class FormData(object):
         items = self.get_items()
         expired_total = len(self.get_expired_items())
         result["form_data"] = {
-            "@id": "{}/@form-data".format(self.context.absolute_url()),
+            "@id": f"{self.context.absolute_url()}/@form-data",
             "items": items,
             "items_total": len(items),
             "expired_total": expired_total,
@@ -78,7 +77,7 @@ class FormData(object):
     @view.memoize
     def form_block(self):
         blocks = get_blocks(self.context)
-        if isinstance(blocks, six.text_type):
+        if isinstance(blocks, str):
             blocks = json.loads(blocks)
         if not blocks:
             return {}

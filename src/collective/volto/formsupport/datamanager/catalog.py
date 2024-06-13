@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 from base64 import b64decode
 from collective.volto.formsupport import logger
 from collective.volto.formsupport.interfaces import IFormDataStore
@@ -21,7 +20,7 @@ from zope.interface import Interface
 
 
 @implementer(ICatalogFactory)
-class FormDataSoupCatalogFactory(object):
+class FormDataSoupCatalogFactory:
     def __call__(self, context):
         #  do not set any index here..maybe on each form
         catalog = Catalog()
@@ -32,7 +31,7 @@ class FormDataSoupCatalogFactory(object):
 
 @implementer(IFormDataStore)
 @adapter(IDexterityContent, Interface)
-class FormDataStore(object):
+class FormDataStore:
     def __init__(self, context, request):
         self.context = context
         self.request = request
