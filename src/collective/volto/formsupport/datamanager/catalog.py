@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from base64 import b64decode
 from collective.volto.formsupport import logger
 from collective.volto.formsupport.interfaces import IFormDataStore

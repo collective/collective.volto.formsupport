@@ -4,7 +4,7 @@ Changelog
 3.0.3 (unreleased)
 ------------------
 
-- Save attachments as blobfile in the storage adapater, add a view to download them, returns
+- Save attachments as blobfile in the storage adapter, add a view to download them, returns
   attachment info in the restapi @form-data endpoint.
   [mamico]
 - Fix: if there are multiple forms on a page, each csv button downloads the record of all the forms,

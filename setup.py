@@ -60,6 +60,7 @@ setup(
         "plone.keyring",
         "plone.i18n",
         "plone.memoize",
+        "plone.namedfile",
         "plone.protect",
         "plone.restapi>=8.36.0",
         "plone.base",

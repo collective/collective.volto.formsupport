@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collective.volto.formsupport.interfaces import IFormDataStore
 from plone.namedfile.utils import set_headers
 from plone.namedfile.utils import stream_data

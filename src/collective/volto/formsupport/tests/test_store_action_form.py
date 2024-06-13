@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
@@ -221,7 +220,7 @@ class TestMailStore(unittest.TestCase):
         )
         self.assertEqual(data["items"][1]["file"]["value"]["filename"], "file.pdf")
         self.assertEqual(data["items"][1]["file"]["value"]["size"], 74429)
-        self.assertRegexpMatches(
+        self.assertRegex(
             data["items"][1]["file"]["value"]["url"],
             r"/example-context/saved_data/@@download/[0-9]+/file/file.pdf$",
         )
