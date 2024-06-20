@@ -1,6 +1,12 @@
 Changelog
 =========
 
+2.7.1 (unreleased)
+------------------
+
+- Configurable mail header and footer
+  [folix-01]
+
 2.7.0 (2023-04-03)
 ------------------
 
