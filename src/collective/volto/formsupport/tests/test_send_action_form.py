@@ -3,6 +3,7 @@ from collective.volto.formsupport.testing import (  # noqa: E501,
 )
 from collective.volto.formsupport.utils import generate_email_token
 from email.parser import Parser
+from io import StringIO
 from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import SITE_OWNER_NAME
@@ -1075,19 +1076,204 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> John", msg)
 
+    def test_field_custom_display_value(
+        self,
+    ):
+        self.document.blocks = {
+            "form-id": {
+                "@type": "form",
+                "send": True,
+                "email_format": "list",
+                "subblocks": [
+                    {
+                        "field_id": "12345678",
+                        "display_values": {"John": "Paul"},
+                    },
+                    {
+                        "field_id": "000000002",
+                        "field_type": "yes_no",
+                        "widget": "single_choice",
+                        "display_values": {"yes": "Correct", "no": "Incorrect"},
+                    },
+                    {
+                        "label": "Yes/ no radio without display value",
+                        "field_id": "000000003",
+                        "field_type": "yes_no",
+                        "widget": "single_choice",
+                    },
+                    {
+                        "label": "My attachment field",
+                        "field_id": "000000004",
+                        "field_type": "attachment",
+                    },
+                ],
+            }
+        }
+        transaction.commit()
+
+        filename = os.path.join(os.path.dirname(__file__), "file.pdf")
+        with open(filename, "rb") as f:
+            file_str = f.read()
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {
+                        "label": "Name",
+                        "field_id": "12345678",
+                        "value": "John",
+                    },
+                    {
+                        "label": "Yes/ no",
+                        "field_id": "000000002",
+                        "value": True,
+                    },
+                    {
+                        "field_id": "000000003",
+                        "value": True,
+                    },
+                    {
+                        "field_id": "000000004",
+                        "value": "Attachments don't work this way normally, this is just to test",
+                    },
+                ],
+                "attachments": {"foo": {"data": base64.b64encode(file_str)}},
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+        self.assertEqual(response.status_code, 204)
+        msg = self.mailhost.messages[0]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+        self.assertIn("Subject: test subject", msg)
+        self.assertIn("From: john@doe.com", msg)
+        self.assertIn("To: site_addr@plone.com", msg)
+        self.assertIn("Reply-To: john@doe.com", msg)
+        self.assertIn("<strong>Message:</strong> just want to say hi", msg)
+        self.assertIn("<strong>Name:</strong> Paul", msg)
+        self.assertIn("<strong>Yes/ no:</strong> Correct", msg)
+        self.assertIn("<strong>Yes/ no radio without display value:</strong> True", msg)
+        self.assertNotIn(
+            "<strong>My attachment field:</strong>",
+            Parser()
+            .parse(StringIO(msg))
+            .get_payload()[0]
+            .get_payload(),  # 1st get_payload splits the messages. First message is the body and second is the attachment
+        )
+        self.assertNotIn("foo", msg)
+
+        # breakpoint()
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": [
+                    {
+                        "label": "Yes/ no",
+                        "field_id": "000000002",
+                        "value": False,
+                    },
+                    {
+                        "field_id": "000000003",
+                        "value": False,
+                    },
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+
+        msg = self.mailhost.messages[1]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+        self.assertIn("<strong>Yes/ no:</strong> Incorrect", msg)
+        self.assertIn(
+            "<strong>Yes/ no radio without display value:</strong> False", msg
+        )
+
+    def test_send_custom_field_id(self):
+        """Custom field IDs should still appear as their friendly names in the email"""
+        self.document.blocks = {
+            "form-id": {
+                "@type": "form",
+                "send": True,
+                "internal_mapped_name": "renamed-internal_mapped_name",
+                "subblocks": [
+                    {
+                        "field_id": "internal_mapped_name",
+                        "label": "Name with internal mapping",
+                        "field_type": "text",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        form_data = [
+            {"label": "Name", "value": "John"},
+            {
+                "label": "Other name",
+                "value": "Test",
+                "custom_field_id": "My custom field id",
+            },
+            {
+                "field_id": "internal_mapped_name",
+                "value": "Test",
+            },
+        ]
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": form_data,
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+        self.assertEqual(response.status_code, 204)
+        msg = self.mailhost.messages[0]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+
+        parsed_msgs = Parser().parse(StringIO(msg))
+        body = parsed_msgs.get_payload()
+
+        self.assertIn("Name", body)
+        self.assertIn("John", body)
+        self.assertNotIn("My custom field id", body)
+        self.assertIn("Other name", body)
+        self.assertIn("Test", body)
+        self.assertIn("Name with internal mapping", body)
+
     def test_send_xml(self):
         self.document.blocks = {
             "form-id": {
                 "@type": "form",
                 "send": True,
                 "attachXml": True,
+                "custom_name": "renamed_custom_name",
                 "subblocks": [
                     {
                         "field_id": "message",
+                        "label": "Message",
                         "field_type": "text",
                     },
                     {
                         "field_id": "name",
+                        "label": "Name",
+                        "field_type": "text",
+                    },
+                    {
+                        "field_id": "custom_name",
+                        "label": "Name",
                         "field_type": "text",
                     },
                 ],
@@ -1098,6 +1284,7 @@ class TestMailSend(unittest.TestCase):
         form_data = [
             {"field_id": "message", "label": "Message", "value": "just want to say hi"},
             {"field_id": "name", "label": "Name", "value": "John"},
+            {"field_id": "name", "label": "Name", "value": "Test"},
         ]
 
         response = self.submit_form(
@@ -1121,7 +1308,11 @@ class TestMailSend(unittest.TestCase):
 
         xml_tree = ET.fromstring(msg_contents)
         for index, field in enumerate(xml_tree):
-            self.assertEqual(field.get("name"), form_data[index]["label"])
+            custom_field_id = form_data[index].get("custom_field_id")
+            self.assertEqual(
+                field.get("name"),
+                custom_field_id if custom_field_id else form_data[index]["field_id"],
+            )
             self.assertEqual(field.text, form_data[index]["value"])
 
     def test_submit_return_400_if_malformed_email_in_email_field(

@@ -2,6 +2,9 @@ from collective.volto.formsupport import _
 from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.interfaces import IPostEvent
+from collective.volto.formsupport.restapi.services.submit_form.field import (
+    construct_fields,
+)
 from collective.volto.formsupport.utils import get_blocks
 from collective.volto.formsupport.utils import validate_email_token
 from copy import deepcopy
@@ -15,7 +18,6 @@ from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
-from plone.schema.email import _isemail
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import SubElement
@@ -45,6 +47,8 @@ class PostEventService:
 
 
 class SubmitPost(Service):
+    fields = []
+
     def __init__(self, context, request):
         super().__init__(context, request)
 
@@ -64,6 +68,29 @@ class SubmitPost(Service):
         alsoProvides(self.request, IDisableCSRFProtection)
 
         notify(PostEventService(self.context, self.form_data))
+
+        # Construct self.fieldss
+        fields_data = []
+        for submitted_field in self.form_data.get("data", []):
+            # TODO: Review if fields submitted without a field_id should be included. Is breaking change if we remove it
+            if submitted_field.get("field_id") is None:
+                fields_data.append(submitted_field)
+                continue
+            for field in self.block.get("subblocks", []):
+                if field.get("id", field.get("field_id")) == submitted_field.get(
+                    "field_id"
+                ):
+                    fields_data.append(
+                        {
+                            **field,
+                            **submitted_field,
+                            "display_value_mapping": field.get("display_values"),
+                            "custom_field_id": self.block.get(field["field_id"]),
+                        }
+                    )
+        self.fields = construct_fields(fields_data)
+        for field in self.fields:
+            field.validate(request=self.request)
 
         if send_action:
             try:
@@ -169,31 +196,28 @@ class SubmitPost(Service):
                 name=self.block["captcha"],
             ).verify(self.form_data.get("captcha"))
 
-        self.validate_email_fields()
         self.validate_bcc()
 
-    def validate_email_fields(self):
-        email_fields = [
-            x.get("field_id", "")
-            for x in self.block.get("subblocks", [])
-            if x.get("field_type", "") == "from"
-        ]
-        for form_field in self.form_data.get("data", []):
-            if form_field.get("field_id", "") not in email_fields:
+    def validate_bcc(self):
+        bcc_fields = []
+        for field in self.block.get("subblocks", []):
+            if field.get("use_as_bcc", False):
+                field_id = field.get("field_id", "")
+                if field_id not in bcc_fields:
+                    bcc_fields.append(field_id)
+
+        for data in self.form_data.get("data", []):
+            value = data.get("value", "")
+            if not value:
                 continue
-            if _isemail(form_field.get("value", "")) is None:
-                raise BadRequest(
-                    translate(
-                        _(
-                            "wrong_email",
-                            default='Email not valid in "${field}" field.',
-                            mapping={
-                                "field": form_field.get("label", ""),
-                            },
-                        ),
-                        context=self.request,
+
+            if data.get("field_id", "") in bcc_fields:
+                if not validate_email_token(
+                    self.form_data.get("block_id", ""), data["value"], data["otp"]
+                ):
+                    raise BadRequest(
+                        _("{email}'s OTP is wrong").format(email=data["value"])
                     )
-                )
 
     def validate_attachments(self):
         attachments_limit = os.environ.get("FORM_ATTACHMENTS_LIMIT", "")
@@ -224,27 +248,6 @@ class SubmitPost(Service):
                     context=self.request,
                 )
             )
-
-    def validate_bcc(self):
-        bcc_fields = []
-        for field in self.block.get("subblocks", []):
-            if field.get("use_as_bcc", False):
-                field_id = field.get("field_id", "")
-                if field_id not in bcc_fields:
-                    bcc_fields.append(field_id)
-
-        for data in self.form_data.get("data", []):
-            value = data.get("value", "")
-            if not value:
-                continue
-
-            if data.get("field_id", "") in bcc_fields:
-                if not validate_email_token(
-                    self.form_data.get("block_id", ""), data["value"], data["otp"]
-                ):
-                    raise BadRequest(
-                        _("{email}'s OTP is wrong").format(email=data["value"])
-                    )
 
     def get_block_data(self, block_id):
         blocks = get_blocks(self.context)
@@ -422,16 +425,7 @@ class SubmitPost(Service):
         """
         do not send attachments fields.
         """
-        skip_fields = [
-            x.get("field_id", "")
-            for x in self.block.get("subblocks", [])
-            if x.get("field_type", "") == "attachment"
-        ]
-        return [
-            x
-            for x in self.form_data.get("data", [])
-            if x.get("field_id", "") not in skip_fields
-        ]
+        return [field for field in self.fields if field.send_in_email]
 
     def send_mail(self, msg, charset):
         host = api.portal.get_tool(name="MailHost")
@@ -484,9 +478,9 @@ class SubmitPost(Service):
         xmlRoot = Element("form")
 
         for field in self.filter_parameters():
-            SubElement(
-                xmlRoot, "field", name=field.get("custom_field_id", field["label"])
-            ).text = str(field.get("value", ""))
+            SubElement(xmlRoot, "field", name=field.field_id).text = str(
+                field.internal_value
+            )
 
         doc = ElementTree(xmlRoot)
         doc.write(output, encoding="utf-8", xml_declaration=True)
