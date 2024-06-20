@@ -1,8 +1,7 @@
+from collective.volto.formsupport import _
 from plone.schema.email import _isemail
 from zExceptions import BadRequest
 from zope.i18n import translate
-
-from collective.volto.formsupport import _
 
 
 class Field:

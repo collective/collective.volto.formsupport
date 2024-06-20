@@ -1,24 +1,20 @@
-# -*- coding: utf-8 -*-
-import csv
-import unittest
+from collective.volto.formsupport.testing import (  # noqa: E501,
+    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
+)
 from datetime import datetime
 from io import StringIO
-
-import transaction
 from plone import api
-from plone.app.testing import (
-    SITE_OWNER_NAME,
-    SITE_OWNER_PASSWORD,
-    TEST_USER_ID,
-    setRoles,
-)
+from plone.app.testing import setRoles
+from plone.app.testing import SITE_OWNER_NAME
+from plone.app.testing import SITE_OWNER_PASSWORD
+from plone.app.testing import TEST_USER_ID
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
 from zope.component import getUtility
 
-from collective.volto.formsupport.testing import (  # noqa: E501,
-    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
-)
+import csv
+import transaction
+import unittest
 
 
 class TestMailStore(unittest.TestCase):
@@ -63,7 +59,7 @@ class TestMailStore(unittest.TestCase):
         transaction.commit()
 
     def submit_form(self, data):
-        url = "{}/@submit-form".format(self.document_url)
+        url = f"{self.document_url}/@submit-form"
         response = self.api_session.post(
             url,
             json=data,
@@ -72,17 +68,17 @@ class TestMailStore(unittest.TestCase):
         return response
 
     def export_data(self):
-        url = "{}/@form-data".format(self.document_url)
+        url = f"{self.document_url}/@form-data"
         response = self.api_session.get(url)
         return response
 
     def export_csv(self):
-        url = "{}/@form-data-export".format(self.document_url)
+        url = f"{self.document_url}/@form-data-export"
         response = self.api_session.get(url)
         return response
 
     def clear_data(self):
-        url = "{}/@form-data-clear".format(self.document_url)
+        url = f"{self.document_url}/@form-data-clear"
         response = self.api_session.delete(url)
         return response
 

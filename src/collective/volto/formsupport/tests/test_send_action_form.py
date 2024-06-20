@@ -1,28 +1,25 @@
-# -*- coding: utf-8 -*-
-import base64
-import os
-import unittest
-import xml.etree.ElementTree as ET
-from email.parser import Parser
-
-import transaction
-from plone import api
-from plone.app.testing import (
-    SITE_OWNER_NAME,
-    SITE_OWNER_PASSWORD,
-    TEST_USER_ID,
-    setRoles,
-)
-from plone.registry.interfaces import IRegistry
-from plone.restapi.testing import RelativeSession
-from Products.MailHost.interfaces import IMailHost
-from six import StringIO
-from zope.component import getUtility
-
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
 from collective.volto.formsupport.utils import generate_email_token
+from email.parser import Parser
+from io import StringIO
+from plone import api
+from plone.app.testing import setRoles
+from plone.app.testing import SITE_OWNER_NAME
+from plone.app.testing import SITE_OWNER_PASSWORD
+from plone.app.testing import TEST_USER_ID
+from plone.registry.interfaces import IRegistry
+from plone.restapi.testing import RelativeSession
+from Products.MailHost.interfaces import IMailHost
+from zope.component import getUtility
+
+import base64
+import os
+import re
+import transaction
+import unittest
+import xml.etree.ElementTree as ET
 
 
 class TestMailSend(unittest.TestCase):
@@ -74,7 +71,7 @@ class TestMailSend(unittest.TestCase):
         transaction.commit()
 
     def submit_form(self, data):
-        url = "{}/@submit-form".format(self.document_url)
+        url = f"{self.document_url}/@submit-form"
         response = self.api_session.post(
             url,
             json=data,
@@ -261,6 +258,7 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
+        msg = re.sub(r"\s+", " ", msg)
         self.assertIn("Subject: test subject", msg)
         self.assertIn("From: john@doe.com", msg)
         self.assertIn("To: site_addr@plone.com", msg)
@@ -310,6 +308,7 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
+        msg = re.sub(r"\s+", " ", msg)
         self.assertIn("Subject: test subject", msg)
         self.assertIn("From: john@doe.com", msg)
         self.assertIn("To: site_addr@plone.com", msg)
@@ -360,6 +359,7 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
+        msg = re.sub(r"\s+", " ", msg)
         self.assertIn("Subject: test subject", msg)
         self.assertIn("From: john@doe.com", msg)
         self.assertIn("To: site_addr@plone.com", msg)
@@ -412,6 +412,7 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
+        msg = re.sub(r"\s+", " ", msg)
         self.assertIn("Subject: test subject", msg)
         self.assertIn("From: john@doe.com", msg)
         self.assertIn("To: site_addr@plone.com", msg)
@@ -464,6 +465,7 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
+        msg = re.sub(r"\s+", " ", msg)
         self.assertIn("Subject: test subject", msg)
         self.assertIn("From: john@doe.com", msg)
         self.assertIn("To: site_addr@plone.com", msg)
@@ -515,6 +517,7 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
+        msg = re.sub(r"\s+", " ", msg)
         self.assertIn("Subject: test subject", msg)
         self.assertIn("From: john@doe.com", msg)
         self.assertIn("To: to@block.com", msg)
@@ -566,6 +569,7 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
+        msg = re.sub(r"\s+", " ", msg)
         self.assertIn("Subject: block subject", msg)
         self.assertIn("From: john@doe.com", msg)
         self.assertIn("To: site_addr@plone.com", msg)
@@ -623,6 +627,7 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
+        msg = re.sub(r"\s+", " ", msg)
         self.assertIn("Subject: block subject", msg)
         self.assertIn("From: john@doe.com", msg)
         self.assertIn("To: site_addr@plone.com", msg)
@@ -920,7 +925,8 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(parsed_msg.get("to"), "site_addr@plone.com")
         self.assertEqual(parsed_msg.get("subject"), "block subject")
 
-        msg_body = parsed_msg.get_payload()[1].get_payload().replace("\r\n", "")
+        msg_body = parsed_msg.get_payload()[1].get_payload()
+        msg_body = re.sub(r"\s+", " ", msg_body)
         self.assertIn("<strong>Message:</strong> just want to say hi", msg_body)
         self.assertIn("<strong>Name:</strong> Smith", msg_body)
 
@@ -986,7 +992,7 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
-        msg.replace("\r\n", "")
+        msg = re.sub(r"\s+", " ", msg).replace(" >", ">")
 
         self.assertIn(f"Subject: {subject}", msg)
         self.assertIn("From: john@doe.com", msg)
@@ -999,22 +1005,22 @@ class TestMailSend(unittest.TestCase):
             f"<caption>Form submission data for {self.document.title}</caption>", msg
         )
         self.assertIn(
-            """<th align="left" scope="col" role="columnheader">Field</th>""",
+            """<th align="left" role="columnheader" scope="col">Field</th>""",
             msg,
         )
         self.assertIn(
-            """<th align="left" scope="col" role="columnheader">Value</th>""",
+            """<th align="left" role="columnheader" scope="col">Value</th>""",
             msg,
         )
 
         self.assertIn(
-            """<th align="left" scope="row" role="rowheader">Name</th>""",
+            """<th align="left" role="rowheader" scope="row">Name</th>""",
             msg,
         )
 
         self.assertIn(f'<td align="left">{name}</td>', msg)
         self.assertIn(
-            """<th align="left" scope="row" role="rowheader">""",
+            """<th align="left" role="rowheader" scope="row">""",
             msg,
         )
         self.assertIn(f'<td align="left">{message}</td>', msg)
@@ -1062,6 +1068,7 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
+        msg = re.sub(r"\s+", " ", msg)
         self.assertIn("Subject: test subject", msg)
         self.assertIn("From: john@doe.com", msg)
         self.assertIn("To: site_addr@plone.com", msg)
@@ -1486,6 +1493,7 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
+        msg = re.sub(r"\s+", " ", msg)
         self.assertIn("Subject: test subject", msg)
         self.assertIn("From: john@doe.com", msg)
         self.assertIn("To: site_addr@plone.com", msg)
@@ -1558,8 +1566,9 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
+        msg = re.sub(r"\s+", " ", msg)
         self.assertIn(
             "<strong>Message:</strong> click here keep tags",
             msg,
         )
-        self.assertIn("<strong>Name:</strong> alert(=E2=80=98XSS=E2=80=99)  foo", msg)
+        self.assertIn("<strong>Name:</strong> alert(=E2=80=98XSS=E2=80=99) foo", msg)

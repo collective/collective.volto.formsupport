@@ -1,3 +1,5 @@
+from . import CaptchaSupport
+from collective.volto.formsupport import _
 from plone.formwidget.hcaptcha.interfaces import IHCaptchaSettings
 from plone.formwidget.hcaptcha.nohcaptcha import submit
 
@@ -6,10 +8,6 @@ from plone.registry.interfaces import IRegistry
 from zExceptions import BadRequest
 from zope.component import queryUtility
 from zope.i18n import translate
-
-from collective.volto.formsupport import _
-
-from . import CaptchaSupport
 
 
 class HCaptchaSupport(CaptchaSupport):

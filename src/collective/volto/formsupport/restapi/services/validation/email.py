@@ -1,21 +1,17 @@
-# -*- coding: utf-8 -*-
-
-import logging
-import os
+from collective.volto.formsupport import _
+from collective.volto.formsupport.utils import generate_email_token
+from collective.volto.formsupport.utils import validate_email_token
 from email import policy
 from email.message import EmailMessage
 from email.utils import parseaddr
-
 from plone import api
 from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
 from zExceptions import BadRequest
 
-from collective.volto.formsupport import _
-from collective.volto.formsupport.utils import (
-    generate_email_token,
-    validate_email_token,
-)
+import logging
+import os
+
 
 CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
 

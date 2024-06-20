@@ -1,8 +1,11 @@
 <tal:root xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-  i18n:domain="collective.volto.formsupport"
-  define="parameters python:options.get('parameters', {});
+          define="
+            parameters python:options.get('parameters', {});
             url python:options.get('url', '');
-            title python:options.get('title', '');">
+            title python:options.get('title', '');
+          "
+          i18n:domain="collective.volto.formsupport"
+>
   <style>
     th {
         text-align: start;
@@ -13,26 +16,32 @@
     <thead>
       <tr role="row">
         <th align="left"
-          scope="col"
-          role="columnheader">Field</th>
+            role="columnheader"
+            scope="col"
+            i18n:translate=""
+        >Field</th>
         <th align="left"
-          scope="col"
-          role="columnheader">Value</th>
+            role="columnheader"
+            scope="col"
+            i18n:translate=""
+        >Value</th>
       </tr>
     </thead>
     <tbody>
       <tal:field repeat="field parameters">
         <tr role="row"
-          tal:define="value field/display_value|nothing;
-                      label field/label|nothing">
+            tal:define="
+              value field/display_value|nothing;
+              label field/label|nothing;
+            "
+        >
           <th align="left"
-            scope="row"
-            role="rowheader">${label}</th>
+              role="rowheader"
+              scope="row"
+          >${label}</th>
           <td align="left">${value}</td>
         </tr>
       </tal:field>
     </tbody>
   </table>
 </tal:root>
-
-

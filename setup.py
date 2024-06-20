@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Installer for the collective.volto.formsupport package."""
 
 from setuptools import find_packages
@@ -21,14 +20,18 @@ setup(
     long_description=long_description,
     # Get more from https://pypi.org/classifiers/
     classifiers=[
+        "Development Status :: 5 - Production/Stable",
         "Environment :: Web Environment",
         "Framework :: Plone",
         "Framework :: Plone :: Addon",
         "Framework :: Plone :: 5.2",
+        "Framework :: Plone :: 6.0",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Operating System :: OS Independent",
         "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
     ],
@@ -47,13 +50,21 @@ setup(
     package_dir={"": "src"},
     include_package_data=True,
     zip_safe=False,
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     install_requires=[
         "setuptools",
         "z3c.jbot",
+        "Zope",
         "plone.api>=1.8.4",
+        "plone.dexterity",
+        "plone.keyring",
+        "plone.i18n",
+        "plone.memoize",
+        "plone.protect",
         "plone.restapi>=8.36.0",
-        "plone.app.dexterity",
+        "plone.base",
+        "Products.GenericSetup",
+        "Products.PortalTransforms",
         "souper.plone",
         "click",
         "pyotp",
@@ -71,15 +82,22 @@ setup(
         "honeypot": [
             "collective.honeypot>=2.1",
         ],
+        "blocksfield": [
+            "collective.volto.blocksfield",
+        ],
         "test": [
             "plone.app.testing",
             # Plone KGS does not use this version, because it would break
             # Remove if your package shall be part of coredev.
             # plone_coredev tests as of 2016-04-01.
             "plone.testing>=5.0.0",
-            "plone.app.contenttypes",
-            "plone.app.robotframework[debug]",
+            "plone.app.contenttypes[test]",
+            "plone.restapi[test]",
+            "plone.app.iterate",
+            "Products.MailHost",
+            "plone.browserlayer",
             "collective.MockMailHost",
+            "collective.honeypot",
             "plone.formwidget.hcaptcha",
             "plone.formwidget.recaptcha",
             "collective.z3cform.norobots",
