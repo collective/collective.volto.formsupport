@@ -25,6 +25,11 @@ collective.volto.formsupport
 
 Add some helper routes and functionalities for Volto sites with ``form`` blocks provided by `volto-form-block <https://github.com/collective/volto-form-block>`_ Volto plugin.
 
+volto-form-block version
+========================
+
+Works with volto-form-block >= v3.8.0
+
 plone.restapi endpoints
 =======================
 
