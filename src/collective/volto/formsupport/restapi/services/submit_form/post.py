@@ -518,12 +518,12 @@ class SubmitPost(Service):
 
     def store_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
-        data = self.filter_parameters()
+        data = {"form_data": self.filter_parameters()}
 
         if self.submit_limit is not None and -1 < self.submit_limit < self.count_data():
-            data.append({"value": True, "label": "Lista d'attesa"})
+            data.update({"waiting_list": True})
         else:
-            data.append({"value": False, "label": "Lista d'attesa"})
+            data.update({"waiting_list": False})
 
         res = store.add(data=data)
         if not res:
