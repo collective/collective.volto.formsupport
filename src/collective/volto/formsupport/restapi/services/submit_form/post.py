@@ -95,7 +95,7 @@ class SubmitPost(Service):
                 message = translate(
                     _(
                         "save_data_exception",
-                        default="Unable to save data. Value not unique.",
+                        default=f"Unable to save data. {e.args[0]}",
                     ),
                     context=self.request,
                 )
