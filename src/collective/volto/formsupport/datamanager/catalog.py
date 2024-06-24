@@ -96,12 +96,27 @@ class FormDataStore:
         record.attrs["fields_order"] = fields_order
         record.attrs["date"] = datetime.now()
         record.attrs["block_id"] = self.block_id
+
+        keys = [x["field_id"] for x in form_fields if x.get("unique", False)]
+        if keys:
+            saved_data = self.soup.data.values()
+            for saved_record in saved_data:
+                unique = False
+                for key in keys:
+                    if record.attrs.storage[key] != saved_record.attrs.storage[key]:
+                        unique = True
+                        break
+
+                if not unique:
+                    raise ValueError("Value not unique")
+
         return self.soup.add(record)
 
     def length(self):
         return len([x for x in self.soup.data.values()])
 
     def search(self, query=None):
+        records = []
         if not query:
             records = sorted(
                 self.soup.data.values(),
@@ -109,6 +124,13 @@ class FormDataStore:
                 reverse=True,
             )
         return records
+
+    def count(self, query=None):
+        records = []
+        if not query:
+            records = self.soup.data.values()
+
+        return len(records)
 
     def delete(self, id):
         record = self.soup.get(id)
