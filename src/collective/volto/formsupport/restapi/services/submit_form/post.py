@@ -50,7 +50,7 @@ class SubmitPost(Service):
 
         self.send_action = False
         self.store_action = False
-        self.submit_limit = -1
+        self.submit_limit = None
 
         self.block = {}
         self.form_data = self.cleanup_data()
@@ -522,7 +522,7 @@ class SubmitPost(Service):
 
         if self.submit_limit is not None and -1 < self.submit_limit < self.count_data():
             data.update({"waiting_list": True})
-        else:
+        elif self.submit_limit is not None:
             data.update({"waiting_list": False})
 
         res = store.add(data=data)
