@@ -98,18 +98,20 @@ class FormDataStore:
         record.attrs["date"] = datetime.now()
         record.attrs["block_id"] = self.block_id
 
-        keys = [x["field_id"] for x in form_fields if x.get("unique", False)]
-        if keys:
+        keys = [
+            (x["field_id"], x["label"]) for x in form_fields if x.get("unique", False)
+        ]
+        if keys[0]:
             saved_data = self.soup.data.values()
             for saved_record in saved_data:
                 unique = False
-                for key in keys:
+                for key in keys[0]:
                     if record.attrs.storage[key] != saved_record.attrs.storage[key]:
                         unique = True
                         break
 
                 if not unique:
-                    raise ValueError(f"Value not unique: {', '.join(keys)}")
+                    raise ValueError(f"Value not unique: {', '.join(keys[1])}")
 
         return self.soup.add(record)
 
