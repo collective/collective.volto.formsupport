@@ -65,12 +65,13 @@ class FormDataExportGet(Service):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
         sbuf = StringIO()
         fixed_columns = ["date"]
-        if self.form_block.get("limit", None) is not None:
-            fixed_columns.append("waiting_list")
         columns = []
+        custom_colums = []
+        if self.form_block.get("limit", None) is not None:
+            custom_colums.append("Lista d'attesa")
 
         rows = []
-        for item in store.search():
+        for index, item in enumerate(store.search()):
             data = {}
             fields_labels = item.attrs.get("fields_labels", {})
             for k in self.get_ordered_keys(item):
@@ -85,8 +86,13 @@ class FormDataExportGet(Service):
                 # add fixed columns values
                 value = item.attrs.get(k, None)
                 data[k] = json_compatible(value)
+            if "Lista d'attesa" in custom_colums:
+                limit = int(self.form_block["limit"])
+                data.update({"Lista d'attesa": not (index < limit)})
+
             rows.append(data)
         columns.extend(fixed_columns)
+        columns.extend(custom_colums)
         writer = csv.DictWriter(sbuf, fieldnames=columns, quoting=csv.QUOTE_ALL)
         writer.writeheader()
         for row in rows:

@@ -92,7 +92,6 @@ class FormDataStore:
                 record.attrs[field_id] = value
                 fields_labels[field_id] = fields[field_id]
                 fields_order.append(field_id)
-        record.attrs["waiting_list"] = data["waiting_list"]
         record.attrs["fields_labels"] = fields_labels
         record.attrs["fields_order"] = fields_order
         record.attrs["date"] = datetime.now()
