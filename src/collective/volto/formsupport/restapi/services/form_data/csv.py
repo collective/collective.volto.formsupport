@@ -1,8 +1,10 @@
+from collective.volto.formsupport import _
 from collective.volto.formsupport.interfaces import IFormDataStore
 from io import StringIO
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
 from zope.component import getMultiAdapter
+from zope.i18n import translate
 
 import csv
 
@@ -89,7 +91,15 @@ class FormDataExportGet(Service):
                 value = item.attrs.get(k, None)
                 data[k] = json_compatible(value)
             if "waiting_list" in custom_colums:
-                data.update({"waiting_list": "Sì" if not (index < limit) else "No"})
+                data.update(
+                    {
+                        "waiting_list": (
+                            translate(_("yes_label", default="Yes"))
+                            if not (index < limit)
+                            else translate(_("no_label", default="No"))
+                        )
+                    }
+                )
 
             rows.append(data)
         columns.extend(fixed_columns)

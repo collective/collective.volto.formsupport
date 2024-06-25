@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-06-25 10:15+0000\n"
+"POT-Creation-Date: 2024-06-25 15:21+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -142,6 +142,11 @@ msgstr "Devi selezionare almeno un'azione tra \"salva\" e \"invia\"."
 msgid "missing_blockid_label"
 msgstr "Campo block_id mancante."
 
+#. Default: "No"
+#: ../restapi/services/form_data/csv.py:99
+msgid "no_label"
+msgstr "No"
+
 #. Default: "Unable to save data. Value not unique: '${fields}'"
 #: ../restapi/services/submit_form/post.py:96
 msgid "save_data_exception"
@@ -167,6 +172,11 @@ msgstr "Campo obbligatorio mancante: subject o from."
 #: ../restapi/services/submit_form/post.py:206
 msgid "wrong_email"
 msgstr "Email inserita non valida nel campo \"${field}\"."
+
+#. Default: "Yes"
+#: ../restapi/services/form_data/csv.py:97
+msgid "yes_label"
+msgstr "Sì"
 
 #: ../restapi/services/submit_form/post.py:265
 msgid "{email}'s OTP is wrong"

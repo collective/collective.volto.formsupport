@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: collective.volto.formsupport\n"
-"POT-Creation-Date: 2024-06-25 10:15+0000\n"
+"POT-Creation-Date: 2024-06-25 15:21+0000\n"
 "PO-Revision-Date: 2023-05-11 10:11-0400\n"
 "Last-Translator: Leonardo J. Caballero G. <leonardocaballero@gmail.com>\n"
 "Language-Team: ES <LL@li.org>\n"
@@ -147,6 +147,11 @@ msgstr "Debe seleccionar al menos una acción entre \"guardar\" y \"enviar\"."
 msgid "missing_blockid_label"
 msgstr "Campo block_id no informado"
 
+#. Default: "No"
+#: ../restapi/services/form_data/csv.py:99
+msgid "no_label"
+msgstr ""
+
 #. Default: "Unable to save data. Value not unique: '${fields}'"
 #: ../restapi/services/submit_form/post.py:96
 msgid "save_data_exception"
@@ -171,6 +176,11 @@ msgstr "Campo obligatorio no presente: Asunto o remitente."
 #. Default: "Email not valid in \"${field}\" field."
 #: ../restapi/services/submit_form/post.py:206
 msgid "wrong_email"
+msgstr ""
+
+#. Default: "Yes"
+#: ../restapi/services/form_data/csv.py:97
+msgid "yes_label"
 msgstr ""
 
 #: ../restapi/services/submit_form/post.py:265
