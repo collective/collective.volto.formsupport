@@ -89,7 +89,7 @@ class FormDataExportGet(Service):
                 value = item.attrs.get(k, None)
                 data[k] = json_compatible(value)
             if "waiting_list" in custom_colums:
-                data.update({"waiting_list": not (index < limit)})
+                data.update({"waiting_list": "Sì" if not (index < limit) else "No"})
 
             rows.append(data)
         columns.extend(fixed_columns)
