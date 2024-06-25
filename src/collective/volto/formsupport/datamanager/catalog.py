@@ -114,9 +114,7 @@ class FormDataStore:
                         break
 
                 if not unique:
-                    raise ValueError(
-                        f"Value not unique: {', '.join([x[1] for x in keys])}"
-                    )
+                    raise ValueError(f" {', '.join([x[1] for x in keys])}")
 
         return self.soup.add(record)
 

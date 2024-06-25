@@ -63,7 +63,7 @@ class SubmitPost(Service):
 
         self.store_action = self.block.get("store", False)
         self.send_action = self.block.get("send", [])
-        self.submit_limit = self.block.get("limit", -1)
+        self.submit_limit = int(self.block.get("limit", "-1"))
 
         # Disable CSRF protection
         alsoProvides(self.request, IDisableCSRFProtection)
@@ -95,7 +95,7 @@ class SubmitPost(Service):
                 message = translate(
                     _(
                         "save_data_exception",
-                        default=f"Unable to save data. {e.args[0]}",
+                        default=f"Unable to save data. Value not unique: {e.args[0]}",
                     ),
                     context=self.request,
                 )

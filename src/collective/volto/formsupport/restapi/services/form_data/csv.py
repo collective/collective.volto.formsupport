@@ -65,8 +65,8 @@ class FormDataExportGet(Service):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
         sbuf = StringIO()
         fixed_columns = ["date"]
-        if getattr(self.form_block, "limit", None) is not None:
-            fixed_columns.append("limit")
+        if self.form_block.get("limit", None) is not None:
+            fixed_columns.append("waiting_list")
         columns = []
 
         rows = []
