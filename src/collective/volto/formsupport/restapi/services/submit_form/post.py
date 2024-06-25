@@ -95,7 +95,8 @@ class SubmitPost(Service):
                 message = translate(
                     _(
                         "save_data_exception",
-                        default=f"Unable to save data. Value not unique: {e.args[0]}",
+                        default="Unable to save data. Value not unique: '${fields}'",
+                        mapping={"fields": e.args[0]},
                     ),
                     context=self.request,
                 )

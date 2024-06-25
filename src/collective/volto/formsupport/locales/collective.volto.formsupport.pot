@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-06-07 00:42+0000\n"
+"POT-Creation-Date: 2024-06-25 10:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,6 +19,10 @@ msgstr ""
 
 #: ../restapi/services/validation/email.py:51
 msgid "Email confirmation code"
+msgstr ""
+
+#: ../browser/send_mail_template_table.pt:18
+msgid "Field"
 msgstr ""
 
 #: ../captcha/recaptcha.py:12
@@ -55,6 +59,10 @@ msgstr ""
 msgid "OTP is wrong"
 msgstr ""
 
+#: ../browser/templates/email_confirm_view.pt:17
+msgid "Simple Transactional Email"
+msgstr ""
+
 #: ../captcha/hcaptcha.py:56
 #: ../captcha/norobots.py:65
 #: ../captcha/recaptcha.py:54
@@ -85,6 +93,10 @@ msgstr ""
 msgid "Uninstalls the collective.volto.formsupport add-on."
 msgstr ""
 
+#: ../browser/send_mail_template_table.pt:23
+msgid "Value"
+msgstr ""
+
 #: ../configure.zcml:34
 msgid "Volto: Form support"
 msgstr ""
@@ -98,17 +110,17 @@ msgid "Your code to validate the email address:"
 msgstr ""
 
 #. Default: "Attachments too big. You uploaded ${uploaded_str}, but limit is ${max} MB. Try to compress files."
-#: ../restapi/services/submit_form/post.py:215
+#: ../restapi/services/submit_form/post.py:234
 msgid "attachments_too_big"
 msgstr ""
 
 #. Default: "Block with @type \"form\" and id \"$block\" not found in this context: $context"
-#: ../restapi/services/submit_form/post.py:130
+#: ../restapi/services/submit_form/post.py:149
 msgid "block_form_not_found_label"
 msgstr ""
 
 #. Default: "Empty form data."
-#: ../restapi/services/submit_form/post.py:156
+#: ../restapi/services/submit_form/post.py:175
 msgid "empty_form_data"
 msgstr ""
 
@@ -118,22 +130,27 @@ msgid "honeypot_error"
 msgstr ""
 
 #. Default: "Unable to send confirm email. Please retry later or contact site administrator."
-#: ../restapi/services/submit_form/post.py:76
+#: ../restapi/services/submit_form/post.py:82
 msgid "mail_send_exception"
 msgstr ""
 
 #. Default: "You need to set at least one form action between \"send\" and \"store\"."
-#: ../restapi/services/submit_form/post.py:145
+#: ../restapi/services/submit_form/post.py:164
 msgid "missing_action"
 msgstr ""
 
 #. Default: "Missing block_id"
-#: ../restapi/services/submit_form/post.py:123
+#: ../restapi/services/submit_form/post.py:142
 msgid "missing_blockid_label"
 msgstr ""
 
-#. Default: "A new form has been submitted from <a href=\"${url}\">${url}</a>"
-#: ../browser/send_mail_template.pt:22
+#. Default: "Unable to save data. Value not unique: '${fields}'"
+#: ../restapi/services/submit_form/post.py:96
+msgid "save_data_exception"
+msgstr ""
+
+#. Default: "A new form has been submitted from <a href=\"${DYNAMIC_CONTENT}\">${url}</a>"
+#: ../browser/send_mail_template.pt:24
 msgid "send_mail_text"
 msgstr ""
 
@@ -143,15 +160,15 @@ msgid "send_mail_text_table"
 msgstr ""
 
 #. Default: "Missing required field: subject or from."
-#: ../restapi/services/submit_form/post.py:322
+#: ../restapi/services/submit_form/post.py:341
 msgid "send_required_field_missing"
 msgstr ""
 
 #. Default: "Email not valid in \"${field}\" field."
-#: ../restapi/services/submit_form/post.py:187
+#: ../restapi/services/submit_form/post.py:206
 msgid "wrong_email"
 msgstr ""
 
-#: ../restapi/services/submit_form/post.py:246
+#: ../restapi/services/submit_form/post.py:265
 msgid "{email}'s OTP is wrong"
 msgstr ""

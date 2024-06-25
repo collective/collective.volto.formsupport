@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2024-06-07 00:42+0000\n"
+"POT-Creation-Date: 2024-06-25 10:15+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,10 @@ msgstr ""
 #: ../restapi/services/validation/email.py:51
 msgid "Email confirmation code"
 msgstr "Codice di conferma dell'email"
+
+#: ../browser/send_mail_template_table.pt:18
+msgid "Field"
+msgstr ""
 
 #: ../captcha/recaptcha.py:12
 msgid "Google ReCaptcha"
@@ -52,6 +56,10 @@ msgstr "NoRobots"
 msgid "OTP is wrong"
 msgstr "Il codice OTP è errato."
 
+#: ../browser/templates/email_confirm_view.pt:17
+msgid "Simple Transactional Email"
+msgstr ""
+
 #: ../captcha/hcaptcha.py:56
 #: ../captcha/norobots.py:65
 #: ../captcha/recaptcha.py:54
@@ -82,6 +90,10 @@ msgstr "Campo uid è mancante"
 msgid "Uninstalls the collective.volto.formsupport add-on."
 msgstr "Disinstalla collective.volto.formsupport."
 
+#: ../browser/send_mail_template_table.pt:23
+msgid "Value"
+msgstr ""
+
 #: ../configure.zcml:34
 msgid "Volto: Form support"
 msgstr "Volto: Form support"
@@ -95,17 +107,17 @@ msgid "Your code to validate the email address:"
 msgstr "Il tuo codice per la conferma dell'indirizzo email:"
 
 #. Default: "Attachments too big. You uploaded ${uploaded_str}, but limit is ${max} MB. Try to compress files."
-#: ../restapi/services/submit_form/post.py:215
+#: ../restapi/services/submit_form/post.py:234
 msgid "attachments_too_big"
 msgstr "Allegati troppo grandi. Hai caricato ${uploaded_str}, ma il limite è di ${max} MB. Prova a comprimerli."
 
 #. Default: "Block with @type \"form\" and id \"$block\" not found in this context: $context"
-#: ../restapi/services/submit_form/post.py:130
+#: ../restapi/services/submit_form/post.py:149
 msgid "block_form_not_found_label"
 msgstr "Blocco con @type \"form\" e id \"$block\" non trovato nel contesto: $context"
 
 #. Default: "Empty form data."
-#: ../restapi/services/submit_form/post.py:156
+#: ../restapi/services/submit_form/post.py:175
 msgid "empty_form_data"
 msgstr "Form senza dati."
 
@@ -114,23 +126,30 @@ msgstr "Form senza dati."
 msgid "honeypot_error"
 msgstr "Errore nella sottomissione del form."
 
-#. Default: "Unable to send confirm email. Please retry later or contact site administator."
-#: ../restapi/services/submit_form/post.py:76
+#. Default: "Unable to send confirm email. Please retry later or contact site administrator."
+#: ../restapi/services/submit_form/post.py:82
+#, fuzzy
 msgid "mail_send_exception"
 msgstr "Impossibile inviare la mail di conferma. Per favore riprova più tardi o contatta l'amministratore del sito."
 
 #. Default: "You need to set at least one form action between \"send\" and \"store\"."
-#: ../restapi/services/submit_form/post.py:145
+#: ../restapi/services/submit_form/post.py:164
 msgid "missing_action"
 msgstr "Devi selezionare almeno un'azione tra \"salva\" e \"invia\"."
 
 #. Default: "Missing block_id"
-#: ../restapi/services/submit_form/post.py:123
+#: ../restapi/services/submit_form/post.py:142
 msgid "missing_blockid_label"
 msgstr "Campo block_id mancante."
 
-#. Default: "A new form has been submitted from <a href=\"${url}\">${url}</a>"
-#: ../browser/send_mail_template.pt:22
+#. Default: "Unable to save data. Value not unique: '${fields}'"
+#: ../restapi/services/submit_form/post.py:96
+msgid "save_data_exception"
+msgstr "Impossibile salvare i dati. I campi '${fields}' non sono univoci."
+
+#. Default: "A new form has been submitted from <a href=\"${DYNAMIC_CONTENT}\">${url}</a>"
+#: ../browser/send_mail_template.pt:24
+#, fuzzy
 msgid "send_mail_text"
 msgstr "Modulo compilato su <a href=\"${url}\">${url}</a>"
 
@@ -140,15 +159,15 @@ msgid "send_mail_text_table"
 msgstr "Dati inviati per ${title}"
 
 #. Default: "Missing required field: subject or from."
-#: ../restapi/services/submit_form/post.py:322
+#: ../restapi/services/submit_form/post.py:341
 msgid "send_required_field_missing"
 msgstr "Campo obbligatorio mancante: subject o from."
 
 #. Default: "Email not valid in \"${field}\" field."
-#: ../restapi/services/submit_form/post.py:187
+#: ../restapi/services/submit_form/post.py:206
 msgid "wrong_email"
 msgstr "Email inserita non valida nel campo \"${field}\"."
 
-#: ../restapi/services/submit_form/post.py:246
+#: ../restapi/services/submit_form/post.py:265
 msgid "{email}'s OTP is wrong"
 msgstr "Il codice OTP per {email} è errato."
