@@ -68,7 +68,9 @@ class FormDataExportGet(Service):
         columns = []
         custom_colums = []
         if self.form_block.get("limit", None) is not None:
-            custom_colums.append("Lista d'attesa")
+            limit = int(self.form_block["limit"])
+            if limit > -1:
+                custom_colums.append("Lista d'attesa")
 
         rows = []
         for index, item in enumerate(store.search()):
@@ -87,7 +89,6 @@ class FormDataExportGet(Service):
                 value = item.attrs.get(k, None)
                 data[k] = json_compatible(value)
             if "Lista d'attesa" in custom_colums:
-                limit = int(self.form_block["limit"])
                 data.update({"Lista d'attesa": not (index < limit)})
 
             rows.append(data)
