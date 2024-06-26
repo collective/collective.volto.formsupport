@@ -6,7 +6,7 @@
     :target: https://pypi.python.org/pypi/collective.volto.formsupport
     :alt: Egg Status
 
-.. image:: https://img.shields.io/pypi/pyversions/collective.volto.formsupport.svg?style=plastic   
+.. image:: https://img.shields.io/pypi/pyversions/collective.volto.formsupport.svg?style=plastic
     :target: https://pypi.python.org/pypi/collective.volto.formsupport/
     :alt: Supported - Python Versions
 
@@ -196,6 +196,11 @@ There is an environment variable that you can use to set that limit (in MB)::
 By default this is not set.
 
 The upload limit is also passed to the frontend in the form data with the `attachments_limit` key.
+
+Email subject templating
+========================
+You can also interpolate the form values to email subject using the field id, in this way: ${123321123}
+
 
 Content-transfer-encoding
 =========================

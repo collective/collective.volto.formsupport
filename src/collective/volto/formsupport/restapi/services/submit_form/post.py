@@ -220,10 +220,24 @@ class SubmitPost(Service):
                 bcc.append(data["value"])
         return bcc
 
-    def send_data(self):
+    def get_subject(self):
         subject = self.form_data.get("subject", "") or self.block.get(
             "default_subject", ""
         )
+
+        for i in self.form_data.get("data", []):
+            field_id = i.get("field_id")
+
+            if not field_id:
+                continue
+
+            subject = subject.replace("${" + i.get("field_id") + "}", i.get("value"))
+
+        return subject
+
+    def send_data(self):
+
+        subject = self.get_subject()
 
         mfrom = self.form_data.get("from", "") or self.block.get("default_from", "")
         mreply_to = self.get_reply_to()
