@@ -1,5 +1,6 @@
 from collective.volto.formsupport import logger
 from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.utils import DuplicateValueError
 from collective.volto.formsupport.utils import get_blocks
 from copy import deepcopy
 from datetime import datetime
@@ -113,7 +114,7 @@ class FormDataStore:
                         break
 
                 if not unique:
-                    raise ValueError(f" {', '.join([x[1] for x in keys])}")
+                    raise DuplicateValueError(f" {', '.join([x[1] for x in keys])}")
 
         return self.soup.add(record)
 

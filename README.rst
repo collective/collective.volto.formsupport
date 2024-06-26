@@ -177,6 +177,12 @@ Each Record stores also two *service* attributes:
 
 We store these attributes because the form can change over time and we want to have a snapshot of the fields in the Record.
 
+With the store function we have added a function to limit the number of submits made for a form.
+This function is based on the use case of, for example, reserved place for a private lessons.
+Beyond a certain limit the date are marked with waiting_list True.
+
+We have also added the function to make one or more fields of the form unique.
+
 Data ID Mapping
 ^^^^^^^^^^^^^^^
 
