@@ -1,7 +1,7 @@
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
-from collective.volto.formsupport.utils import generate_email_token
+from collective.volto.otp.utils import generate_email_token
 from email.parser import Parser
 from plone import api
 from plone.app.testing import setRoles
