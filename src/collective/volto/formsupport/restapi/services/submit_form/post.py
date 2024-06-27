@@ -413,8 +413,8 @@ class SubmitPost(Service):
             "parameters": self.filter_parameters(),
             "url": self.context.absolute_url(),
             "title": self.context.Title(),
-            "mail_header": self.block.get("mail_header", None),
-            "mail_footer": self.block.get("mail_footer", None),
+            "mail_header": self.block.get("mail_header", {}).get('data', {}),
+            "mail_footer": self.block.get("mail_footer", {}).get('data', {}),
         }
         return message_template(**parameters)
 
