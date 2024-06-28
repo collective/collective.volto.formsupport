@@ -270,8 +270,8 @@ class SubmitPost(Service):
     def prepare_message(self):
         from bs4 import BeautifulSoup
 
-        mail_header = (self.block.get("mail_header", {}).get("data", None),)
-        mail_footer = (self.block.get("mail_footer", {}).get("data", None),)
+        mail_header = self.block.get("mail_header", {}).get("data", "")
+        mail_footer = self.block.get("mail_footer", {}).get("data", "")
 
         # Check if there is content
         mail_header = BeautifulSoup(mail_header).get_text() and mail_header or None
