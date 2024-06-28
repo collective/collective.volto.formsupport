@@ -4,6 +4,9 @@ Changelog
 3.0.3 (unreleased)
 ------------------
 
+- Subject templating
+  [folix-01]
+
 - Handle the edge cases where the `blocks` attribute is not set.
   [mamico]
 
