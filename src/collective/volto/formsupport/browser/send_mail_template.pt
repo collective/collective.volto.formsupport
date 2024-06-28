@@ -9,7 +9,7 @@
 
    <header>
     <tal:element tal:replace="structure mail_header"></tal:element>
-    <tal:element tal:condition="python:not mail_footer">
+    <tal:element tal:condition="python:not mail_header">
       <p i18n:translate="send_mail_text">
       A new form has been submitted from <strong i18n:name="url">${title}</strong>:
       </p>
