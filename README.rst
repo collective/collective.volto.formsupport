@@ -280,7 +280,7 @@ https://github.com/zopefoundation/Products.MailHost/blob/master/src/Products/Mai
 
 Email subject templating
 ========================
-You can also interpolate the form values to email subject using the field id, in this way: ${123321123}
+You can also interpolate the form values to the email subject using the field id, in this way: ${123321123}
 
 
 Header forwarding
