@@ -268,6 +268,15 @@ class SubmitPost(Service):
             self.send_mail(msg=msg, charset=charset)
 
     def prepare_message(self):
+        from bs4 import BeautifulSoup
+
+        mail_header = (self.block.get("mail_header", {}).get("data", None),)
+        mail_footer = (self.block.get("mail_footer", {}).get("data", None),)
+
+        # Check if there is content
+        mail_header = BeautifulSoup(mail_header).get_text() and mail_header or None
+        mail_footer = BeautifulSoup(mail_footer).get_text() and mail_footer or None
+
         message_template = api.content.get_view(
             name="send_mail_template",
             context=self.context,
@@ -277,8 +286,8 @@ class SubmitPost(Service):
             "parameters": self.filter_parameters(),
             "url": self.context.absolute_url(),
             "title": self.context.Title(),
-            "mail_header": self.block.get("mail_header", {}).get('data', None),
-            "mail_footer": self.block.get("mail_footer", {}).get('data', None),
+            "mail_header": mail_header,
+            "mail_footer": mail_footer,
         }
         return message_template(**parameters)
 
