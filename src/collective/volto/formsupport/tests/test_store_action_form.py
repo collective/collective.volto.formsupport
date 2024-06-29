@@ -169,15 +169,14 @@ class TestMailStore(unittest.TestCase):
                 },
             },
         )
-        transaction.commit()
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
 
         response = self.export_data()
         data = response.json()
         self.assertEqual(len(data["items"]), 1)
         self.assertEqual(
             sorted(data["items"][0].keys()),
-            ["__expired", "block_id", "date", "id", "message", "name"],
+            ["__expired", "block_id", "date", "file", "id", "message", "name"],
         )
         self.assertEqual(
             data["items"][0]["message"],
@@ -206,7 +205,7 @@ class TestMailStore(unittest.TestCase):
         )
         self.assertEqual(
             sorted(data["items"][1].keys()),
-            ["block_id", "date", "file", "id", "message", "name"],
+            ["__expired", "block_id", "date", "file", "id", "message", "name"],
         )
         # sorted_data = sorted(data["items"], key=lambda x: x["name"]["value"])
         self.assertEqual(data["items"][0]["name"]["value"], "Sally")
