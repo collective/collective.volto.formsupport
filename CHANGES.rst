@@ -9,6 +9,7 @@ Changelog
   [mamico]
 - Fix: if there are multiple forms on a page, each csv button downloads the record of all the forms,
   now if there is a block_id parameter, the csv is filtered on that.
+  [mamico]
 - Handle the edge cases where the `blocks` attribute is not set.
   [mamico]
 
