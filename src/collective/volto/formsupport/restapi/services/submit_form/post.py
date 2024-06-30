@@ -10,10 +10,13 @@ from email import policy
 from email.message import EmailMessage
 from io import BytesIO
 from plone import api
+
+
 try:
     from plone.base.interfaces.controlpanel import IMailSchema
 except ImportError:
     from Products.CMFPlone.interfaces.controlpanel import IMailSchema
+
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
