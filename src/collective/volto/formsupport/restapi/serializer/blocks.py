@@ -1,7 +1,10 @@
 from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import ICollectiveVoltoFormsupportLayer
 from plone import api
-from plone.base.interfaces import IPloneSiteRoot
+try:
+    from plone.base.interfaces import IPloneSiteRoot
+except ImportError:
+    from Products.CMFPlone.interfaces import IPloneSiteRoot
 from plone.restapi.behaviors import IBlocks
 from plone.restapi.interfaces import IBlockFieldSerializationTransformer
 from zope.component import adapter
