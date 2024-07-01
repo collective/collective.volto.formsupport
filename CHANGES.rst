@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.7.1 (unreleased)
+2.7.1 (2024-07-01)
 ------------------
 
 - Configurable email subject.
