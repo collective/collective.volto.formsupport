@@ -1,7 +1,7 @@
 Changelog
 =========
 
-2.7.2 (unreleased)
+2.7.2 (2024-07-01)
 ------------------
 
 - Handle field id format used by frontend logics.
