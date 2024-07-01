@@ -226,7 +226,8 @@ class SubmitPost(Service):
         )
 
         for i in self.form_data.get("data", []):
-            field_id = i.get("field_id")
+            # Handle this kind of id format: `field_name_123321, whichj is used by frontend package logics
+            field_id = i.get("field_id").split("_")[-1]
 
             if not field_id:
                 continue

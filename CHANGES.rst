@@ -4,7 +4,8 @@ Changelog
 2.7.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Handle field id format used by frontend logics.
+  [folix-01]
 
 
 2.7.1 (2024-07-01)
