@@ -10,6 +10,7 @@ from email import policy
 from email.message import EmailMessage
 from io import BytesIO
 from plone import api
+
 try:
     from plone.base.interfaces.controlpanel import IMailSchema
 except ImportError:
