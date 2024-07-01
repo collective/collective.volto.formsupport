@@ -277,6 +277,12 @@ This is useful for some SMTP servers that have problems with `quoted-printable` 
 By default the content-transfer-encoding is `quoted-printable` as overridden in
 https://github.com/zopefoundation/Products.MailHost/blob/master/src/Products/MailHost/MailHost.py#L65
 
+
+Email subject templating
+========================
+You can also interpolate the form values to the email subject using the field id, in this way: ${123321123}
+
+
 Header forwarding
 =========================
 
