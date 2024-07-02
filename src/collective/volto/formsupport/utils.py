@@ -11,6 +11,10 @@ import pyotp
 EMAIL_OTP_LIFETIME = 5 * 60
 
 
+class DuplicateValueError(ValueError):
+    pass
+
+
 def flatten_block_hierachy(blocks):
     """Given some blocks, return all contained blocks, including "subblocks"
     This allows embedding the form block into something like columns datastorage

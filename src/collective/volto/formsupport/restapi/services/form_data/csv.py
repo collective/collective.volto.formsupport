@@ -1,8 +1,10 @@
+from collective.volto.formsupport import _
 from collective.volto.formsupport.interfaces import IFormDataStore
 from io import StringIO
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
 from zope.component import getMultiAdapter
+from zope.i18n import translate
 
 import csv
 
@@ -66,9 +68,14 @@ class FormDataExportGet(Service):
         sbuf = StringIO()
         fixed_columns = ["date"]
         columns = []
+        custom_colums = []
+        if self.form_block.get("limit", None) is not None:
+            limit = int(self.form_block["limit"])
+            if limit > -1:
+                custom_colums.append("waiting_list")
 
         rows = []
-        for item in store.search():
+        for index, item in enumerate(store.search()):
             data = {}
             fields_labels = item.attrs.get("fields_labels", {})
             for k in self.get_ordered_keys(item):
@@ -83,8 +90,20 @@ class FormDataExportGet(Service):
                 # add fixed columns values
                 value = item.attrs.get(k, None)
                 data[k] = json_compatible(value)
+            if "waiting_list" in custom_colums:
+                data.update(
+                    {
+                        "waiting_list": (
+                            translate(_("yes_label", default="Yes"))
+                            if not (index < limit)
+                            else translate(_("no_label", default="No"))
+                        )
+                    }
+                )
+
             rows.append(data)
         columns.extend(fixed_columns)
+        columns.extend(custom_colums)
         writer = csv.DictWriter(sbuf, fieldnames=columns, quoting=csv.QUOTE_ALL)
         writer.writeheader()
         for row in rows:

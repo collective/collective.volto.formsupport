@@ -1,5 +1,6 @@
 from collective.volto.formsupport import logger
 from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.utils import DuplicateValueError
 from collective.volto.formsupport.utils import get_blocks
 from copy import deepcopy
 from datetime import datetime
@@ -85,7 +86,7 @@ class FormDataStore:
         record = Record()
         fields_labels = {}
         fields_order = []
-        for field_data in data:
+        for field_data in data["form_data"]:
             field_id = field_data.get("field_id", "")
             value = field_data.get("value", "")
             if field_id in fields:
@@ -96,12 +97,32 @@ class FormDataStore:
         record.attrs["fields_order"] = fields_order
         record.attrs["date"] = datetime.now()
         record.attrs["block_id"] = self.block_id
+
+        keys = [
+            (x["field_id"], x["label"]) for x in form_fields if x.get("unique", False)
+        ]
+        if keys:
+            saved_data = self.soup.data.values()
+            for saved_record in saved_data:
+                unique = False
+                for key in keys:
+                    if (
+                        record.attrs.storage[key[0]]
+                        != saved_record.attrs.storage[key[0]]
+                    ):
+                        unique = True
+                        break
+
+                if not unique:
+                    raise DuplicateValueError(f" {', '.join([x[1] for x in keys])}")
+
         return self.soup.add(record)
 
     def length(self):
         return len([x for x in self.soup.data.values()])
 
     def search(self, query=None):
+        records = []
         if not query:
             records = sorted(
                 self.soup.data.values(),
@@ -109,6 +130,13 @@ class FormDataStore:
                 reverse=True,
             )
         return records
+
+    def count(self, query=None):
+        records = []
+        if not query:
+            records = self.soup.data.values()
+
+        return len(records)
 
     def delete(self, id):
         record = self.soup.get(id)

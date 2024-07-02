@@ -48,6 +48,10 @@ class SubmitPost(Service):
     def __init__(self, context, request):
         super().__init__(context, request)
 
+        self.send_action = False
+        self.store_action = False
+        self.submit_limit = None
+
         self.block = {}
         self.form_data = self.cleanup_data()
         self.block_id = self.form_data.get("block_id", "")
@@ -57,15 +61,17 @@ class SubmitPost(Service):
     def reply(self):
         self.validate_form()
 
-        store_action = self.block.get("store", False)
-        send_action = self.block.get("send", [])
+        self.store_action = self.block.get("store", False)
+        self.send_action = self.block.get("send", [])
+        self.submit_limit = int(self.block.get("limit", "-1"))
 
         # Disable CSRF protection
         alsoProvides(self.request, IDisableCSRFProtection)
 
         notify(PostEventService(self.context, self.form_data))
+        data = self.form_data.get("data", [])
 
-        if send_action:
+        if self.send_action:
             try:
                 self.send_data()
             except BadRequest as e:
@@ -81,10 +87,23 @@ class SubmitPost(Service):
                 )
                 self.request.response.setStatus(500)
                 return dict(type="InternalServerError", message=message)
-        if store_action:
-            self.store_data()
+        if self.store_action:
+            try:
+                data = self.store_data()
+            except ValueError as e:
+                logger.exception(e)
+                message = translate(
+                    _(
+                        "save_data_exception",
+                        default="Unable to save data. Value not unique: '${fields}'",
+                        mapping={"fields": e.args[0]},
+                    ),
+                    context=self.request,
+                )
+                self.request.response.setStatus(500)
+                return dict(type="InternalServerError", message=message)
 
-        return {"data": self.form_data.get("data", [])}
+        return {"data": data}
 
     def cleanup_data(self):
         """
@@ -515,6 +534,21 @@ class SubmitPost(Service):
 
     def store_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
-        res = store.add(data=self.filter_parameters())
+        data = {"form_data": self.filter_parameters()}
+
+        res = store.add(data=data)
         if not res:
             raise BadRequest("Unable to store data")
+
+        data.update(
+            {
+                "waiting_list": self.submit_limit is not None
+                and -1 < self.submit_limit < self.count_data()
+            }
+        )
+
+        return data
+
+    def count_data(self):
+        store = getMultiAdapter((self.context, self.request), IFormDataStore)
+        return store.count()
