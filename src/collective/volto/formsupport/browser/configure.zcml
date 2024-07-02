@@ -34,6 +34,21 @@
       template="send_mail_template_table.pt"
       permission="zope2.View"
       />
+
+  <browser:page
+      name="saved_data"
+      for="plone.dexterity.interfaces.IDexterityContent"
+      class=".saved_data.SavedData"
+      permission="cmf.ModifyPortalContent"
+      />
+
+  <browser:page
+      name="download"
+      for=".saved_data.ISavedDataTraverse"
+      class=".saved_data.AttachmentDownload"
+      permission="cmf.ModifyPortalContent"
+      />
+
   <browser:page
       name="email-confirm-view"
       for="*"
