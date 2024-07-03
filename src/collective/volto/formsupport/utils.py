@@ -1,12 +1,12 @@
+from collections import deque
+from plone.keyring.interfaces import IKeyManager
+from zope.component import getUtility
+
 import base64
 import copy
 import json
-from collections import deque
-
 import pyotp
-import six
-from plone.keyring.interfaces import IKeyManager
-from zope.component import getUtility
+
 
 EMAIL_OTP_LIFETIME = 5 * 60
 
@@ -37,10 +37,10 @@ def get_blocks(context):
     """Returns all blocks from a context, including those coming from slots"""
 
     blocks = copy.deepcopy(getattr(context, "blocks", {}))
-    if isinstance(blocks, six.text_type):
+    if isinstance(blocks, str):
         blocks = json.loads(blocks)
 
-    flat = list(flatten_block_hierachy(blocks))
+    flat = list(flatten_block_hierachy(blocks)) if blocks else []
 
     return dict(flat)
 

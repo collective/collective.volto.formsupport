@@ -1,6 +1,7 @@
 <tal:root xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-  i18n:domain="collective.volto.formsupport"
-  define="parameters python:options.get('parameters', {});
+          i18n:domain="collective.volto.formsupport"
+          define="
+            parameters python:options.get('parameters', {});
             url python:options.get('url', '');
             title python:options.get('title', '');
             mail_header python:options.get('mail_header', '');
@@ -21,21 +22,29 @@
     <thead>
       <tr role="row">
         <th align="left"
-          scope="col"
-          role="columnheader">Field</th>
+            role="columnheader"
+            scope="col"
+            i18n:translate=""
+        >Field</th>
         <th align="left"
-          scope="col"
-          role="columnheader">Value</th>
+            role="columnheader"
+            scope="col"
+            i18n:translate=""
+        >Value</th>
       </tr>
     </thead>
     <tbody>
       <tal:field repeat="field parameters">
         <tr role="row"
-          tal:define="value field/value|nothing;
-                      label field/label|nothing">
+            tal:define="
+              value field/value|nothing;
+              label field/label|nothing;
+            "
+        >
           <th align="left"
-            scope="row"
-            role="rowheader">${label}</th>
+              role="rowheader"
+              scope="row"
+          >${label}</th>
           <td align="left">${value}</td>
         </tr>
       </tal:field>
@@ -45,5 +54,3 @@
     <tal:element tal:replace="structure mail_footer"></tal:element>
   </footer>
 </tal:root>
-
-

@@ -6,6 +6,10 @@ Changelog
 
 - Configurable header and footer for email message.
   [folix-01]
+- Subject templating
+  [folix-01]
+- Handle the edge cases where the `blocks` attribute is not set.
+  [mamico]
 
 
 3.0.2 (2024-05-05)
@@ -123,7 +127,7 @@ Changelog
 2.2.0 (2022-04-07)
 ------------------
 
-- Notify an event on sumbit.
+- Notify an event on submit.
   [mamico]
 
 

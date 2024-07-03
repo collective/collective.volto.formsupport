@@ -25,6 +25,11 @@ collective.volto.formsupport
 
 Add some helper routes and functionalities for Volto sites with ``form`` blocks provided by `volto-form-block <https://github.com/collective/volto-form-block>`_ Volto plugin.
 
+volto-form-block version
+========================
+
+Works with volto-form-block >= v3.8.0
+
 plone.restapi endpoints
 =======================
 
@@ -104,7 +109,7 @@ Optional parameters could be passed in the payload:
 @validate-email-address
 -----------------------
 
-Send an message to the passed email wit OTP code to verify the address.
+Send an message to the passed email with OTP code to verify the address.
 Returns a HTTP 204 in case of success or HTTP 400 in case the email is badly composed.::
 
 > curl -i -X POST http://localhost:8080/Plone/my-form/@validate-email-address --data-raw '{"email": "email@email.com", "uid": "ffffffff"}' -H 'Accept: application/json' -H 'Content-Type: application/json'
@@ -269,8 +274,14 @@ variable `MAIL_CONTENT_TRANSFER_ENCODING`::
 
 This is useful for some SMTP servers that have problems with `quoted-printable` encoding.
 
-By default the content-transfer-encoding is `quoted-printable` as overrided in
+By default the content-transfer-encoding is `quoted-printable` as overridden in
 https://github.com/zopefoundation/Products.MailHost/blob/master/src/Products/MailHost/MailHost.py#L65
+
+
+Email subject templating
+========================
+You can also interpolate the form values to the email subject using the field id, in this way: ${123321123}
+
 
 Header forwarding
 =========================

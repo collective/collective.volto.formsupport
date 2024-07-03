@@ -1,6 +1,7 @@
 <tal:root xmlns:i18n="http://xml.zope.org/namespaces/i18n"
-    i18n:domain="collective.volto.formsupport"
-    define="parameters python:options.get('parameters', {});
+          i18n:domain="collective.volto.formsupport"
+          define="
+            parameters python:options.get('parameters', {});
             url python:options.get('url', '');
             title python:options.get('title', '');
             mail_header python:options.get('mail_header', '');
@@ -11,9 +12,12 @@
   </header>
   <ul>
     <tal:field repeat="field parameters">
-      <li tal:define="value field/value|nothing;
-                      label field/label|nothing">
-          <strong>${label}:</strong> ${value}
+      <li tal:define="
+            value field/value|nothing;
+            label field/label|nothing;
+          ">
+        <strong tal:content="string:$label:">label:</strong>
+         ${value}
       </li>
     </tal:field>
   </ul>
@@ -21,7 +25,12 @@
     <tal:element tal:replace="structure mail_footer"></tal:element>
     <tal:element tal:condition="python:not mail_footer ">
       <p i18n:translate="send_mail_text">
-        A new form has been submitted from <a href="${url}"><strong i18n:name="url">${url}</strong></a>
+        A new form has been submitted from
+        <a tal:attributes="
+             href url;
+           "><strong tal:content="url"
+                  i18n:name="url"
+          >url</strong></a>
       </p>
     </tal:element>
   </footer>
