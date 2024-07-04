@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.3 (unreleased)
+3.1.0 (2024-07-04)
 ------------------
 
 - Configurable header and footer for email message.
