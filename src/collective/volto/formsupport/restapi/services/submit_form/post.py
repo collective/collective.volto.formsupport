@@ -320,13 +320,19 @@ class SubmitPost(Service):
         )
 
         for i in self.form_data.get("data", []):
-            # Handle `field_name_321323` kind of id used by frontend package
-            field_id = i.get("field_id", "").split("_")[-1]
+
+            field_id = i.get("field_id")
 
             if not field_id:
                 continue
 
-            subject = subject.replace("${" + i.get("field_id") + "}", i.get("value"))
+            # Handle this kind of id format: `field_name_123321, whichj is used by frontend package logics
+            pattern = r"\$\{[^}]+\}"
+            matches = re.findall(pattern, subject)
+
+            for match in matches:
+                if field_id in match:
+                    subject = subject.replace(match, i.get("value"))
 
         return subject
 
