@@ -68,6 +68,7 @@ setup(
         "Products.PortalTransforms",
         "souper.plone",
         "click",
+        "beautifulsoup4",
         "pyotp",
     ],
     extras_require={

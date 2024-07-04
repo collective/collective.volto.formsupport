@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup
 from collective.volto.formsupport import _
 from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import IFormDataStore
@@ -425,6 +426,14 @@ class SubmitPost(Service):
                 self.send_mail(msg=acknowledgement_mail, charset=charset)
 
     def prepare_message(self):
+
+        mail_header = self.block.get("mail_header", {}).get("data", "")
+        mail_footer = self.block.get("mail_footer", {}).get("data", "")
+
+        # Check if there is content
+        mail_header = BeautifulSoup(mail_header).get_text() if mail_header else None
+        mail_footer = BeautifulSoup(mail_footer).get_text() if mail_footer else None
+
         email_format_page_template_mapping = {
             "list": "send_mail_template",
             "table": "send_mail_template_table",
@@ -443,6 +452,8 @@ class SubmitPost(Service):
             "parameters": self.filter_parameters(),
             "url": self.context.absolute_url(),
             "title": self.context.Title(),
+            "mail_header": mail_header,
+            "mail_footer": mail_footer,
         }
         return message_template(**parameters)
 

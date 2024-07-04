@@ -84,6 +84,7 @@ Zope = [
 ]
 python-dateutil = ['dateutil']
 'souper.plone' = ['souper', 'repoze.catalog']
+beautifulsoup4 = ['bs4']
 # extra packages
 ignore-packages = [
   # these are packages defined in extras_require

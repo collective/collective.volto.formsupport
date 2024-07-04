@@ -4,9 +4,10 @@ Changelog
 3.0.3 (unreleased)
 ------------------
 
+- Configurable header and footer for email message.
+  [folix-01]
 - Subject templating
   [folix-01]
-
 - Handle the edge cases where the `blocks` attribute is not set.
   [mamico]
 
