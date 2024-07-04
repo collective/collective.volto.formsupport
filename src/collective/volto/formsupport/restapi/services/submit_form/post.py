@@ -424,8 +424,8 @@ class SubmitPost(Service):
         mail_footer = self.block.get("mail_footer", {}).get("data", "")
 
         # Check if there is content
-        mail_header = BeautifulSoup(mail_header).get_text() and mail_header or None
-        mail_footer = BeautifulSoup(mail_footer).get_text() and mail_footer or None
+        mail_header = BeautifulSoup(mail_header).get_text() if mail_header else None
+        mail_footer = BeautifulSoup(mail_footer).get_text() if mail_footer else None
 
         email_format_page_template_mapping = {
             "list": "send_mail_template",
