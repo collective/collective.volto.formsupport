@@ -4,7 +4,8 @@ Changelog
 2.7.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix subject templating logics.
+  [folix-01]
 
 
 2.7.2 (2024-07-01)
