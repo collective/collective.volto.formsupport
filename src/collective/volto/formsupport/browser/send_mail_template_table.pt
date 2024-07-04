@@ -14,7 +14,7 @@
   </style>
   <header>
     <tal:element tal:replace="structure mail_header"></tal:element>
-    <tal:element tal:condition="python:not mail_footer">
+    <tal:element tal:condition="python:not mail_header">
       <caption i18n:translate="send_mail_text_table">Form submission data for ${title}</caption>
     <tal:element>
   </header>
