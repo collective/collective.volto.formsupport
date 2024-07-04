@@ -33,6 +33,7 @@ from zope.i18n import translate
 from zope.interface import alsoProvides
 from zope.interface import implementer
 
+import re
 import codecs
 import logging
 import math
