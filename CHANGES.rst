@@ -10,6 +10,8 @@ Changelog
   [folix-01]
 - Handle the edge cases where the `blocks` attribute is not set.
   [mamico]
+- Configuring with plone/meta
+  [mamico]
 
 
 3.0.2 (2024-05-05)
