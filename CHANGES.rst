@@ -4,8 +4,8 @@ Changelog
 3.1.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Remove otp logics (moved to collective.volto.otp)
+  [folix-01]
 
 3.1.0 (2024-07-04)
 ------------------
@@ -13,8 +13,6 @@ Changelog
 - Configurable header and footer for email message.
   [folix-01]
 - Subject templating
-- Remove otp logics (moved to collective.volto.otp)
-  [folix-01]
 - Handle the edge cases where the `blocks` attribute is not set.
   [mamico]
 - Configuring with plone/meta
