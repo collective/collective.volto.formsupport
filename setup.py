@@ -57,7 +57,6 @@ setup(
         "Zope",
         "plone.api>=1.8.4",
         "plone.dexterity",
-        "plone.keyring",
         "plone.i18n",
         "plone.memoize",
         "plone.protect",
@@ -69,7 +68,7 @@ setup(
         "souper.plone",
         "click",
         "beautifulsoup4",
-        "pyotp",
+        "collective.volto.otp",
     ],
     extras_require={
         "hcaptcha": [

@@ -4,7 +4,7 @@ from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.interfaces import IPostEvent
 from collective.volto.formsupport.utils import get_blocks
-from collective.volto.formsupport.utils import validate_email_token
+from collective.volto.otp.utils import validate_email_token
 from copy import deepcopy
 from datetime import datetime
 from email import policy
