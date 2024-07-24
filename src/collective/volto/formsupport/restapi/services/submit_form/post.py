@@ -298,18 +298,19 @@ class SubmitPost(Service):
         # Check if there is content
         bs_mail_header = BeautifulSoup(mail_header)
         bs_mail_footer = BeautifulSoup(mail_footer)
-        mail_header = bs_mail_header.get_text() and mail_header or None
-        mail_footer = bs_mail_footer.get_text() and mail_footer or None
 
         portal = getMultiAdapter(
             (self.context, self.request), name="plone_portal_state"
         ).portal()
 
-        for snippet in [mail_header, mail_footer]:
+        for snippet in [bs_mail_header, bs_mail_footer]:
             if snippet:
                 for link in snippet.find_all("a"):
                     if link.get("href", "").startswith("/"):
                         link["href"] = portal.absolute_url() + link["href"]
+
+        mail_header = bs_mail_header.get_text() and mail_header or None
+        mail_footer = bs_mail_footer.get_text() and mail_footer or None
 
         message_template = api.content.get_view(
             name="send_mail_template",
