@@ -5,6 +5,7 @@ Changelog
 ------------------
 
 - @form-data-clear use by DELETE method.
+- Fix link in the mail header and footer.
   [folix-01]
 
 
