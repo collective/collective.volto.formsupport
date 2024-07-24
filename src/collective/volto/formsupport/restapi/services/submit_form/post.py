@@ -309,8 +309,8 @@ class SubmitPost(Service):
                     if link.get("href", "").startswith("/"):
                         link["href"] = portal.absolute_url() + link["href"]
 
-        mail_header = bs_mail_header.get_text() and mail_header or None
-        mail_footer = bs_mail_footer.get_text() and mail_footer or None
+        mail_header = bs_mail_header.get_text() and bs_mail_header.prettify() or None
+        mail_footer = bs_mail_footer.get_text() and bs_mail_footer.prettify() or None
 
         message_template = api.content.get_view(
             name="send_mail_template",
