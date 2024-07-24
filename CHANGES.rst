@@ -4,6 +4,9 @@ Changelog
 3.1.1 (unreleased)
 ------------------
 
+- Fix mail header and footer links.
+  [folix-01]
+
 - Remove otp logics (moved to collective.volto.otp)
   [folix-01]
 

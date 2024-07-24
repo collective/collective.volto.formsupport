@@ -431,8 +431,21 @@ class SubmitPost(Service):
         mail_footer = self.block.get("mail_footer", {}).get("data", "")
 
         # Check if there is content
-        mail_header = BeautifulSoup(mail_header).get_text() if mail_header else None
-        mail_footer = BeautifulSoup(mail_footer).get_text() if mail_footer else None
+        bs_mail_header = BeautifulSoup(mail_header)
+        bs_mail_footer = BeautifulSoup(mail_footer)
+
+        portal = getMultiAdapter(
+            (self.context, self.request), name="plone_portal_state"
+        ).portal()
+
+        for snippet in [bs_mail_header, bs_mail_footer]:
+            if snippet:
+                for link in snippet.find_all("a"):
+                    if link.get("href", "").startswith("/"):
+                        link["href"] = portal.absolute_url() + link["href"]
+
+        mail_header = bs_mail_header.get_text() and bs_mail_header.prettify() or None
+        mail_footer = bs_mail_footer.get_text() and bs_mail_footer.prettify() or None
 
         email_format_page_template_mapping = {
             "list": "send_mail_template",
