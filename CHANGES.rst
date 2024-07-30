@@ -4,7 +4,8 @@ Changelog
 2.7.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- @form-data-clear use by DELETE method.
+  [folix-01]
 
 
 2.7.3 (2024-07-04)

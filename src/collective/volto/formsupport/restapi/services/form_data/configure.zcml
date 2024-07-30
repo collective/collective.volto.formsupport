@@ -14,7 +14,7 @@
   <adapter factory=".form_data.FormData" name="form-data"/>
 
   <plone:service
-    method="GET"
+    method="DELETE"
     name="@form-data-clear"
     for="plone.restapi.behaviors.IBlocks"
     factory=".clear.FormDataClear"
