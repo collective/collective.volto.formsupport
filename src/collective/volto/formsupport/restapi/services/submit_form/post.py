@@ -468,7 +468,7 @@ class SubmitPost(Service):
                 continue
 
             for item in self.form_data.get("data", []):
-                if item.get("field_id") == field.get("field_id", {}):
+                if item.get("field_id", "") == field.get("field_id", ""):
                     result.append(item)
 
         return result
