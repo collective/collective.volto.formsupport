@@ -461,16 +461,17 @@ class SubmitPost(Service):
         """
         do not send attachments fields.
         """
-        skip_fields = [
-            x.get("field_id", "")
-            for x in self.block.get("subblocks", [])
-            if x.get("field_type", "") == "attachment"
-        ]
-        return [
-            x
-            for x in self.form_data.get("data", [])
-            if x.get("field_id", "") not in skip_fields
-        ]
+        result = []
+
+        for field in self.block.get("subblocks", []):
+            if field.get("field_type", "") == "attachment":
+                continue
+
+            for item in self.form_data.get("data", []):
+                if item.get("field_id") == field.get("field_id", {}):
+                    result.append(item)
+
+        return result
 
     def send_mail(self, msg, charset):
         host = api.portal.get_tool(name="MailHost")
