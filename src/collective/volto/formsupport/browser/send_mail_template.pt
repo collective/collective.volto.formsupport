@@ -8,24 +8,19 @@
           "
           i18n:domain="collective.volto.formsupport"
 >
-  <style>
-    .data_field{
-      margin-bottom: 1em;
-    }
-  </style>
   <header>
     <tal:element tal:replace="structure mail_header" />
   </header>
   <ul>
     <tal:field repeat="field parameters">
-      <li class="data_field"
-          tal:define="
+      <li tal:define="
             value field/value|nothing;
             label field/label|nothing;
-          "
-      >
-        <strong tal:content="string:$label:">label:</strong>
-         ${value}
+          ">
+        <p>
+          <strong tal:content="string:$label:">label:</strong>
+          ${value}
+        </p>
       </li>
     </tal:field>
   </ul>
