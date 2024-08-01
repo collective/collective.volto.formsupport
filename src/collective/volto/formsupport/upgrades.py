@@ -2,9 +2,9 @@ from Acquisition import aq_base
 from collective.volto.formsupport.interfaces import IFormDataStore
 from copy import deepcopy
 from plone import api
+from plone.app.upgrade.utils import installOrReinstallProduct
 from plone.dexterity.utils import iterSchemata
 from plone.i18n.normalizer.interfaces import IIDNormalizer
-from plone.app.upgrade.utils import installOrReinstallProduct
 from souper.soup import Record
 from zope.component import getMultiAdapter
 from zope.component import getUtility

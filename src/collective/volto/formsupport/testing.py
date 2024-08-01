@@ -10,8 +10,8 @@ from plone.testing import z2
 import collective.honeypot
 import collective.MockMailHost
 import collective.volto.formsupport
-import plone.restapi
 import collective.volto.otp
+import plone.restapi
 
 
 class VoltoFormsupportLayer(PloneSandboxLayer):
