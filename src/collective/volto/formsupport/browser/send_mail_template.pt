@@ -18,11 +18,12 @@
   </header>
   <ul>
     <tal:field repeat="field parameters">
-      <li tal:define="
+      <li class="data_field"
+          tal:define="
             value field/value|nothing;
             label field/label|nothing;
           "
-          class="data_field">
+      >
         <strong tal:content="string:$label:">label:</strong>
          ${value}
       </li>
