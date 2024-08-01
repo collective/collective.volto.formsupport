@@ -4,6 +4,7 @@ from copy import deepcopy
 from plone import api
 from plone.dexterity.utils import iterSchemata
 from plone.i18n.normalizer.interfaces import IIDNormalizer
+from plone.app.upgrade.utils import installOrReinstallProduct
 from souper.soup import Record
 from zope.component import getMultiAdapter
 from zope.component import getUtility
@@ -231,3 +232,7 @@ def to_1300(context):  # noqa: C901 # pragma: no cover
     logger.info("### FINISHED UPGRADE SEND FROM STRING TO ARRAY ###")
 
     # self.block.get("send")
+
+
+def to_1301(context):
+    installOrReinstallProduct(api.portal.get(), "collective.volto.otp")
