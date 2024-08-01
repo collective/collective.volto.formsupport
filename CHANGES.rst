@@ -5,10 +5,9 @@ Changelog
 ------------------
 
 - Install otp package by upgradestep
-- Mantain the fields order in email message.
+  [folix-01]
 - Maintain the fields order in email message.
   [folix-01]
-
 - Remove otp logics (moved to collective.volto.otp)
   [folix-01]
 
