@@ -103,6 +103,7 @@ setup(
             "plone.formwidget.recaptcha",
             "collective.z3cform.norobots",
             "collective.honeypot",
+            "collective.volto.otp",
         ],
     },
     entry_points="""
