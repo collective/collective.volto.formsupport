@@ -11,6 +11,8 @@ from zope.component import getUtility
 from zope.globalrequest import getRequest
 from zope.schema import getFields
 
+import json
+
 
 try:
     from collective.volto.blocksfield.field import BlocksField
@@ -20,8 +22,6 @@ except ImportError:
     HAS_BLOCKSFIELD = False
 
 from collective.volto.formsupport import logger
-
-import json
 
 
 DEFAULT_PROFILE = "profile-collective.volto.formsupport:default"
@@ -40,6 +40,10 @@ def _get_all_content_with_blocks():
     portal = api.portal.get()
     portal_blocks = getattr(portal, "blocks", "")
     if portal_blocks:
+        portal_blocks = (
+            type(portal_blocks) is str and json.loads(portal_blocks) or portal_blocks
+        )
+
         if _has_block_form(portal_blocks):
             content.append(portal)
 

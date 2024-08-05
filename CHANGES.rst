@@ -4,6 +4,8 @@ Changelog
 3.1.1 (unreleased)
 ------------------
 
+- Plone5 compatibility in the upgradesteps
+  [folix-01]
 - Install otp package by upgradestep
   [folix-01]
 
