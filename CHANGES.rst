@@ -4,6 +4,9 @@ Changelog
 3.1.1 (unreleased)
 ------------------
 
+- Plone5 compatibility in the upgradesteps
+  [folix-01]
+
 - Remove otp logics (moved to collective.volto.otp)
   [folix-01]
 

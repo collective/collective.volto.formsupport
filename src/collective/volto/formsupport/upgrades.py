@@ -1,3 +1,5 @@
+import json
+
 from Acquisition import aq_base
 from collective.volto.formsupport.interfaces import IFormDataStore
 from copy import deepcopy
@@ -39,6 +41,10 @@ def _get_all_content_with_blocks():
     portal = api.portal.get()
     portal_blocks = getattr(portal, "blocks", "")
     if portal_blocks:
+        portal_blocks = (
+            type(portal_blocks) is str and json.loads(portal_blocks) or portal_blocks
+        )
+
         if _has_block_form(portal_blocks):
             content.append(portal)
 
