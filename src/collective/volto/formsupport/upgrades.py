@@ -22,8 +22,6 @@ except ImportError:
 
 from collective.volto.formsupport import logger
 
-import json
-
 
 DEFAULT_PROFILE = "profile-collective.volto.formsupport:default"
 
