@@ -4,6 +4,9 @@ Changelog
 3.1.1 (unreleased)
 ------------------
 
+- Install otp package by upgradestep
+  [folix-01]
+
 - Remove otp logics (moved to collective.volto.otp)
   [folix-01]
 

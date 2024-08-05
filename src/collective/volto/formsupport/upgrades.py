@@ -2,6 +2,7 @@ from Acquisition import aq_base
 from collective.volto.formsupport.interfaces import IFormDataStore
 from copy import deepcopy
 from plone import api
+from plone.app.upgrade.utils import installOrReinstallProduct
 from plone.dexterity.utils import iterSchemata
 from plone.i18n.normalizer.interfaces import IIDNormalizer
 from souper.soup import Record
@@ -231,3 +232,7 @@ def to_1300(context):  # noqa: C901 # pragma: no cover
     logger.info("### FINISHED UPGRADE SEND FROM STRING TO ARRAY ###")
 
     # self.block.get("send")
+
+
+def to_1301(context):
+    installOrReinstallProduct(api.portal.get(), "collective.volto.otp")
