@@ -6,7 +6,12 @@ Changelog
 
 - Fix mail header and footer links.
   [folix-01]
-
+- Plone5 compatibility in the upgradesteps
+  [folix-01]
+- Install otp package by upgradestep
+  [folix-01]
+- Maintain the fields order in email message.
+  [folix-01]
 - Remove otp logics (moved to collective.volto.otp)
   [folix-01]
 
