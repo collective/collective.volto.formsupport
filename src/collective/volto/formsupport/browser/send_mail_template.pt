@@ -17,8 +17,10 @@
             value field/value|nothing;
             label field/label|nothing;
           ">
-        <strong tal:content="string:$label:">label:</strong>
-         ${value}
+        <p>
+          <strong tal:content="string:$label:">label:</strong>
+          ${value}
+        </p>
       </li>
     </tal:field>
   </ul>
