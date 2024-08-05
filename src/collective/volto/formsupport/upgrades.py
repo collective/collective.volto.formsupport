@@ -1,5 +1,3 @@
-import json
-
 from Acquisition import aq_base
 from collective.volto.formsupport.interfaces import IFormDataStore
 from copy import deepcopy
@@ -11,6 +9,8 @@ from zope.component import getMultiAdapter
 from zope.component import getUtility
 from zope.globalrequest import getRequest
 from zope.schema import getFields
+
+import json
 
 
 try:
