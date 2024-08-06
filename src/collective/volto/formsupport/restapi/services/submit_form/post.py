@@ -447,8 +447,8 @@ class SubmitPost(Service):
                 for link in snippet.find_all("a"):
                     if link.get("href", "").startswith("/"):
                         link["href"] = (
-                            frontend_domain or portal.absolute_url() + link["href"]
-                        )
+                            frontend_domain or portal.absolute_url()
+                        ) + link["href"]
 
         mail_header = bs_mail_header.get_text() and bs_mail_header.prettify() or None
         mail_footer = bs_mail_footer.get_text() and bs_mail_footer.prettify() or None
