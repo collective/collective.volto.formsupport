@@ -4,6 +4,8 @@ Changelog
 3.1.1 (unreleased)
 ------------------
 
+- Fix mail header and footer links.
+  [folix-01]
 - Plone5 compatibility in the upgradesteps
   [folix-01]
 - Install otp package by upgradestep

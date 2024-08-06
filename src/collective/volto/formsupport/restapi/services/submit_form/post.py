@@ -431,8 +431,27 @@ class SubmitPost(Service):
         mail_footer = self.block.get("mail_footer", {}).get("data", "")
 
         # Check if there is content
-        mail_header = BeautifulSoup(mail_header).get_text() and mail_header or None
-        mail_footer = BeautifulSoup(mail_footer).get_text() and mail_footer or None
+        bs_mail_header = BeautifulSoup(mail_header)
+        bs_mail_footer = BeautifulSoup(mail_footer)
+
+        portal = getMultiAdapter(
+            (self.context, self.request), name="plone_portal_state"
+        ).portal()
+
+        frontend_domain = api.portal.get_registry_record(
+            name="volto.frontend_domain", default=""
+        )
+
+        for snippet in [bs_mail_header, bs_mail_footer]:
+            if snippet:
+                for link in snippet.find_all("a"):
+                    if link.get("href", "").startswith("/"):
+                        link["href"] = (
+                            frontend_domain or portal.absolute_url() + link["href"]
+                        )
+
+        mail_header = bs_mail_header.get_text() and bs_mail_header.prettify() or None
+        mail_footer = bs_mail_footer.get_text() and bs_mail_footer.prettify() or None
 
         email_format_page_template_mapping = {
             "list": "send_mail_template",
