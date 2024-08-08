@@ -92,7 +92,6 @@ msgstr "Errore nella sottomissione del form."
 
 #. Default: "Unable to send confirm email. Please retry later or contact site administrator."
 #: collective/volto/formsupport/restapi/services/submit_form/post.py:76
-#, fuzzy
 msgid "mail_send_exception"
 msgstr "Impossibile inviare la mail di conferma. Per favore riprova più tardi o contatta l'amministratore del sito."
 
@@ -108,9 +107,8 @@ msgstr "Campo block_id mancante."
 
 #. Default: "A new form has been submitted from <a href=\"${DYNAMIC_CONTENT}\">${url}</a>"
 #: collective/volto/formsupport/browser/send_mail_template.pt:24
-#, fuzzy
 msgid "send_mail_text"
-msgstr "Modulo compilato su <a href=\"${url}\">${url}</a>"
+msgstr "Un nuovo form è stato compilato su <a href=\"${DYNAMIC_CONTENT}\">${url}</a>"
 
 #. Default: "Form submission data for ${title}"
 #: collective/volto/formsupport/browser/send_mail_template_table.pt:15
