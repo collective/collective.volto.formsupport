@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.1.1 (unreleased)
+3.1.1 (2024-08-08)
 ------------------
 
 - Fix mail header and footer links.
