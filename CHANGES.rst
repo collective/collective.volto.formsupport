@@ -4,7 +4,8 @@ Changelog
 3.1.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Update Italian translations.
+  [cekk]
 
 
 3.1.2 (2024-08-08)
