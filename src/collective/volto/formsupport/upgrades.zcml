@@ -27,7 +27,7 @@
   <genericsetup:upgradeStep
       title="Convert send from a bool into a list of who to send to"
       profile="collective.volto.formsupport:default"
-      source="*"
+      source="1200"
       destination="1300"
       handler=".upgrades.to_1300"
       />
