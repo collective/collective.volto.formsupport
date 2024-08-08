@@ -4,7 +4,8 @@ Changelog
 3.1.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix upgradestep from version.
+  [folix-01]
 
 
 3.1.1 (2024-08-08)
