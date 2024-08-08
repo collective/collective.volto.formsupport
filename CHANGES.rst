@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.1.2 (unreleased)
+3.1.2 (2024-08-08)
 ------------------
 
 - Fix upgradestep from version.
