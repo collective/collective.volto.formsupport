@@ -4,7 +4,7 @@ Changelog
 3.1.3 (unreleased)
 ------------------
 
-- Send messages to emails signed as 'use_as_bcc' indipendently from 'send' flag.
+- Send messages to emails signed as 'use_as_bcc' independently from 'send' flag.
   [folix-01]
 
 - Update Italian translations.
