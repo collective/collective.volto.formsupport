@@ -27,14 +27,14 @@
   <footer>
     <tal:element tal:replace="structure mail_footer" />
     <tal:element tal:condition="python:not mail_footer ">
-      <p i18n:translate="send_mail_text">
-        A new form has been submitted from
+      <p>
+        <span i18n:translate="send_mail_text">
+          A new form has been submitted from</span>
         <a tal:attributes="
              href url;
-           "><strong tal:content="url"
-                  i18n:name="url"
-          >url</strong></a>
-      </p>
-    </tal:element>
+           "><strong tal:content="view/context/Title">
+            page</strong></a>
+        <p>
+        </p></p></tal:element>
   </footer>
 </tal:root>

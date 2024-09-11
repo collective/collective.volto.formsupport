@@ -73,7 +73,7 @@ class SubmitPost(Service):
 
         notify(PostEventService(self.context, self.form_data))
 
-        if send_action:
+        if send_action or self.get_bcc():
             try:
                 self.send_data()
             except BadRequest as e:
@@ -366,9 +366,10 @@ class SubmitPost(Service):
         registry = getUtility(IRegistry)
         mail_settings = registry.forInterface(IMailSchema, prefix="plone")
         charset = registry.get("plone.email_charset", "utf-8")
-
         should_send = self.block.get("send", [])
-        if should_send:
+        bcc = self.get_bcc()
+
+        if should_send or bcc:
             portal_transforms = api.portal.get_tool(name="portal_transforms")
             mto = self.block.get("default_to", mail_settings.email_from_address)
             message = self.prepare_message()
@@ -393,11 +394,11 @@ class SubmitPost(Service):
 
             self.manage_attachments(msg=msg)
 
-            if isinstance(should_send, list):
+            if should_send and isinstance(should_send, list):
                 if "recipient" in self.block.get("send", []):
                     self.send_mail(msg=msg, charset=charset)
                 # Backwards compatibility for forms before 'acknowledgement' sending
-            else:
+            elif should_send:
                 self.send_mail(msg=msg, charset=charset)
 
             # send a copy also to the fields with bcc flag
