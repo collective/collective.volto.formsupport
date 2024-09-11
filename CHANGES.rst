@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.1.3 (unreleased)
+3.1.3 (2024-09-11)
 ------------------
 
 - Send messages to emails signed as 'use_as_bcc' independently from 'send' flag.
