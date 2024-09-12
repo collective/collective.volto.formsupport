@@ -484,9 +484,6 @@ class SubmitPost(Service):
         """
         do not send attachments fields.
         """
-<<<<<<< HEAD
-        return [field for field in self.fields if field.send_in_email]
-=======
         result = []
 
         for field in self.block.get("subblocks", []):
@@ -498,7 +495,6 @@ class SubmitPost(Service):
                     result.append(item)
 
         return result
->>>>>>> main
 
     def send_mail(self, msg, charset):
         host = api.portal.get_tool(name="MailHost")
