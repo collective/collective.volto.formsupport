@@ -482,19 +482,10 @@ class SubmitPost(Service):
 
     def filter_parameters(self):
         """
-        do not send attachments fields.
+        Remove fields which shouldn't be included in emails.
+        Only applied to the attachment field at the time of writing.
         """
-        result = []
-
-        for field in self.block.get("subblocks", []):
-            if field.get("field_type", "") == "attachment":
-                continue
-
-            for item in self.form_data.get("data", []):
-                if item.get("field_id", "") == field.get("field_id", ""):
-                    result.append(item)
-
-        return result
+        return [field for field in self.fields if field.send_in_email]
 
     def send_mail(self, msg, charset):
         host = api.portal.get_tool(name="MailHost")
