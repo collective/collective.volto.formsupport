@@ -25,6 +25,11 @@ collective.volto.formsupport
 
 Add some helper routes and functionalities for Volto sites with ``form`` blocks provided by `volto-form-block <https://github.com/collective/volto-form-block>`_ Volto plugin.
 
+volto-form-block version
+========================
+
+Works with volto-form-block >= v3.8.0
+
 plone.restapi endpoints
 =======================
 
@@ -100,33 +105,6 @@ Optional parameters could be passed in the payload:
 
 * `block_id` to delete only data related to a specific block on the page, otherwise data from all form blocks on the page will be deleted
 * `expired` a boolean that, if `true`, removes only records older than the value of days specified in the block configuration (the above `block_id` parameter is required)
-
-@validate-email-address
------------------------
-
-Send an message to the passed email with OTP code to verify the address.
-Returns a HTTP 204 in case of success or HTTP 400 in case the email is badly composed.::
-
-> curl -i -X POST http://localhost:8080/Plone/my-form/@validate-email-address --data-raw '{"email": "email@email.com", "uid": "ffffffff"}' -H 'Accept: application/json' -H 'Content-Type: application/json'
-
-parameters:
-
-* `email` email address.
-* `uid` uid related to email field
-
-@validate-email-token
----------------------
-
-Supposed to validate the OTP code received by the user via email.
-Returns HTTP 204 in case of success or HTTP 400 in case of failure ::
-
-> curl -i -X POST http://localhost:8080/Plone/my-form/@validate-email-token --data-raw '{"email": "email@email.com", "otp": "blahblahblah"}' -H 'Accept: application/json' -H 'Content-Type: application/json'
-
-parameters:
-
-* `email` email address
-* `uid` uid used to generate the OTP
-* `otp` OTP code
 
 Form actions
 ============
@@ -271,6 +249,12 @@ This is useful for some SMTP servers that have problems with `quoted-printable` 
 
 By default the content-transfer-encoding is `quoted-printable` as overridden in
 https://github.com/zopefoundation/Products.MailHost/blob/master/src/Products/MailHost/MailHost.py#L65
+
+
+Email subject templating
+========================
+You can also interpolate the form values to the email subject using the field id, in this way: ${123321123}
+
 
 Header forwarding
 =========================

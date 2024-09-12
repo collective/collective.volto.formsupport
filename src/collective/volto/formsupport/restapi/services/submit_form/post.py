@@ -1,3 +1,4 @@
+from bs4 import BeautifulSoup
 from collective.volto.formsupport import _
 from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import IFormDataStore
@@ -6,14 +7,20 @@ from collective.volto.formsupport.restapi.services.submit_form.field import (
     construct_fields,
 )
 from collective.volto.formsupport.utils import get_blocks
-from collective.volto.formsupport.utils import validate_email_token
+from collective.volto.otp.utils import validate_email_token
 from copy import deepcopy
 from datetime import datetime
 from email import policy
 from email.message import EmailMessage
 from io import BytesIO
 from plone import api
-from plone.base.interfaces.controlpanel import IMailSchema
+
+
+try:
+    from plone.base.interfaces.controlpanel import IMailSchema
+except ImportError:
+    from Products.CMFPlone.interfaces.controlpanel import IMailSchema
+
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
 from plone.restapi.deserializer import json_body
@@ -33,6 +40,7 @@ import codecs
 import logging
 import math
 import os
+import re
 
 
 logger = logging.getLogger(__name__)
@@ -92,7 +100,7 @@ class SubmitPost(Service):
         for field in self.fields:
             field.validate(request=self.request)
 
-        if send_action:
+        if send_action or self.get_bcc():
             try:
                 self.send_data()
             except BadRequest as e:
@@ -311,10 +319,31 @@ class SubmitPost(Service):
                     if data.get("field_id", "") == field.get("field_id"):
                         return data.get("value")
 
-    def send_data(self):
+    def get_subject(self):
         subject = self.form_data.get("subject", "") or self.block.get(
             "default_subject", ""
         )
+
+        for i in self.form_data.get("data", []):
+
+            field_id = i.get("field_id")
+
+            if not field_id:
+                continue
+
+            # Handle this kind of id format: `field_name_123321, whichj is used by frontend package logics
+            pattern = r"\$\{[^}]+\}"
+            matches = re.findall(pattern, subject)
+
+            for match in matches:
+                if field_id in match:
+                    subject = subject.replace(match, i.get("value"))
+
+        return subject
+
+    def send_data(self):
+
+        subject = self.get_subject()
 
         mfrom = self.form_data.get("from", "") or self.block.get("default_from", "")
         mreply_to = self.get_reply_to()
@@ -340,9 +369,10 @@ class SubmitPost(Service):
         registry = getUtility(IRegistry)
         mail_settings = registry.forInterface(IMailSchema, prefix="plone")
         charset = registry.get("plone.email_charset", "utf-8")
-
         should_send = self.block.get("send", [])
-        if should_send:
+        bcc = self.get_bcc()
+
+        if should_send or bcc:
             portal_transforms = api.portal.get_tool(name="portal_transforms")
             mto = self.block.get("default_to", mail_settings.email_from_address)
             message = self.prepare_message()
@@ -367,11 +397,11 @@ class SubmitPost(Service):
 
             self.manage_attachments(msg=msg)
 
-            if isinstance(should_send, list):
+            if should_send and isinstance(should_send, list):
                 if "recipient" in self.block.get("send", []):
                     self.send_mail(msg=msg, charset=charset)
                 # Backwards compatibility for forms before 'acknowledgement' sending
-            else:
+            elif should_send:
                 self.send_mail(msg=msg, charset=charset)
 
             # send a copy also to the fields with bcc flag
@@ -400,6 +430,33 @@ class SubmitPost(Service):
                 self.send_mail(msg=acknowledgement_mail, charset=charset)
 
     def prepare_message(self):
+
+        mail_header = self.block.get("mail_header", {}).get("data", "")
+        mail_footer = self.block.get("mail_footer", {}).get("data", "")
+
+        # Check if there is content
+        bs_mail_header = BeautifulSoup(mail_header)
+        bs_mail_footer = BeautifulSoup(mail_footer)
+
+        portal = getMultiAdapter(
+            (self.context, self.request), name="plone_portal_state"
+        ).portal()
+
+        frontend_domain = api.portal.get_registry_record(
+            name="volto.frontend_domain", default=""
+        )
+
+        for snippet in [bs_mail_header, bs_mail_footer]:
+            if snippet:
+                for link in snippet.find_all("a"):
+                    if link.get("href", "").startswith("/"):
+                        link["href"] = (
+                            frontend_domain or portal.absolute_url()
+                        ) + link["href"]
+
+        mail_header = bs_mail_header.get_text() and bs_mail_header.prettify() or None
+        mail_footer = bs_mail_footer.get_text() and bs_mail_footer.prettify() or None
+
         email_format_page_template_mapping = {
             "list": "send_mail_template",
             "table": "send_mail_template_table",
@@ -418,6 +475,8 @@ class SubmitPost(Service):
             "parameters": self.filter_parameters(),
             "url": self.context.absolute_url(),
             "title": self.context.Title(),
+            "mail_header": mail_header,
+            "mail_footer": mail_footer,
         }
         return message_template(**parameters)
 
@@ -425,7 +484,21 @@ class SubmitPost(Service):
         """
         do not send attachments fields.
         """
+<<<<<<< HEAD
         return [field for field in self.fields if field.send_in_email]
+=======
+        result = []
+
+        for field in self.block.get("subblocks", []):
+            if field.get("field_type", "") == "attachment":
+                continue
+
+            for item in self.form_data.get("data", []):
+                if item.get("field_id", "") == field.get("field_id", ""):
+                    result.append(item)
+
+        return result
+>>>>>>> main
 
     def send_mail(self, msg, charset):
         host = api.portal.get_tool(name="MailHost")

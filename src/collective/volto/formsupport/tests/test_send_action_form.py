@@ -1,7 +1,7 @@
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
-from collective.volto.formsupport.utils import generate_email_token
+from collective.volto.otp.utils import generate_email_token
 from email.parser import Parser
 from io import StringIO
 from plone import api
@@ -644,7 +644,8 @@ class TestMailSend(unittest.TestCase):
                 "@type": "form",
                 "default_subject": "block subject",
                 "default_from": "john@doe.com",
-                "send": ["recipient"],
+                "send": False,
+                "store": True,
                 "subblocks": [
                     {
                         "field_id": "contact",
@@ -684,15 +685,13 @@ class TestMailSend(unittest.TestCase):
         transaction.commit()
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(self.mailhost.messages), 2)
-        msg = self.mailhost.messages[0]
-        bcc_msg = self.mailhost.messages[1]
-        if isinstance(msg, bytes) and bytes is not str:
-            # Python 3 with Products.MailHost 4.10+
-            msg = msg.decode("utf-8")
+        self.assertEqual(len(self.mailhost.messages), 1)
+
+        bcc_msg = self.mailhost.messages[0]
+
+        if isinstance(bcc_msg, bytes) and bytes is not str:
             bcc_msg = bcc_msg.decode("utf-8")
-        self.assertIn("To: site_addr@plone.com", msg)
-        self.assertNotIn("To: smith@doe.com", msg)
+
         self.assertNotIn("To: site_addr@plone.com", bcc_msg)
         self.assertIn("To: smith@doe.com", bcc_msg)
 

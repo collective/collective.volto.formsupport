@@ -1,10 +1,52 @@
 Changelog
 =========
 
-3.0.3 (unreleased)
+3.1.4 (unreleased)
 ------------------
 
+- Nothing changed yet.
+
+
+3.1.3 (2024-09-11)
+------------------
+
+- Send messages to emails signed as 'use_as_bcc' independently from 'send' flag.
+  [folix-01]
+
+- Update Italian translations.
+  [cekk]
+
+
+3.1.2 (2024-08-08)
+------------------
+
+- Fix upgradestep from version.
+  [folix-01]
+
+
+3.1.1 (2024-08-08)
+------------------
+
+- Fix mail header and footer links.
+  [folix-01]
+- Plone5 compatibility in the upgradesteps
+  [folix-01]
+- Install otp package by upgradestep
+  [folix-01]
+- Maintain the fields order in email message.
+  [folix-01]
+- Remove otp logics (moved to collective.volto.otp)
+  [folix-01]
+
+3.1.0 (2024-07-04)
+------------------
+
+- Configurable header and footer for email message.
+  [folix-01]
+- Subject templating
 - Handle the edge cases where the `blocks` attribute is not set.
+  [mamico]
+- Configuring with plone/meta
   [mamico]
 
 

@@ -15,7 +15,7 @@ long_description = "\n\n".join(
 
 setup(
     name="collective.volto.formsupport",
-    version="3.0.3.dev0",
+    version="3.1.4.dev0",
     description="Add support for customizable forms in Volto",
     long_description=long_description,
     # Get more from https://pypi.org/classifiers/
@@ -57,17 +57,18 @@ setup(
         "Zope",
         "plone.api>=1.8.4",
         "plone.dexterity",
-        "plone.keyring",
         "plone.i18n",
         "plone.memoize",
         "plone.protect",
+        "plone.registry",
         "plone.restapi>=8.36.0",
-        "plone.base",
+        "plone.schema",
         "Products.GenericSetup",
         "Products.PortalTransforms",
         "souper.plone",
         "click",
-        "pyotp",
+        "beautifulsoup4",
+        "collective.volto.otp",
     ],
     extras_require={
         "hcaptcha": [
@@ -102,6 +103,7 @@ setup(
             "plone.formwidget.recaptcha",
             "collective.z3cform.norobots",
             "collective.honeypot",
+            "collective.volto.otp",
         ],
     },
     entry_points="""
