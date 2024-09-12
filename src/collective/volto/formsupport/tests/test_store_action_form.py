@@ -192,7 +192,7 @@ class TestMailStore(unittest.TestCase):
 
         # clear data
         response = self.clear_data()
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 204)
         response = self.export_csv()
         data = [*csv.reader(StringIO(response.text), delimiter=",")]
         self.assertEqual(len(data), 1)
