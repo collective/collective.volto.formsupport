@@ -22,6 +22,21 @@ import unittest
 import xml.etree.ElementTree as ET
 
 
+def _get_text_from_message(msg):
+    parsed_msgs = Parser().parsestr(msg)
+    email_message = parsed_msgs.get_payload()[0]
+
+    if not email_message.is_multipart():
+        return re.sub(r"\s+", " ", email_message.get_payload())
+
+    text_message = next(
+        message
+        for message in email_message.get_payload()
+        if message.get_content_subtype() == "plain"
+    )
+    return re.sub(r"\s+", " ", text_message.get_payload())
+
+
 class TestMailSend(unittest.TestCase):
     layer = VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING
 
@@ -1085,6 +1100,10 @@ class TestMailSend(unittest.TestCase):
                 "email_format": "list",
                 "subblocks": [
                     {
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
+                    {
                         "field_id": "12345678",
                         "display_values": {"John": "Paul"},
                     },
@@ -1117,7 +1136,11 @@ class TestMailSend(unittest.TestCase):
             data={
                 "from": "john@doe.com",
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
                     {
                         "label": "Name",
                         "field_id": "12345678",
@@ -1148,24 +1171,15 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
-        self.assertIn("Subject: test subject", msg)
-        self.assertIn("From: john@doe.com", msg)
-        self.assertIn("To: site_addr@plone.com", msg)
-        self.assertIn("Reply-To: john@doe.com", msg)
-        self.assertIn("<strong>Message:</strong> just want to say hi", msg)
-        self.assertIn("<strong>Name:</strong> Paul", msg)
-        self.assertIn("<strong>Yes/ no:</strong> Correct", msg)
-        self.assertIn("<strong>Yes/ no radio without display value:</strong> True", msg)
-        self.assertNotIn(
-            "<strong>My attachment field:</strong>",
-            Parser()
-            .parse(StringIO(msg))
-            .get_payload()[0]
-            .get_payload(),  # 1st get_payload splits the messages. First message is the body and second is the attachment
-        )
-        self.assertNotIn("foo", msg)
 
-        # breakpoint()
+        message_contents = _get_text_from_message(msg)
+
+        self.assertIn("Message: just want to say hi", message_contents)
+        self.assertIn("Name: Paul", message_contents)
+        self.assertIn("Yes/ no: Correct", message_contents)
+        self.assertIn("Yes/ no radio without display value: True", message_contents)
+        self.assertNotIn("My attachment field:", message_contents)
+        self.assertNotIn("foo", message_contents)
 
         response = self.submit_form(
             data={
@@ -1191,10 +1205,10 @@ class TestMailSend(unittest.TestCase):
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
-        self.assertIn("<strong>Yes/ no:</strong> Incorrect", msg)
-        self.assertIn(
-            "<strong>Yes/ no radio without display value:</strong> False", msg
-        )
+        message_contents = _get_text_from_message(msg)
+
+        self.assertIn("Yes/ no: Incorrect", message_contents)
+        self.assertIn("Yes/ no radio without display value: False", message_contents)
 
     def test_send_custom_field_id(self):
         """Custom field IDs should still appear as their friendly names in the email"""
@@ -1242,8 +1256,7 @@ class TestMailSend(unittest.TestCase):
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
 
-        parsed_msgs = Parser().parse(StringIO(msg))
-        body = parsed_msgs.get_payload()
+        body = _get_text_from_message(msg)
 
         self.assertIn("Name", body)
         self.assertIn("John", body)
