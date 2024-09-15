@@ -1,9 +1,9 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2024-06-12 14:56+0000\n"
-"PO-Revision-Date: 2024-08-29 19:41-0300\n"
-"Last-Translator: Érico Andrei <ericof@plone.org>\n"
+"POT-Creation-Date: 2024-08-30 14:14+0000\n"
+"PO-Revision-Date: 2021-05-11 18:49-0300\n"
+"Last-Translator: Érico Andrei <ericof@plone.org>, 2021\n"
 "Language-Team: Portuguese (https://www.transifex.com/plone/teams/14552/pt/)\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Domain: collective.volto.formsupport\n"
 "X-Generator: Poedit 3.4.4\n"
 
-#: collective/volto/formsupport/browser/send_mail_template_table.pt:18
+#: collective/volto/formsupport/browser/send_mail_template_table.pt:25
 msgid "Field"
 msgstr "Campo"
 
@@ -60,7 +60,7 @@ msgstr "O código que você inseriu está errado, por favor, insira um novo."
 msgid "Uninstalls the collective.volto.formsupport add-on."
 msgstr "Desinstala o complemento collective.volto.formsupport."
 
-#: collective/volto/formsupport/browser/send_mail_template_table.pt:23
+#: collective/volto/formsupport/browser/send_mail_template_table.pt:30
 msgid "Value"
 msgstr "Valor"
 
@@ -73,17 +73,17 @@ msgid "Volto: Form support (uninstall)"
 msgstr "Volto: Suporte a formulários (Desinstalar)"
 
 #. Default: "Attachments too big. You uploaded ${uploaded_str}, but limit is ${max} MB. Try to compress files."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:215
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:223
 msgid "attachments_too_big"
 msgstr "Anexos muito grandes. Você enviou ${uploaded_str}, mas o limite é de ${max} MB. Tente compactar os arquivos."
 
 #. Default: "Block with @type \"form\" and id \"$block\" not found in this context: $context"
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:130
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:138
 msgid "block_form_not_found_label"
 msgstr "Bloco com @type \"form\" e id \"${block}\" não encontrado no contexto: $context."
 
 #. Default: "Empty form data."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:156
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:164
 msgid "empty_form_data"
 msgstr "Formulário sem dados."
 
@@ -93,40 +93,40 @@ msgid "honeypot_error"
 msgstr "Erro ao enviar o formulário"
 
 #. Default: "Unable to send confirm email. Please retry later or contact site administrator."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:76
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:84
 msgid "mail_send_exception"
 msgstr "Não foi possível enviar o e-mail de confirmação. Por favor, tente novamente mais tarde ou entre em contato com o administrador do site."
 
 #. Default: "You need to set at least one form action between \"send\" and \"store\"."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:145
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:153
 msgid "missing_action"
 msgstr "Você deve selecionar pelo menos uma ação entre \"salvar\" e \"enviar\"."
 
 #. Default: "Missing block_id"
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:123
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:131
 msgid "missing_blockid_label"
 msgstr "Campo block_id não informado"
 
-#. Default: "A new form has been submitted from <a href=\"${DYNAMIC_CONTENT}\">${url}</a>"
-#: collective/volto/formsupport/browser/send_mail_template.pt:24
+#. Default: "A new form has been submitted from"
+#: collective/volto/formsupport/browser/send_mail_template.pt:31
 msgid "send_mail_text"
-msgstr "Um novo formulário foi enviado de <a href=“${DYNAMIC_CONTENT}”>${url}</a>"
+msgstr "Um novo formulário foi enviado de"
 
 #. Default: "Form submission data for ${title}"
-#: collective/volto/formsupport/browser/send_mail_template_table.pt:15
+#: collective/volto/formsupport/browser/send_mail_template_table.pt:19
 msgid "send_mail_text_table"
 msgstr "Dados de envio do formulário para ${title}"
 
 #. Default: "Missing required field: subject or from."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:322
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:351
 msgid "send_required_field_missing"
 msgstr "Campo obrigatório não presente: Assunto ou remetente."
 
 #. Default: "Email not valid in \"${field}\" field."
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:187
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:195
 msgid "wrong_email"
 msgstr "E-mail inválido no campo \\“${field}\\”."
 
-#: collective/volto/formsupport/restapi/services/submit_form/post.py:246
+#: collective/volto/formsupport/restapi/services/submit_form/post.py:254
 msgid "{email}'s OTP is wrong"
 msgstr "O token do email {email} é incorreto"
