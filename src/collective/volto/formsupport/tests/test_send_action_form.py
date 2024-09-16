@@ -1,24 +1,27 @@
-from collective.volto.formsupport.testing import (  # noqa: E501,
-    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
-)
-from collective.volto.otp.utils import generate_email_token
+import base64
+import os
+import re
+import unittest
+import xml.etree.ElementTree as ET
 from email.parser import Parser
+
+import transaction
 from plone import api
-from plone.app.testing import setRoles
-from plone.app.testing import SITE_OWNER_NAME
-from plone.app.testing import SITE_OWNER_PASSWORD
-from plone.app.testing import TEST_USER_ID
+from plone.app.testing import (
+    SITE_OWNER_NAME,
+    SITE_OWNER_PASSWORD,
+    TEST_USER_ID,
+    setRoles,
+)
 from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
 from zope.component import getUtility
 
-import base64
-import os
-import re
-import transaction
-import unittest
-import xml.etree.ElementTree as ET
+from collective.volto.formsupport.testing import (  # noqa: E501,
+    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
+)
+from collective.volto.otp.utils import generate_email_token
 
 
 class TestMailSend(unittest.TestCase):
@@ -1073,6 +1076,61 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("Reply-To: john@doe.com", msg)
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> John", msg)
+
+    def test_send_date(
+        self,
+    ):
+        self.document.blocks = {
+            "form-id": {
+                "@type": "form",
+                "send": True,
+                "email_format": "list",
+                "subblocks": [
+                    {
+                        "field_id": "date_field_simple",
+                        "field_type": "date",
+                    },
+                    {
+                        "field_id": "date_field_iso",
+                        "field_type": "date",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": [
+                    {
+                        "field_id": "date_field_simple",
+                        "label": "Simple date",
+                        "value": "2024-09-16",
+                    },
+                    {
+                        "field_id": "date_field_iso",
+                        "label": "ISO date",
+                        "value": "2024-09-16T16:20:00Z",
+                    },
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+        self.assertEqual(response.status_code, 200)
+        msg = self.mailhost.messages[0]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+        msg = re.sub(r"\s+", " ", msg)
+        self.assertIn("Subject: test subject", msg)
+        self.assertIn("From: john@doe.com", msg)
+        self.assertIn("To: site_addr@plone.com", msg)
+        self.assertIn("Reply-To: john@doe.com", msg)
+        self.assertIn("<strong>Simple date:</strong> Sep 16, 2024", msg)
+        self.assertIn("<strong>ISO date:</strong> Sep 16, 2024", msg)
 
     def test_send_xml(self):
         self.document.blocks = {
