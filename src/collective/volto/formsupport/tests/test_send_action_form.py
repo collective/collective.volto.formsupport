@@ -3,7 +3,6 @@ from collective.volto.formsupport.testing import (  # noqa: E501,
 )
 from collective.volto.otp.utils import generate_email_token
 from email.parser import Parser
-from io import StringIO
 from plone import api
 from plone.app.testing import setRoles
 from plone.app.testing import SITE_OWNER_NAME
