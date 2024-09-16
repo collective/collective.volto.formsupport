@@ -134,9 +134,13 @@ class SubmitPost(Service):
 
         block = self.get_block_data(block_id=form_data.get("block_id", ""))
         block_fields = [x.get("field_id", "") for x in block.get("subblocks", [])]
+        custom_block_fields = [
+            block.get(field_id) for field_id in block_fields if block.get(field_id)
+        ]
 
         for form_field in form_data.get("data", []):
-            if form_field.get("field_id", "") not in block_fields:
+            field_id = form_field.get("custom_field_id", form_field.get("field_id", ""))
+            if field_id not in block_fields and field_id not in custom_block_fields:
                 # unknown field, skip it
                 continue
             new_field = deepcopy(form_field)
