@@ -1,10 +1,15 @@
-# -*- coding: utf-8 -*-
 from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import ICollectiveVoltoFormsupportLayer
 from plone import api
+
+
+try:
+    from plone.base.interfaces import IPloneSiteRoot
+except ImportError:
+    from Products.CMFPlone.interfaces import IPloneSiteRoot
+
 from plone.restapi.behaviors import IBlocks
 from plone.restapi.interfaces import IBlockFieldSerializationTransformer
-from Products.CMFPlone.interfaces import IPloneSiteRoot
 from zope.component import adapter
 from zope.component import getMultiAdapter
 from zope.interface import implementer
@@ -12,7 +17,7 @@ from zope.interface import implementer
 import os
 
 
-class FormSerializer(object):
+class FormSerializer:
     """ """
 
     order = 200  # after standard ones

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
@@ -12,9 +11,9 @@ from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
 from zope.component import getUtility
 
+import json
 import transaction
 import unittest
-import json
 
 
 class TestHoneypot(unittest.TestCase):
@@ -63,7 +62,7 @@ class TestHoneypot(unittest.TestCase):
         transaction.commit()
 
     def submit_form(self, data):
-        url = "{}/@submit-form".format(self.document_url)
+        url = f"{self.document_url}/@submit-form"
         response = self.api_session.post(
             url,
             json=data,
@@ -84,6 +83,10 @@ class TestHoneypot(unittest.TestCase):
                         "field_type": "from",
                         "use_as_bcc": True,
                     },
+                    {
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
                 ],
                 "captcha": "honeypot",
             },
@@ -92,7 +95,11 @@ class TestHoneypot(unittest.TestCase):
         response = self.submit_form(
             data={
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
                 ],
                 "block_id": "form-id",
             },
@@ -118,6 +125,10 @@ class TestHoneypot(unittest.TestCase):
                         "field_type": "from",
                         "use_as_bcc": True,
                     },
+                    {
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
                 ],
                 "captcha": "honeypot",
             },
@@ -126,13 +137,17 @@ class TestHoneypot(unittest.TestCase):
         response = self.submit_form(
             data={
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
                     {"label": "protected_1", "value": ""},
                 ],
                 "block_id": "form-id",
             },
         )
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
 
     def test_honeypot_field_in_form_compiled_fail_validation(self):
         self.document.blocks = {
@@ -148,6 +163,14 @@ class TestHoneypot(unittest.TestCase):
                         "field_type": "from",
                         "use_as_bcc": True,
                     },
+                    {
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
+                    {
+                        "field_id": "protected_1",
+                        "field_type": "text",
+                    },
                 ],
                 "captcha": "honeypot",
             },
@@ -156,8 +179,12 @@ class TestHoneypot(unittest.TestCase):
         response = self.submit_form(
             data={
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
-                    {"label": "protected_1", "value": "foo"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
+                    {"field_id": "protected_1", "label": "protected_1", "value": "foo"},
                 ],
                 "block_id": "form-id",
             },
@@ -186,6 +213,10 @@ class TestHoneypot(unittest.TestCase):
                         "field_type": "from",
                         "use_as_bcc": True,
                     },
+                    {
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
                 ],
                 "captcha": "honeypot",
             },
@@ -195,7 +226,11 @@ class TestHoneypot(unittest.TestCase):
         response = self.submit_form(
             data={
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
                 ],
                 "block_id": "form-id",
                 "captcha": {
@@ -206,7 +241,7 @@ class TestHoneypot(unittest.TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
 
     def test_form_submitted_from_volto_invalid_because_missing_value(self):
         """
@@ -225,6 +260,10 @@ class TestHoneypot(unittest.TestCase):
                         "field_type": "from",
                         "use_as_bcc": True,
                     },
+                    {
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
                 ],
                 "captcha": "honeypot",
             },
@@ -234,7 +273,11 @@ class TestHoneypot(unittest.TestCase):
         response = self.submit_form(
             data={
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
                 ],
                 "block_id": "form-id",
                 "captcha": {
@@ -267,6 +310,10 @@ class TestHoneypot(unittest.TestCase):
                         "field_type": "from",
                         "use_as_bcc": True,
                     },
+                    {
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
                 ],
                 "captcha": "honeypot",
             },
@@ -276,7 +323,11 @@ class TestHoneypot(unittest.TestCase):
         response = self.submit_form(
             data={
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
                 ],
                 "block_id": "form-id",
                 "captcha": {

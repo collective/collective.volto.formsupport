@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
@@ -18,7 +17,7 @@ import transaction
 import unittest
 
 
-class TestMailSend(unittest.TestCase):
+class TestMailStore(unittest.TestCase):
     layer = VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING
 
     def setUp(self):
@@ -60,7 +59,7 @@ class TestMailSend(unittest.TestCase):
         transaction.commit()
 
     def submit_form(self, data):
-        url = "{}/@submit-form".format(self.document_url)
+        url = f"{self.document_url}/@submit-form"
         response = self.api_session.post(
             url,
             json=data,
@@ -69,25 +68,27 @@ class TestMailSend(unittest.TestCase):
         return response
 
     def export_data(self):
-        url = "{}/@form-data".format(self.document_url)
+        url = f"{self.document_url}/@form-data"
         response = self.api_session.get(url)
         return response
 
     def export_csv(self):
-        url = "{}/@form-data-export".format(self.document_url)
+        url = f"{self.document_url}/@form-data-export"
         response = self.api_session.get(url)
         return response
 
     def clear_data(self):
-        url = "{}/@form-data-clear".format(self.document_url)
-        response = self.api_session.get(url)
-        # transaction.commit()
+        url = f"{self.document_url}/@form-data-clear"
+        response = self.api_session.delete(url)
         return response
 
     def test_unable_to_store_data(self):
         """form schema not defined, unable to store data"""
         self.document.blocks = {
-            "form-id": {"@type": "form", "store": True},
+            "form-id": {
+                "@type": "form",
+                "store": True,
+            },
         }
         transaction.commit()
 
@@ -95,8 +96,12 @@ class TestMailSend(unittest.TestCase):
             data={
                 "from": "john@doe.com",
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
-                    {"label": "Name", "value": "John"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
+                    {"field_id": "name", "label": "Name", "value": "John"},
                 ],
                 "subject": "test subject",
                 "block_id": "form-id",
@@ -104,7 +109,7 @@ class TestMailSend(unittest.TestCase):
         )
         transaction.commit()
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "Unable to store data")
+        self.assertEqual(response.json()["message"], "Empty form data.")
         response = self.export_csv()
 
     def test_store_data(self):
@@ -141,13 +146,13 @@ class TestMailSend(unittest.TestCase):
             },
         )
         transaction.commit()
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         response = self.export_data()
         data = response.json()
         self.assertEqual(len(data["items"]), 1)
         self.assertEqual(
             sorted(data["items"][0].keys()),
-            ["block_id", "date", "id", "message", "name"],
+            ["__expired", "block_id", "date", "id", "message", "name"],
         )
         self.assertEqual(
             data["items"][0]["message"],
@@ -166,17 +171,17 @@ class TestMailSend(unittest.TestCase):
             },
         )
         transaction.commit()
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         response = self.export_data()
         data = response.json()
         self.assertEqual(len(data["items"]), 2)
         self.assertEqual(
             sorted(data["items"][0].keys()),
-            ["block_id", "date", "id", "message", "name"],
+            ["__expired", "block_id", "date", "id", "message", "name"],
         )
         self.assertEqual(
             sorted(data["items"][1].keys()),
-            ["block_id", "date", "id", "message", "name"],
+            ["__expired", "block_id", "date", "id", "message", "name"],
         )
         sorted_data = sorted(data["items"], key=lambda x: x["name"]["value"])
         self.assertEqual(sorted_data[0]["name"]["value"], "John")
@@ -237,7 +242,7 @@ class TestMailSend(unittest.TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         response = self.export_csv()
         data = [*csv.reader(StringIO(response.text), delimiter=",")]
         self.assertEqual(len(data), 3)
@@ -296,7 +301,7 @@ class TestMailSend(unittest.TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         response = self.export_csv()
         data = [*csv.reader(StringIO(response.text), delimiter=",")]
         self.assertEqual(len(data), 3)

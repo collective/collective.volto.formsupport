@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
+from collective.z3cform.norobots.browser.interfaces import INorobotsWidgetSettings
 from hashlib import md5
 from plone import api
 from plone.app.testing import setRoles
@@ -10,7 +10,6 @@ from plone.app.testing import SITE_OWNER_PASSWORD
 from plone.app.testing import TEST_USER_ID
 from plone.formwidget.hcaptcha.interfaces import IHCaptchaSettings
 from plone.formwidget.recaptcha.interfaces import IReCaptchaSettings
-from collective.z3cform.norobots.browser.interfaces import INorobotsWidgetSettings
 from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
@@ -69,7 +68,7 @@ class TestCaptcha(unittest.TestCase):
         transaction.commit()
 
     def submit_form(self, data):
-        url = "{}/@submit-form".format(self.document_url)
+        url = f"{self.document_url}/@submit-form"
         response = self.api_session.post(
             url,
             json=data,
@@ -91,6 +90,10 @@ class TestCaptcha(unittest.TestCase):
                         "field_type": "from",
                         "use_as_bcc": True,
                     },
+                    {
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
                 ],
                 "captcha": "recaptcha",
             },
@@ -100,7 +103,11 @@ class TestCaptcha(unittest.TestCase):
         response = self.submit_form(
             data={
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
                 ],
                 "block_id": "form-id",
             },
@@ -132,6 +139,10 @@ class TestCaptcha(unittest.TestCase):
                         "field_type": "from",
                         "use_as_bcc": True,
                     },
+                    {
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
                 ],
                 "captcha": "recaptcha",
             },
@@ -141,7 +152,11 @@ class TestCaptcha(unittest.TestCase):
         response = self.submit_form(
             data={
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
                 ],
                 "block_id": "form-id",
             },
@@ -157,7 +172,11 @@ class TestCaptcha(unittest.TestCase):
             response = self.submit_form(
                 data={
                     "data": [
-                        {"label": "Message", "value": "just want to say hi"},
+                        {
+                            "field_id": "message",
+                            "label": "Message",
+                            "value": "just want to say hi",
+                        },
                     ],
                     "block_id": "form-id",
                     "captcha": {"token": "12345"},
@@ -178,7 +197,11 @@ class TestCaptcha(unittest.TestCase):
             response = self.submit_form(
                 data={
                     "data": [
-                        {"label": "Message", "value": "just want to say hi"},
+                        {
+                            "field_id": "message",
+                            "label": "Message",
+                            "value": "just want to say hi",
+                        },
                     ],
                     "block_id": "form-id",
                     "captcha": {"token": "12345"},
@@ -186,7 +209,7 @@ class TestCaptcha(unittest.TestCase):
             )
             transaction.commit()
             mock_submit.assert_called_once_with("12345", "private", "127.0.0.1")
-            self.assertEqual(response.status_code, 204)
+            self.assertEqual(response.status_code, 200)
 
     def test_hcaptcha(
         self,
@@ -209,6 +232,10 @@ class TestCaptcha(unittest.TestCase):
                         "field_type": "from",
                         "use_as_bcc": True,
                     },
+                    {
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
                 ],
                 "captcha": "hcaptcha",
             },
@@ -218,7 +245,11 @@ class TestCaptcha(unittest.TestCase):
         response = self.submit_form(
             data={
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
                 ],
                 "block_id": "form-id",
             },
@@ -234,7 +265,11 @@ class TestCaptcha(unittest.TestCase):
             response = self.submit_form(
                 data={
                     "data": [
-                        {"label": "Message", "value": "just want to say hi"},
+                        {
+                            "field_id": "message",
+                            "label": "Message",
+                            "value": "just want to say hi",
+                        },
                     ],
                     "block_id": "form-id",
                     "captcha": {"token": "12345"},
@@ -255,7 +290,11 @@ class TestCaptcha(unittest.TestCase):
             response = self.submit_form(
                 data={
                     "data": [
-                        {"label": "Message", "value": "just want to say hi"},
+                        {
+                            "field_id": "message",
+                            "label": "Message",
+                            "value": "just want to say hi",
+                        },
                     ],
                     "block_id": "form-id",
                     "captcha": {"token": "12345"},
@@ -263,7 +302,7 @@ class TestCaptcha(unittest.TestCase):
             )
             transaction.commit()
             mock_submit.assert_called_once_with("12345", "private", "127.0.0.1")
-            self.assertEqual(response.status_code, 204)
+            self.assertEqual(response.status_code, 200)
 
     def test_get_vocabulary(self):
         response = self.api_session.get(
@@ -314,7 +353,7 @@ class TestCaptcha(unittest.TestCase):
         """test that using norobots the captcha can be passed"""
         self.registry.registerInterface(INorobotsWidgetSettings)
         settings = self.registry.forInterface(INorobotsWidgetSettings)
-        settings.questions = ("Write five using cipers::5", "How much is 10 + 4::14")
+        settings.questions = ("Write five using ciphers::5", "How much is 10 + 4::14")
         transaction.commit()
 
         self.document.blocks = {
@@ -329,6 +368,10 @@ class TestCaptcha(unittest.TestCase):
                         "field_id": "contact",
                         "field_type": "from",
                         "use_as_bcc": True,
+                    },
+                    {
+                        "field_id": "message",
+                        "field_type": "text",
                     },
                 ],
                 "captcha": "norobots-captcha",
@@ -341,7 +384,7 @@ class TestCaptcha(unittest.TestCase):
                 "value": "5",
                 "id": "question0",
                 "id_check": md5(
-                    "Write five using cipers".encode("ascii", "ignore")
+                    "Write five using ciphers".encode("ascii", "ignore")
                 ).hexdigest(),
             }
         )
@@ -349,19 +392,23 @@ class TestCaptcha(unittest.TestCase):
         response = self.submit_form(
             data={
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
                 ],
                 "block_id": "form-id",
                 "captcha": {"provider": "norobots-captcha", "token": captcha_token},
             },
         )
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
 
     def test_norobots_wrong_captcha(self):
         """test that using norobots and a wrong answer, the captcha is not passed"""
         self.registry.registerInterface(INorobotsWidgetSettings)
         settings = self.registry.forInterface(INorobotsWidgetSettings)
-        settings.questions = ("Write five using cipers::5", "How much is 10 + 4::14")
+        settings.questions = ("Write five using ciphers::5", "How much is 10 + 4::14")
         transaction.commit()
 
         self.document.blocks = {
@@ -377,6 +424,10 @@ class TestCaptcha(unittest.TestCase):
                         "field_type": "from",
                         "use_as_bcc": True,
                     },
+                    {
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
                 ],
                 "captcha": "norobots-captcha",
             },
@@ -388,7 +439,7 @@ class TestCaptcha(unittest.TestCase):
                 "value": "15",
                 "id": "question0",
                 "id_check": md5(
-                    "Write five using cipers".encode("ascii", "ignore")
+                    "Write five using ciphers".encode("ascii", "ignore")
                 ).hexdigest(),
             }
         )
@@ -396,7 +447,11 @@ class TestCaptcha(unittest.TestCase):
         response = self.submit_form(
             data={
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
                 ],
                 "block_id": "form-id",
                 "captcha": {"provider": "norobots-captcha", "token": captcha_token},

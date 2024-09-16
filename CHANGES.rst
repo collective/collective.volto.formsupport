@@ -1,9 +1,84 @@
 Changelog
 =========
 
-2.7.1 (unreleased)
+3.1.4 (unreleased)
 ------------------
 
+- Nothing changed yet.
+
+
+3.1.3 (2024-09-11)
+------------------
+
+- Send messages to emails signed as 'use_as_bcc' independently from 'send' flag.
+  [folix-01]
+
+- Update Italian translations.
+  [cekk]
+
+
+3.1.2 (2024-08-08)
+------------------
+
+- Fix upgradestep from version.
+  [folix-01]
+
+
+3.1.1 (2024-08-08)
+------------------
+
+- Fix mail header and footer links.
+  [folix-01]
+- Plone5 compatibility in the upgradesteps
+  [folix-01]
+- Install otp package by upgradestep
+  [folix-01]
+- Maintain the fields order in email message.
+  [folix-01]
+- Remove otp logics (moved to collective.volto.otp)
+  [folix-01]
+
+3.1.0 (2024-07-04)
+------------------
+
+- Configurable header and footer for email message.
+  [folix-01]
+- Subject templating
+- Handle the edge cases where the `blocks` attribute is not set.
+  [mamico]
+- Configuring with plone/meta
+  [mamico]
+
+
+3.0.2 (2024-05-05)
+------------------
+
+- Cleanup all possible HTML in user formitted data and convert it to plain text.
+  [cekk]
+
+
+3.0.1 (2024-04-18)
+------------------
+
+- Fix README.
+  [cekk]
+
+
+3.0.0 (2024-04-18)
+------------------
+
+- Add functionality to check the user inserted email by an OTP.
+  [folix-01]
+- Breaking change: clear data method changed from GET to DELETE
+  [mamico]
+- Fix: with multiple blocks on the same page, all data is deleted.
+  Now, if you pass a parameter block_id, only the records related to the
+  block are deleted.
+  [mamico]
+- Feat: clear data restapi accept a parameter for remove the expired records
+  [mamico]
+- data cleaning script
+  [mamico]
 - Allow attaching an XML version of the form data to the sent email #22
   [JeffersonBledsoe]
 - Allow the IDs of fields to be customised for CSV download and XML attaachments #22
@@ -17,6 +92,18 @@ Changelog
 - Added support for sending emails as a table #31
   [JeffersonBledsoe]
 - Add validation for email fields.
+  [cekk]
+- Better compose email message with plain and html text.
+  [cekk]
+- Prevent XSS applying safe_html transform to all string values passed on form.
+  [cekk]
+- Discard fields submitted that are not defined in form schema.
+  [cekk]
+- On form submit, reply with a 200 with submitted data (eventually cleaned) for confirm message.
+  [cekk]
+- Fix label in send_mail_template.
+  [cekk]
+- Prevent XSS also in send_message field.
   [cekk]
 
 2.7.0 (2023-04-03)
@@ -78,7 +165,7 @@ Changelog
 2.2.0 (2022-04-07)
 ------------------
 
-- Notify an event on sumbit.
+- Notify an event on submit.
   [mamico]
 
 

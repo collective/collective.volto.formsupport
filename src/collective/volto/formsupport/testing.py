@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from plone.app.contenttypes.testing import PLONE_APP_CONTENTTYPES_FIXTURE
 from plone.app.testing import applyProfile
 from plone.app.testing import FunctionalTesting
@@ -8,9 +7,10 @@ from plone.app.testing import quickInstallProduct
 from plone.restapi.testing import PloneRestApiDXLayer
 from plone.testing import z2
 
+import collective.honeypot
 import collective.MockMailHost
 import collective.volto.formsupport
-import collective.honeypot
+import collective.volto.otp
 import plone.restapi
 
 
@@ -25,10 +25,19 @@ class VoltoFormsupportLayer(PloneSandboxLayer):
 
         self.loadZCML(package=plone.restapi)
         self.loadZCML(package=collective.volto.formsupport)
+        self.loadZCML(package=collective.volto.otp)
 
     def setUpPloneSite(self, portal):
         applyProfile(portal, "plone.restapi:blocks")
         applyProfile(portal, "collective.volto.formsupport:default")
+
+        # Mock the validate email tocken function
+        def validate_email_token_mock(*args, **kwargs):
+            return True
+
+        from collective.volto.formsupport import utils
+
+        utils.validate_email_token = validate_email_token_mock
 
 
 VOLTO_FORMSUPPORT_FIXTURE = VoltoFormsupportLayer()
@@ -50,11 +59,12 @@ class VoltoFormsupportRestApiLayer(PloneRestApiDXLayer):
     defaultBases = (PLONE_APP_CONTENTTYPES_FIXTURE,)
 
     def setUpZope(self, app, configurationContext):
-        super(VoltoFormsupportRestApiLayer, self).setUpZope(app, configurationContext)
+        super().setUpZope(app, configurationContext)
         self.loadZCML(package=collective.MockMailHost)
         self.loadZCML(package=plone.restapi)
         self.loadZCML(package=collective.honeypot)
         self.loadZCML(package=collective.volto.formsupport)
+        self.loadZCML(package=collective.volto.otp)
 
     def setUpPloneSite(self, portal):
         applyProfile(portal, "collective.volto.formsupport:default")
