@@ -1217,9 +1217,21 @@ class TestMailSend(unittest.TestCase):
                 "@type": "form",
                 "send": True,
                 "internal_mapped_name": "renamed-internal_mapped_name",
+                "000000001": "submit_and_map_with_custom_field_id",
+                "000000002": "submit_and_map_with_original_field_id",
                 "subblocks": [
                     {
-                        "field_id": "internal_mapped_name",
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
+                    {
+                        "field_id": "000000001",
+                        "label": "Other name",
+                        "field_type": "text",
+                    },
+                    {
+                        "field_id": "000000002",
                         "label": "Name with internal mapping",
                         "field_type": "text",
                     },
@@ -1229,14 +1241,18 @@ class TestMailSend(unittest.TestCase):
         transaction.commit()
 
         form_data = [
-            {"label": "Name", "value": "John"},
+            {
+                "label": "Name",
+                "value": "John",
+                "field_id": "message",
+            },
             {
                 "label": "Other name",
                 "value": "Test",
-                "custom_field_id": "My custom field id",
+                "custom_field_id": "submit_and_map_with_custom_field_id",
             },
             {
-                "field_id": "internal_mapped_name",
+                "field_id": "000000002",
                 "value": "Test",
             },
         ]
