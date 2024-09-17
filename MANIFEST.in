@@ -5,6 +5,7 @@ include *.rst
 include *.GPL
 include *.txt
 global-exclude *.pyc
+global-exclude *.DS_Store
 exclude coverage.json
 exclude .coveragerc
 exclude .isort.cfg

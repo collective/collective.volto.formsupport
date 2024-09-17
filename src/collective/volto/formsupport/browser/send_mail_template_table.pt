@@ -38,7 +38,7 @@
       <tal:field repeat="field parameters">
         <tr role="row"
             tal:define="
-              value field/value|nothing;
+              value field/display_value|nothing;
               label field/label|nothing;
             "
         >
