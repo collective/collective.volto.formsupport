@@ -329,7 +329,6 @@ class SubmitPost(Service):
         )
 
         for i in self.form_data.get("data", []):
-
             field_id = i.get("field_id")
 
             if not field_id:
@@ -346,7 +345,6 @@ class SubmitPost(Service):
         return subject
 
     def send_data(self):
-
         subject = self.get_subject()
 
         mfrom = self.form_data.get("from", "") or self.block.get("default_from", "")
@@ -434,7 +432,6 @@ class SubmitPost(Service):
                 self.send_mail(msg=acknowledgement_mail, charset=charset)
 
     def prepare_message(self):
-
         mail_header = self.block.get("mail_header", {}).get("data", "")
         mail_footer = self.block.get("mail_footer", {}).get("data", "")
 
@@ -476,7 +473,7 @@ class SubmitPost(Service):
             request=self.request,
         )
         parameters = {
-            "parameters": self.format_fields(self.filter_parameters()),
+            "parameters": self.filter_parameters(),
             "url": self.context.absolute_url(),
             "title": self.context.Title(),
             "mail_header": mail_header,
@@ -490,18 +487,6 @@ class SubmitPost(Service):
         Only applied to the attachment field at the time of writing.
         """
         return [field for field in self.fields if field.send_in_email]
-
-    def format_fields(self, fields):
-        formatted_fields = []
-        field_ids = [field.get("field_id") for field in self.block.get("subblocks", [])]
-        for field in fields:
-            field_id = field.get("field_id", "")
-            if field_id:
-                field_index = field_ids.index(field_id)
-                if self.block["subblocks"][field_index].get("field_type") == "date":
-                    field["value"] = api.portal.get_localized_time(field["value"])
-            formatted_fields.append(field)
-        return formatted_fields
 
     def send_mail(self, msg, charset):
         host = api.portal.get_tool(name="MailHost")

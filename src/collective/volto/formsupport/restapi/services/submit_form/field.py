@@ -1,4 +1,5 @@
 from collective.volto.formsupport import _
+from plone import api
 from plone.schema.email import _isemail
 from zExceptions import BadRequest
 from zope.i18n import translate
@@ -89,6 +90,11 @@ class EmailField(Field):
             )
 
 
+class DateField(Field):
+    def display_value(self):
+        return api.portal.get_localized_time(self.internal_value)
+
+
 def construct_field(field_data):
     if field_data.get("widget") == "single_choice":
         return YesNoField(field_data)
@@ -96,6 +102,8 @@ def construct_field(field_data):
         return AttachmentField(field_data)
     elif field_data.get("field_type") in ["from", "email"]:
         return EmailField(field_data)
+    elif field_data.get("field_type") == "date":
+        return DateField(field_data)
 
     return Field(field_data)
 
