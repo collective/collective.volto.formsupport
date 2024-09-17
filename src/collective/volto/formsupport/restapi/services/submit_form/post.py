@@ -469,7 +469,7 @@ class SubmitPost(Service):
             request=self.request,
         )
         parameters = {
-            "parameters": self.filter_parameters(),
+            "parameters": self.format_fields(self.filter_parameters()),
             "url": self.context.absolute_url(),
             "title": self.context.Title(),
             "mail_header": mail_header,
@@ -492,6 +492,18 @@ class SubmitPost(Service):
                     result.append(item)
 
         return result
+
+    def format_fields(self, fields):
+        formatted_fields = []
+        field_ids = [field.get("field_id") for field in self.block.get("subblocks", [])]
+        for field in fields:
+            field_id = field.get("field_id", "")
+            if field_id:
+                field_index = field_ids.index(field_id)
+                if self.block["subblocks"][field_index].get("field_type") == "date":
+                    field["value"] = api.portal.get_localized_time(field["value"])
+            formatted_fields.append(field)
+        return formatted_fields
 
     def send_mail(self, msg, charset):
         host = api.portal.get_tool(name="MailHost")
