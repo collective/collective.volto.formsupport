@@ -4,7 +4,8 @@ Changelog
 3.1.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added ISO formatted strings being allowed as date inputs
+  [JeffersonBledsoe]
 
 
 3.1.3 (2024-09-11)

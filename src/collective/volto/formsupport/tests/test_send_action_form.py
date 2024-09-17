@@ -1280,6 +1280,61 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("Test", body)
         self.assertIn("Name with internal mapping", body)
 
+    def test_send_date(
+        self,
+    ):
+        self.document.blocks = {
+            "form-id": {
+                "@type": "form",
+                "send": True,
+                "email_format": "list",
+                "subblocks": [
+                    {
+                        "field_id": "date_field_simple",
+                        "field_type": "date",
+                    },
+                    {
+                        "field_id": "date_field_iso",
+                        "field_type": "date",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": [
+                    {
+                        "field_id": "date_field_simple",
+                        "label": "Simple date",
+                        "value": "2024-09-16",
+                    },
+                    {
+                        "field_id": "date_field_iso",
+                        "label": "ISO date",
+                        "value": "2024-09-16T16:20:00Z",
+                    },
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+        self.assertEqual(response.status_code, 200)
+        msg = self.mailhost.messages[0]
+        if isinstance(msg, bytes) and bytes is not str:
+            # Python 3 with Products.MailHost 4.10+
+            msg = msg.decode("utf-8")
+        msg = re.sub(r"\s+", " ", msg)
+        self.assertIn("Subject: test subject", msg)
+        self.assertIn("From: john@doe.com", msg)
+        self.assertIn("To: site_addr@plone.com", msg)
+        self.assertIn("Reply-To: john@doe.com", msg)
+        self.assertIn("<strong>Simple date:</strong> Sep 16, 2024", msg)
+        self.assertIn("<strong>ISO date:</strong> Sep 16, 2024", msg)
+
     def test_send_xml(self):
         self.document.blocks = {
             "form-id": {
