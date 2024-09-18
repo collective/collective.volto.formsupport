@@ -4,6 +4,9 @@ Changelog
 3.1.4 (unreleased)
 ------------------
 
+- Switchable email bcc fields OTP verification.
+  [folix-01]
+
 - Added ISO formatted strings being allowed as date inputs
   [JeffersonBledsoe]
 

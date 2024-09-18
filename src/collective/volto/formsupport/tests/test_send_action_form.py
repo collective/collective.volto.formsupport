@@ -694,6 +694,73 @@ class TestMailSend(unittest.TestCase):
         self.assertNotIn("To: site_addr@plone.com", bcc_msg)
         self.assertIn("To: smith@doe.com", bcc_msg)
 
+        # Test send wrong otp
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {
+                        "field_id": "contact",
+                        "label": "Email",
+                        "value": "smith@doe.com",
+                        "otp": None,
+                    },
+                ],
+                "block_id": "form-id",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+        # Test do not verify opt if otp flag `email_otp_verification` is False
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {
+                "@type": "form",
+                "default_subject": "block subject",
+                "default_from": "john@doe.com",
+                "send": False,
+                "store": True,
+                "email_otp_verification": False,
+                "subblocks": [
+                    {
+                        "field_id": "contact",
+                        "field_type": "from",
+                        "use_as_bcc": True,
+                    },
+                    {
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
+                    {
+                        "field_id": "name",
+                        "field_type": "text",
+                    },
+                ],
+            },
+        }
+
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {
+                        "field_id": "contact",
+                        "label": "Email",
+                        "value": "smith@doe.com",
+                        "otp": 123,
+                    },
+                ],
+                "block_id": "form-id",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+
     def test_send_attachment(
         self,
     ):
