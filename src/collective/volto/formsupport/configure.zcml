@@ -14,6 +14,7 @@
   -->
   <!--<includeDependencies package="." />-->
 
+  <include package="collective.volto.otp" />
   <include package="souper.plone" />
 
   <include package=".browser" />
