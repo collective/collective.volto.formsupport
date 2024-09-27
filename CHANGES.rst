@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.1.4 (unreleased)
+3.1.4 (2024-09-27)
 ------------------
 
 - Add missing collective.volto.otp include for pip environment setup
