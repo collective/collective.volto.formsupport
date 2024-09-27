@@ -4,7 +4,7 @@ Changelog
 3.1.4 (unreleased)
 ------------------
 
-- Missing collective.volto.otp include for pip environment setup
+- Add missing collective.volto.otp include for pip environment setup
   [folix-01]
 
 - Switchable email bcc fields OTP verification.
