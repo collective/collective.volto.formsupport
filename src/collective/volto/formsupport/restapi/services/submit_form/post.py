@@ -4,6 +4,7 @@ from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.interfaces import IPostEvent
 from collective.volto.formsupport.utils import get_blocks
+from collective.volto.formsupport.events import FormSubmittedEvent
 from collective.volto.otp.utils import validate_email_token
 from copy import deepcopy
 from datetime import datetime
@@ -11,7 +12,6 @@ from email import policy
 from email.message import EmailMessage
 from io import BytesIO
 from plone import api
-
 
 try:
     from plone.base.interfaces.controlpanel import IMailSchema
@@ -89,6 +89,9 @@ class SubmitPost(Service):
                 )
                 self.request.response.setStatus(500)
                 return dict(type="InternalServerError", message=message)
+
+        notify(FormSubmittedEvent(self.context, self.block, self.form_data))
+
         if store_action:
             self.store_data()
 

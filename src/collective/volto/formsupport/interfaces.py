@@ -1,5 +1,7 @@
 from zope.interface import Interface
 from zope.publisher.interfaces.browser import IDefaultBrowserLayer
+from zope.interface import Attribute
+from zope.interface.interfaces import IObjectEvent
 
 
 class ICollectiveVoltoFormsupportLayer(IDefaultBrowserLayer):
@@ -44,3 +46,12 @@ class ICaptchaSupport(Interface):
         """Verify the captcha
         @return: True if verified, Raise exception otherwise
         """
+
+
+class IFormSubmittedEvent(IObjectEvent):
+    """An event that's fired upon a workflow transition."""
+
+    obj = Attribute("The context object")
+
+    form = Attribute("Form")
+    form_data = Attribute("Form Data")
