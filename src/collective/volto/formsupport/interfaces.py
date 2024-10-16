@@ -55,3 +55,8 @@ class IFormSubmittedEvent(IObjectEvent):
 
     form = Attribute("Form")
     form_data = Attribute("Form Data")
+
+
+class IFormData(Interface):
+    def data():
+        pass
