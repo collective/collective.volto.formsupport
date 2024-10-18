@@ -137,9 +137,7 @@ class TestMailSend(unittest.TestCase):
             'You need to set at least one form action between "send" and "store".',  # noqa
         )
 
-    def test_email_not_send_if_block_id_is_correct_but_form_data_missing(
-        self,
-    ):
+    def test_email_not_send_if_block_id_is_correct_but_form_data_missing(self):
         self.document.blocks = {
             "form-id": {
                 "@type": "form",
@@ -163,9 +161,7 @@ class TestMailSend(unittest.TestCase):
             "Empty form data.",
         )
 
-    def test_email_not_send_if_block_id_is_correct_but_required_fields_missing(
-        self,
-    ):
+    def test_email_not_send_if_block_id_is_correct_but_required_fields_missing(self):
         self.document.blocks = {
             "form-id": {
                 "@type": "form",
@@ -195,9 +191,7 @@ class TestMailSend(unittest.TestCase):
             "Missing required field: subject or from.",
         )
 
-    def test_email_not_send_if_all_fields_are_not_in_form_schema(
-        self,
-    ):
+    def test_email_not_send_if_all_fields_are_not_in_form_schema(self):
         self.document.blocks = {
             "form-id": {
                 "@type": "form",
@@ -218,9 +212,7 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(res["message"], "Empty form data.")
 
-    def test_email_sent_with_only_fields_from_schema(
-        self,
-    ):
+    def test_email_sent_with_only_fields_from_schema(self):
         self.document.blocks = {
             "form-id": {
                 "@type": "form",
@@ -265,9 +257,7 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("<strong>foo:</strong> foo", msg)
         self.assertNotIn("<strong>bar:</strong> bar", msg)
 
-    def test_email_sent_with_site_recipient(
-        self,
-    ):
+    def test_email_sent_with_site_recipient(self):
         self.document.blocks = {
             "form-id": {
                 "@type": "form",
@@ -315,9 +305,7 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> John", msg)
 
-    def test_email_sent_with_forwarded_headers(
-        self,
-    ):
+    def test_email_sent_with_forwarded_headers(self):
         self.document.blocks = {
             "form-id": {
                 "@type": "form",
@@ -421,9 +409,7 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("REMOTE_ADDR", msg)
         self.assertIn("PATH_INFO", msg)
 
-    def test_email_sent_ignore_passed_recipient(
-        self,
-    ):
+    def test_email_sent_ignore_passed_recipient(self):
         self.document.blocks = {
             "form-id": {
                 "@type": "form",
@@ -472,9 +458,7 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> John", msg)
 
-    def test_email_sent_with_block_recipient_if_set(
-        self,
-    ):
+    def test_email_sent_with_block_recipient_if_set(self):
         self.document.blocks = {
             "text-id": {"@type": "text"},
             "form-id": {
@@ -524,9 +508,7 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> John", msg)
 
-    def test_email_sent_with_block_subject_if_set_and_not_passed(
-        self,
-    ):
+    def test_email_sent_with_block_subject_if_set_and_not_passed(self):
         self.document.blocks = {
             "text-id": {"@type": "text"},
             "form-id": {
@@ -576,9 +558,7 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> John", msg)
 
-    def test_email_with_use_as_reply_to(
-        self,
-    ):
+    def test_email_with_use_as_reply_to(self):
         self.document.blocks = {
             "text-id": {"@type": "text"},
             "form-id": {
@@ -634,9 +614,7 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> Smith", msg)
 
-    def test_email_field_used_as_bcc(
-        self,
-    ):
+    def test_email_field_used_as_bcc_without_otp(self):
         self.document.blocks = {
             "text-id": {"@type": "text"},
             "form-id": {
@@ -673,9 +651,6 @@ class TestMailSend(unittest.TestCase):
                         "field_id": "contact",
                         "label": "Email",
                         "value": "smith@doe.com",
-                        "otp": generate_email_token(
-                            uid="form-id", email="smith@doe.com"
-                        ),
                     },
                 ],
                 "block_id": "form-id",
@@ -694,7 +669,34 @@ class TestMailSend(unittest.TestCase):
         self.assertNotIn("To: site_addr@plone.com", bcc_msg)
         self.assertIn("To: smith@doe.com", bcc_msg)
 
-        # Test send wrong otp
+    def test_email_field_used_as_bcc_with_wrong_otp_raise_400(self):
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {
+                "@type": "form",
+                "default_subject": "block subject",
+                "default_from": "john@doe.com",
+                "send": False,
+                "store": True,
+                "email_otp_verification": True,
+                "subblocks": [
+                    {
+                        "field_id": "contact",
+                        "field_type": "from",
+                        "use_as_bcc": True,
+                    },
+                    {
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
+                    {
+                        "field_id": "name",
+                        "field_type": "text",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
         response = self.submit_form(
             data={
                 "data": [
@@ -710,10 +712,12 @@ class TestMailSend(unittest.TestCase):
                 "block_id": "form-id",
             },
         )
-
         self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.json()["message"], "Missing OTP value. Unable to submit the form."
+        )
 
-        # Test do not verify opt if otp flag `email_otp_verification` is False
+    def test_email_field_used_as_bcc_without_otp_but_disabled_verification(self):
         self.document.blocks = {
             "text-id": {"@type": "text"},
             "form-id": {
@@ -761,9 +765,58 @@ class TestMailSend(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-    def test_send_attachment(
+    def test_email_field_used_as_bcc_without_otp_but_enabled_verification_raise_400(
         self,
     ):
+        self.document.blocks = {
+            "text-id": {"@type": "text"},
+            "form-id": {
+                "@type": "form",
+                "default_subject": "block subject",
+                "default_from": "john@doe.com",
+                "send": False,
+                "store": True,
+                "email_otp_verification": True,
+                "subblocks": [
+                    {
+                        "field_id": "contact",
+                        "field_type": "from",
+                        "use_as_bcc": True,
+                    },
+                    {
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
+                    {
+                        "field_id": "name",
+                        "field_type": "text",
+                    },
+                ],
+            },
+        }
+
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "data": [
+                    {"label": "Message", "value": "just want to say hi"},
+                    {"label": "Name", "value": "Smith"},
+                    {
+                        "field_id": "contact",
+                        "label": "Email",
+                        "value": "smith@doe.com",
+                        "otp": 123,
+                    },
+                ],
+                "block_id": "form-id",
+            },
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["message"], "smith@doe.com's OTP is wrong")
+
+    def test_send_attachment(self):
         self.document.blocks = {
             "text-id": {"@type": "text"},
             "form-id": {
@@ -813,9 +866,7 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(self.mailhost.messages), 1)
 
-    def test_send_attachment_validate_size(
-        self,
-    ):
+    def test_send_attachment_validate_size(self):
         os.environ["FORM_ATTACHMENTS_LIMIT"] = "1"
         self.document.blocks = {
             "text-id": {"@type": "text"},
@@ -1014,9 +1065,7 @@ class TestMailSend(unittest.TestCase):
         )
         self.assertIn("<p>It is <strong>Rich Text</strong></p>", ack_msg_body)
 
-    def test_email_body_formated_as_table(
-        self,
-    ):
+    def test_email_body_formated_as_table(self):
         self.document.blocks = {
             "form-id": {
                 "@type": "form",
@@ -1090,9 +1139,7 @@ class TestMailSend(unittest.TestCase):
         )
         self.assertIn(f'<td align="left">{message}</td>', msg)
 
-    def test_email_body_formated_as_list(
-        self,
-    ):
+    def test_email_body_formated_as_list(self):
         self.document.blocks = {
             "form-id": {
                 "@type": "form",
@@ -1141,9 +1188,7 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> John", msg)
 
-    def test_send_date(
-        self,
-    ):
+    def test_send_date(self):
         self.document.blocks = {
             "form-id": {
                 "@type": "form",
@@ -1245,9 +1290,7 @@ class TestMailSend(unittest.TestCase):
             self.assertEqual(field.get("name"), form_data[index]["label"])
             self.assertEqual(field.text, form_data[index]["value"])
 
-    def test_submit_return_400_if_malformed_email_in_email_field(
-        self,
-    ):
+    def test_submit_return_400_if_malformed_email_in_email_field(self):
         """
         email fields in frontend are set as "from" field_type
         """
@@ -1333,9 +1376,7 @@ class TestMailSend(unittest.TestCase):
             response.json()["message"], 'Email not valid in "Email" field.'
         )
 
-    def test_submit_return_200_if_correct_email_in_email_field(
-        self,
-    ):
+    def test_submit_return_200_if_correct_email_in_email_field(self):
         """
         email fields in frontend are set as "from" field_type
         """
