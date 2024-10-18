@@ -234,27 +234,47 @@ class SubmitPost(Service):
             )
 
     def validate_bcc(self):
+        """
+        If otp validation is enabled, check if is valid
+        """
         bcc_fields = []
+        email_otp_verification = self.block.get("email_otp_verification", False)
+        block_id = self.form_data.get("block_id", "")
         for field in self.block.get("subblocks", []):
             if field.get("use_as_bcc", False):
                 field_id = field.get("field_id", "")
                 if field_id not in bcc_fields:
                     bcc_fields.append(field_id)
-
+        if not bcc_fields:
+            return
+        if not email_otp_verification:
+            return
         for data in self.form_data.get("data", []):
             value = data.get("value", "")
             if not value:
                 continue
-
-            if data.get("field_id", "") in bcc_fields:
-                if self.block.get(
-                    "email_otp_verification", True
-                ) and not validate_email_token(
-                    self.form_data.get("block_id", ""), data["value"], data["otp"]
-                ):
-                    raise BadRequest(
-                        _("{email}'s OTP is wrong").format(email=data["value"])
+            if data.get("field_id", "") not in bcc_fields:
+                continue
+            otp = data.get("otp", "")
+            if not otp:
+                raise BadRequest(
+                    api.portal.translate(
+                        _(
+                            "otp_validation_missing_value",
+                            default="Missing OTP value. Unable to submit the form.",
+                        )
                     )
+                )
+            if not validate_email_token(block_id, value, otp):
+                raise BadRequest(
+                    api.portal.translate(
+                        _(
+                            "otp_validation_wrong_value",
+                            default="${email}'s OTP is wrong",
+                            mapping={"email": data["value"]},
+                        )
+                    )
+                )
 
     def get_block_data(self, block_id):
         blocks = get_blocks(self.context)
