@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
+from collective.volto.formsupport.interfaces import IFormSubmittedEvent
 from zope.interface import implementer
 from zope.interface.interfaces import ObjectEvent
-
-
-from collective.volto.formsupport.interfaces import IFormSubmittedEvent
 
 
 @implementer(IFormSubmittedEvent)

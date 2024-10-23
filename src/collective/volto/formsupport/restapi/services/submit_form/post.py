@@ -1,8 +1,3 @@
-import codecs
-import logging
-import os
-import re
-
 from bs4 import BeautifulSoup
 from datetime import datetime
 from email import policy
@@ -10,15 +5,26 @@ from email.message import EmailMessage
 from io import BytesIO
 from plone import api
 
+import codecs
+import logging
+import os
+import re
+
+
 try:
     from plone.base.interfaces.controlpanel import IMailSchema
 except ImportError:
     from Products.CMFPlone.interfaces.controlpanel import IMailSchema
 
+from collective.volto.formsupport import _
+from collective.volto.formsupport.events import FormSubmittedEvent
+from collective.volto.formsupport.interfaces import IFormData
+from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.interfaces import IPostEvent
+from collective.volto.formsupport.utils import get_blocks
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
 from plone.restapi.services import Service
-from plone.restapi.deserializer import json_body
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import SubElement
@@ -29,13 +35,6 @@ from zope.event import notify
 from zope.i18n import translate
 from zope.interface import alsoProvides
 from zope.interface import implementer
-
-from collective.volto.formsupport import _
-from collective.volto.formsupport.interfaces import IFormDataStore
-from collective.volto.formsupport.interfaces import IPostEvent
-from collective.volto.formsupport.interfaces import IFormData
-from collective.volto.formsupport.events import FormSubmittedEvent
-from collective.volto.formsupport.utils import get_blocks
 
 
 logger = logging.getLogger(__name__)

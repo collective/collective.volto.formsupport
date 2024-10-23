@@ -1,7 +1,7 @@
 from collective.volto.formsupport import logger
+from collective.volto.formsupport.interfaces import ICollectiveVoltoFormsupportLayer
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.utils import get_blocks
-from collective.volto.formsupport.interfaces import ICollectiveVoltoFormsupportLayer
 from copy import deepcopy
 from datetime import datetime
 from plone.dexterity.interfaces import IDexterityContent
@@ -14,7 +14,6 @@ from souper.soup import NodeAttributeIndexer
 from souper.soup import Record
 from zope.component import adapter
 from zope.interface import implementer
-from zope.interface import Interface
 
 
 @implementer(ICatalogFactory)

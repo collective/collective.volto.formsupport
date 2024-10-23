@@ -1,23 +1,21 @@
-import math
-import os
-
-from copy import deepcopy
-
-from zope.interface import implementer
-from zope.component import adapter
-from zope.interface import Interface
-from zExceptions import BadRequest
-from zope.i18n import translate
-from zope.component import getMultiAdapter
-from plone import api
-from plone.schema.email import _isemail
-from plone.restapi.deserializer import json_body
-
-from collective.volto.formsupport.interfaces import IFormData
+from collective.volto.formsupport import _
 from collective.volto.formsupport.interfaces import ICaptchaSupport
+from collective.volto.formsupport.interfaces import IFormData
 from collective.volto.formsupport.utils import get_blocks
 from collective.volto.otp.utils import validate_email_token
-from collective.volto.formsupport import _
+from copy import deepcopy
+from plone import api
+from plone.restapi.deserializer import json_body
+from plone.schema.email import _isemail
+from zExceptions import BadRequest
+from zope.component import adapter
+from zope.component import getMultiAdapter
+from zope.i18n import translate
+from zope.interface import implementer
+from zope.interface import Interface
+
+import math
+import os
 
 
 @implementer(IFormData)
