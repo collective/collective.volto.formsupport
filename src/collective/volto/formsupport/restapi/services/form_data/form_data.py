@@ -31,6 +31,7 @@ class FormData:
             store = getMultiAdapter((self.context, self.request), IFormDataStore)
             remove_data_after_days = int(block.get("remove_data_after_days") or 0)
             data = store.search()
+
             if remove_data_after_days > 0:
                 expire_date = datetime.now() - timedelta(days=remove_data_after_days)
             else:

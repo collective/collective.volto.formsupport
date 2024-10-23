@@ -24,12 +24,12 @@ from collective.volto.formsupport import _
 @adapter(Interface, Interface)
 class FormDataAdapter:
     block_id = None
-    block = None
+    block = {}
 
     def __init__(self, context, request):
         self.context = context
         self.request = request
-        self.form_data = self.extract_data()
+        self.form_data = self.extract_data_from_request()
         self.block_id = self.form_data.get("block_id", "")
         if self.block_id:
             self.block = self.get_block_data(block_id=self.block_id)
@@ -46,7 +46,7 @@ class FormDataAdapter:
 
         return self.form_data
 
-    def extract_data(self):
+    def extract_data_from_request(self):
         form_data = json_body(self.request)
 
         fixed_fields = []
@@ -217,3 +217,37 @@ class FormDataAdapter:
                     context=self.request,
                 )
             )
+
+    def filter_parameters(self):
+        """
+        do not send attachments fields.
+        """
+        result = []
+
+        for field in self.block.get("subblocks", []):
+            if field.get("field_type", "") == "attachment":
+                continue
+
+            for item in self.form_data.get("data", []):
+                if item.get("field_id", "") == field.get("field_id", ""):
+                    result.append(item)
+
+        return result
+
+    def format_fields(self):
+        fields = self.filter_parameters()
+        formatted_fields = []
+        field_ids = [field.get("field_id") for field in self.block.get("subblocks", [])]
+
+        for field in fields:
+            field_id = field.get("field_id", "")
+
+            if field_id:
+                field_index = field_ids.index(field_id)
+
+                if self.block["subblocks"][field_index].get("field_type") == "date":
+                    field["value"] = api.portal.get_localized_time(field["value"])
+
+            formatted_fields.append(field)
+
+        return formatted_fields

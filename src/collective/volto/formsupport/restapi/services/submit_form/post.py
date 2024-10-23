@@ -18,6 +18,7 @@ except ImportError:
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
 from plone.restapi.services import Service
+from plone.restapi.deserializer import json_body
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import SubElement
@@ -34,6 +35,7 @@ from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.interfaces import IPostEvent
 from collective.volto.formsupport.interfaces import IFormData
 from collective.volto.formsupport.events import FormSubmittedEvent
+from collective.volto.formsupport.utils import get_blocks
 
 
 logger = logging.getLogger(__name__)
@@ -52,8 +54,12 @@ class SubmitPost(Service):
         super().__init__(context, request)
 
         self.block = {}
+        self.form_data_adapter = getMultiAdapter(
+            (self.context, self.request), IFormData
+        )
         self.form_data = self.get_form_data()
         self.block_id = self.form_data.get("block_id", "")
+
         if self.block_id:
             self.block = self.get_block_data(block_id=self.block_id)
 
@@ -91,7 +97,7 @@ class SubmitPost(Service):
         return {"data": self.form_data.get("data", [])}
 
     def get_form_data(self):
-        return getMultiAdapter((self.context, self.request), IFormData)()
+        return self.form_data_adapter()
 
     def get_reply_to(self):
         """This method retrieves the correct field to be used as 'reply to'.
@@ -116,6 +122,19 @@ class SubmitPost(Service):
                                 return data.get("value", "")
 
         return self.form_data.get("from", "") or self.block.get("default_from", "")
+
+    def get_block_data(self, block_id):
+        blocks = get_blocks(self.context)
+        if not blocks:
+            return {}
+        for id, block in blocks.items():
+            if id != block_id:
+                continue
+            block_type = block.get("@type", "")
+            if block_type != "form":
+                continue
+            return block
+        return {}
 
     def get_bcc(self):
         bcc = []
@@ -295,41 +314,13 @@ class SubmitPost(Service):
             request=self.request,
         )
         parameters = {
-            "parameters": self.format_fields(self.filter_parameters()),
+            "parameters": self.form_data_adapter.format_fields(),
             "url": self.context.absolute_url(),
             "title": self.context.Title(),
             "mail_header": mail_header,
             "mail_footer": mail_footer,
         }
         return message_template(**parameters)
-
-    def filter_parameters(self):
-        """
-        do not send attachments fields.
-        """
-        result = []
-
-        for field in self.block.get("subblocks", []):
-            if field.get("field_type", "") == "attachment":
-                continue
-
-            for item in self.form_data.get("data", []):
-                if item.get("field_id", "") == field.get("field_id", ""):
-                    result.append(item)
-
-        return result
-
-    def format_fields(self, fields):
-        formatted_fields = []
-        field_ids = [field.get("field_id") for field in self.block.get("subblocks", [])]
-        for field in fields:
-            field_id = field.get("field_id", "")
-            if field_id:
-                field_index = field_ids.index(field_id)
-                if self.block["subblocks"][field_index].get("field_type") == "date":
-                    field["value"] = api.portal.get_localized_time(field["value"])
-            formatted_fields.append(field)
-        return formatted_fields
 
     def send_mail(self, msg, charset):
         host = api.portal.get_tool(name="MailHost")
@@ -381,7 +372,7 @@ class SubmitPost(Service):
         output = BytesIO()
         xmlRoot = Element("form")
 
-        for field in self.filter_parameters():
+        for field in self.form_data_adapter.filter_parameters():
             SubElement(
                 xmlRoot, "field", name=field.get("custom_field_id", field["label"])
             ).text = str(field.get("value", ""))
@@ -398,6 +389,8 @@ class SubmitPost(Service):
 
     def store_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
-        res = store.add(data=self.filter_parameters())
+
+        res = store.add(data=self.form_data_adapter.filter_parameters())
+
         if not res:
             raise BadRequest("Unable to store data")

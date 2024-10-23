@@ -1,6 +1,7 @@
 from collective.volto.formsupport import logger
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.utils import get_blocks
+from collective.volto.formsupport.interfaces import ICollectiveVoltoFormsupportLayer
 from copy import deepcopy
 from datetime import datetime
 from plone.dexterity.interfaces import IDexterityContent
@@ -27,7 +28,7 @@ class FormDataSoupCatalogFactory:
 
 
 @implementer(IFormDataStore)
-@adapter(IDexterityContent, Interface)
+@adapter(IDexterityContent, ICollectiveVoltoFormsupportLayer)
 class FormDataStore:
     def __init__(self, context, request):
         self.context = context
