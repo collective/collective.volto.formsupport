@@ -7,4 +7,3 @@
   <adapter factory=".FormDataAdapter" />
 
 </configure>
-
