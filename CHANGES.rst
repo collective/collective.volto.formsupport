@@ -4,7 +4,11 @@ Changelog
 3.1.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Form add event.
+  [folix-01]
+
+- Form data adapter.
+  [folix-01]
 
 
 3.1.4 (2024-09-27)
