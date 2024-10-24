@@ -4,7 +4,8 @@ Changelog
 3.1.5 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix otp verification logic: do not break if otp is not in POST call
+  [cekk]
 
 
 3.1.4 (2024-09-27)
