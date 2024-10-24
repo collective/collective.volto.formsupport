@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.1.5 (unreleased)
+3.1.5 (2024-10-24)
 ------------------
 
 - Fix otp verification logic: do not break if otp is not in POST call
