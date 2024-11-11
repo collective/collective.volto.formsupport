@@ -73,7 +73,7 @@ class FormData:
             "expired_total": expired_total,
         }
         adapters = getAdapters((self.context, self.request), provided=IDataAdapter)
-        for adpt in adapters:
+        for _, adpt in adapters:
             result = adpt(result, block_id=self.block_id)
         return result
 
