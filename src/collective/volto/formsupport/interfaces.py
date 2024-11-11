@@ -57,6 +57,15 @@ class IFormSubmittedEvent(IObjectEvent):
     form_data = Attribute("Form Data")
 
 
-class IFormData(Interface):
+class IPostAdapter(Interface):
     def data():
+        pass
+
+
+# BBB
+IFormData = IPostAdapter
+
+
+class IDataAdapter(Interface):
+    def __call__(result, block_id=None):
         pass

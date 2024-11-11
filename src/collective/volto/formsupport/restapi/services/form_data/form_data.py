@@ -1,4 +1,4 @@
-from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.interfaces import IFormDataStore, IDataAdapter
 from collective.volto.formsupport.utils import get_blocks
 from datetime import datetime
 from datetime import timedelta
@@ -11,6 +11,7 @@ from zope.component import adapter
 from zope.component import getMultiAdapter
 from zope.interface import implementer
 from zope.interface import Interface
+from zope.component import getAdapters
 
 import json
 
@@ -71,6 +72,9 @@ class FormData:
             "items_total": len(items),
             "expired_total": expired_total,
         }
+        adapters = getAdapters((self.context, self.request), provided=IDataAdapter)
+        for adpt in adapters:
+            result = adpt(result, block_id=self.block_id)
         return result
 
     @property

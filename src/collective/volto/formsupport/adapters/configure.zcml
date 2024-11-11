@@ -4,6 +4,6 @@
     i18n_domain="collective.volto.formsupport"
     >
 
-  <adapter factory=".FormDataAdapter" />
+  <adapter factory=".post.PostAdapter" />
 
 </configure>

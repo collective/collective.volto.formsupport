@@ -18,7 +18,7 @@ except ImportError:
 
 from collective.volto.formsupport import _
 from collective.volto.formsupport.events import FormSubmittedEvent
-from collective.volto.formsupport.interfaces import IFormData
+from collective.volto.formsupport.interfaces import IPostAdapter
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.interfaces import IPostEvent
 from collective.volto.formsupport.utils import get_blocks
@@ -54,7 +54,7 @@ class SubmitPost(Service):
 
         self.block = {}
         self.form_data_adapter = getMultiAdapter(
-            (self.context, self.request), IFormData
+            (self.context, self.request), IPostAdapter
         )
         self.form_data = self.get_form_data()
         self.block_id = self.form_data.get("block_id", "")
