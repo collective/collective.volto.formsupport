@@ -1,8 +1,11 @@
 Changelog
 =========
 
-3.1.5 (unreleased)
+3.2.0 (unreleased)
 ------------------
+
+- Result data adapter
+  [mamico]
 
 - Form add event.
   [folix-01]

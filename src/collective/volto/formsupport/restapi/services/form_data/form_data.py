@@ -1,4 +1,5 @@
-from collective.volto.formsupport.interfaces import IFormDataStore, IDataAdapter
+from collective.volto.formsupport.interfaces import IDataAdapter
+from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.utils import get_blocks
 from datetime import datetime
 from datetime import timedelta
@@ -8,10 +9,10 @@ from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
 from zope.component import adapter
+from zope.component import getAdapters
 from zope.component import getMultiAdapter
 from zope.interface import implementer
 from zope.interface import Interface
-from zope.component import getAdapters
 
 import json
 

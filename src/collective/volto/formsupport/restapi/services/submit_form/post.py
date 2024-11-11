@@ -18,8 +18,8 @@ except ImportError:
 
 from collective.volto.formsupport import _
 from collective.volto.formsupport.events import FormSubmittedEvent
-from collective.volto.formsupport.interfaces import IPostAdapter
 from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.interfaces import IPostAdapter
 from collective.volto.formsupport.interfaces import IPostEvent
 from collective.volto.formsupport.utils import get_blocks
 from plone.protect.interfaces import IDisableCSRFProtection
