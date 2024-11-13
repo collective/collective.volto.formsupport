@@ -4,7 +4,9 @@ Changelog
 3.2.0 (unreleased)
 ------------------
 
-- Result data adapter
+- Added an adapter (`IDataAdapter`) to allow information to be added as a return value 
+  to the form-data expander. This allows addons that integrate information to be added 
+  rather than overwriting the expander each time.
   [mamico]
 
 - Form add event.
