@@ -14,6 +14,13 @@ Changelog
   [folix-01]
 
 
+3.1.5 (2024-10-24)
+------------------
+
+- Fix otp verification logic: do not break if otp is not in POST call
+  [cekk]
+
+
 3.1.4 (2024-09-27)
 ------------------
 
