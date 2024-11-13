@@ -1,5 +1,4 @@
 from collective.volto.formsupport import logger
-from collective.volto.formsupport.interfaces import ICollectiveVoltoFormsupportLayer
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.utils import get_blocks
 from copy import deepcopy
@@ -14,6 +13,7 @@ from souper.soup import NodeAttributeIndexer
 from souper.soup import Record
 from zope.component import adapter
 from zope.interface import implementer
+from zope.interface import Interface
 
 
 @implementer(ICatalogFactory)
@@ -27,7 +27,7 @@ class FormDataSoupCatalogFactory:
 
 
 @implementer(IFormDataStore)
-@adapter(IDexterityContent, ICollectiveVoltoFormsupportLayer)
+@adapter(IDexterityContent, Interface)
 class FormDataStore:
     def __init__(self, context, request):
         self.context = context
