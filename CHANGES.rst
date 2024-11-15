@@ -4,7 +4,8 @@ Changelog
 3.2.1 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- formate date in csv (as in email)
+  [mamico]
 
 
 3.2.0 (2024-11-15)

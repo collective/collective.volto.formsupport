@@ -214,6 +214,12 @@ class TestMailStore(unittest.TestCase):
                         "field_id": "name",
                         "field_type": "text",
                     },
+                    {
+                        "label": "When",
+                        "field_id": "when",
+                        "field_type": "date",
+                    },
+
                 ],
             },
         }
@@ -224,6 +230,7 @@ class TestMailStore(unittest.TestCase):
                 "data": [
                     {"field_id": "message", "value": "just want to say hi"},
                     {"field_id": "name", "value": "John"},
+                    {"field_id": "when", "value": "2024-11-10"},
                     {"field_id": "foo", "value": "skip this"},
                 ],
                 "subject": "test subject",
@@ -237,6 +244,7 @@ class TestMailStore(unittest.TestCase):
                 "data": [
                     {"field_id": "message", "value": "bye"},
                     {"field_id": "name", "value": "Sally"},
+                    {"field_id": "when", "value": "2024-11-30"},
                 ],
                 "subject": "test subject",
                 "block_id": "form-id",
@@ -247,10 +255,10 @@ class TestMailStore(unittest.TestCase):
         response = self.export_csv()
         data = [*csv.reader(StringIO(response.text), delimiter=",")]
         self.assertEqual(len(data), 3)
-        self.assertEqual(data[0], ["Message", "Name", "date"])
+        self.assertEqual(data[0], ["Message", "Name", "When", "date"])
         sorted_data = sorted(data[1:])
-        self.assertEqual(sorted_data[0][:-1], ["bye", "Sally"])
-        self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John"])
+        self.assertEqual(sorted_data[0][:-1], ["bye", "Sally", "Nov 30, 2024"])
+        self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John", "Nov 10, 2024"])
 
         # check date column. Skip seconds because can change during test
         now = datetime.now().strftime("%Y-%m-%dT%H:%M")
