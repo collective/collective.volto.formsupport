@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.2.0 (unreleased)
+3.2.0 (2024-11-15)
 ------------------
 
 - Added an adapter (`IDataAdapter`) to allow information to be added as a return value 
