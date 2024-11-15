@@ -1,10 +1,19 @@
 Changelog
 =========
 
-3.1.6 (unreleased)
+3.2.0 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added an adapter (`IDataAdapter`) to allow information to be added as a return value 
+  to the form-data expander. This allows addons that integrate information to be added 
+  rather than overwriting the expander each time.
+  [mamico]
+
+- Add FormSubmittedEvent to handle the new compiled forms.
+  [folix-01]
+
+- Add PostAdapter to predispose the customization of data handling by other add-ons.
+  [folix-01]
 
 
 3.1.5 (2024-10-24)
