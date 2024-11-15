@@ -9,10 +9,10 @@ Changelog
   rather than overwriting the expander each time.
   [mamico]
 
-- Form add event.
+- Add FormAddEvent to handle the new compiled forms.
   [folix-01]
 
-- Form data adapter.
+- Add FormDataAdapter to predispose the customization of data handling by other add-ons.
   [folix-01]
 
 
