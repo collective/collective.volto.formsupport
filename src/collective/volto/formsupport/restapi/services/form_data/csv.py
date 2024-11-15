@@ -69,7 +69,7 @@ class FormDataExportGet(Service):
 
     def format_date(self, value):
         return api.portal.get_localized_time(value)
-    
+
     def get_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
         sbuf = StringIO()

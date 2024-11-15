@@ -219,7 +219,6 @@ class TestMailStore(unittest.TestCase):
                         "field_id": "when",
                         "field_type": "date",
                     },
-
                 ],
             },
         }
@@ -258,7 +257,9 @@ class TestMailStore(unittest.TestCase):
         self.assertEqual(data[0], ["Message", "Name", "When", "date"])
         sorted_data = sorted(data[1:])
         self.assertEqual(sorted_data[0][:-1], ["bye", "Sally", "Nov 30, 2024"])
-        self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John", "Nov 10, 2024"])
+        self.assertEqual(
+            sorted_data[1][:-1], ["just want to say hi", "John", "Nov 10, 2024"]
+        )
 
         # check date column. Skip seconds because can change during test
         now = datetime.now().strftime("%Y-%m-%dT%H:%M")
