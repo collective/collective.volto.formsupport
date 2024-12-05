@@ -178,7 +178,7 @@ class SubmitPost(Service):
 
             for match in matches:
                 if field_id in match:
-                    subject = subject.replace(match, i.get("value"))
+                    subject = subject.replace(match, str(i.get("value")))
 
         return subject
 
