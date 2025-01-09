@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.2.1 (unreleased)
+3.2.1 (2025-01-09)
 ------------------
 
 - Adapt email subject templating functionality to different value types.
