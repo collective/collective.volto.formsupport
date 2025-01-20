@@ -34,8 +34,6 @@ class PostAdapter:
         if self.block_id:
             self.block = self.get_block_data(block_id=self.block_id)
 
-        self.fields = self.format_fields()
-
     def __call__(self):
         """
         Avoid XSS injections and other attacks.
@@ -46,7 +44,7 @@ class PostAdapter:
 
         self.validate_form()
 
-        for field in self.fields:
+        for field in self.filter_parameters():
             field.validate(request=self.request)
 
         return self.form_data
@@ -227,7 +225,7 @@ class PostAdapter:
         """
         do not send attachments fields.
         """
-        return [field for field in self.fields if field.send_in_email]
+        return [field for field in self.format_fields() if field.send_in_email]
 
     def format_fields(self):
         fields_data = []
