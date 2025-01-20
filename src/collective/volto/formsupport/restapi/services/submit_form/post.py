@@ -312,7 +312,7 @@ class SubmitPost(Service):
             request=self.request,
         )
         parameters = {
-            "parameters": self.form_data_adapter.format_fields(),
+            "parameters": self.form_data_adapter.filter_parameters(),
             "url": self.context.absolute_url(),
             "title": self.context.Title(),
             "mail_header": mail_header,
