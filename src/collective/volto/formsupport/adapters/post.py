@@ -2,6 +2,7 @@ from collective.volto.formsupport import _
 from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import IPostAdapter
 from collective.volto.formsupport.restapi.services.submit_form.field import (
+    construct_field,
     construct_fields,
 )
 from collective.volto.formsupport.utils import get_blocks
@@ -18,6 +19,7 @@ from zope.interface import Interface
 
 import math
 import os
+from datetime import datetime
 
 
 @implementer(IPostAdapter)
@@ -225,7 +227,18 @@ class PostAdapter:
         """
         do not send attachments fields.
         """
-        return [field for field in self.format_fields() if field.send_in_email]
+        fields = [field for field in self.format_fields() if field.send_in_email]
+
+        additionalInfo = self.block['sendAdditionalInfo']
+
+        if "date" in additionalInfo:
+            fields.append(construct_field({'field_id': 'date', 'label': 'Date', 'field_type': 'date', 'value': datetime.now()}))
+        if "time" in additionalInfo:
+            fields.append(construct_field({'field_id': 'time', 'label': 'Time','field_type': 'time', 'value': datetime.now()}))
+        if "currentUrl" in additionalInfo:
+            fields.append(construct_field({'field_id': 'url', 'label': 'URL', 'value': self.context.absolute_url_path()}))
+
+        return fields
 
     def format_fields(self):
         fields_data = []

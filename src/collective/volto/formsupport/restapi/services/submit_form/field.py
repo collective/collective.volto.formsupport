@@ -94,6 +94,10 @@ class DateField(Field):
     def display_value(self):
         return api.portal.get_localized_time(self.internal_value)
 
+class TimeField(Field):
+    def display_value(self):
+        return api.portal.get_localized_time(self.internal_value, time_only=True)
+
 
 def construct_field(field_data):
     if field_data.get("widget") == "single_choice":
@@ -104,6 +108,8 @@ def construct_field(field_data):
         return EmailField(field_data)
     elif field_data.get("field_type") == "date":
         return DateField(field_data)
+    elif field_data.get("field_type") == "time":
+        return TimeField(field_data)
 
     return Field(field_data)
 
