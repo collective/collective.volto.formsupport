@@ -1,6 +1,9 @@
 from collective.volto.formsupport import _
 from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import IPostAdapter
+from collective.volto.formsupport.restapi.services.submit_form.field import (
+    construct_fields,
+)
 from collective.volto.formsupport.utils import get_blocks
 from collective.volto.otp.utils import validate_email_token
 from copy import deepcopy
@@ -31,6 +34,8 @@ class PostAdapter:
         if self.block_id:
             self.block = self.get_block_data(block_id=self.block_id)
 
+        self.fields = self.format_fields()
+
     def __call__(self):
         """
         Avoid XSS injections and other attacks.
@@ -40,6 +45,9 @@ class PostAdapter:
         """
 
         self.validate_form()
+
+        for field in self.fields:
+            field.validate(request=self.request)
 
         return self.form_data
 
@@ -219,32 +227,25 @@ class PostAdapter:
         """
         do not send attachments fields.
         """
-        result = []
-
-        for field in self.block.get("subblocks", []):
-            if field.get("field_type", "") == "attachment":
-                continue
-
-            for item in self.form_data.get("data", []):
-                if item.get("field_id", "") == field.get("field_id", ""):
-                    result.append(item)
-
-        return result
+        return [field for field in self.fields if field.send_in_email]
 
     def format_fields(self):
-        fields = self.filter_parameters()
-        formatted_fields = []
-        field_ids = [field.get("field_id") for field in self.block.get("subblocks", [])]
-
-        for field in fields:
-            field_id = field.get("field_id", "")
-
-            if field_id:
-                field_index = field_ids.index(field_id)
-
-                if self.block["subblocks"][field_index].get("field_type") == "date":
-                    field["value"] = api.portal.get_localized_time(field["value"])
-
-            formatted_fields.append(field)
-
-        return formatted_fields
+        fields_data = []
+        for submitted_field in self.form_data.get("data", []):
+            # TODO: Review if fields submitted without a field_id should be included. Is breaking change if we remove it
+            if submitted_field.get("field_id") is None:
+                fields_data.append(submitted_field)
+                continue
+            for field in self.block.get("subblocks", []):
+                if field.get("id", field.get("field_id")) == submitted_field.get(
+                    "field_id"
+                ):
+                    fields_data.append(
+                        {
+                            **field,
+                            **submitted_field,
+                            "display_value_mapping": field.get("display_values"),
+                            "custom_field_id": self.block.get(field["field_id"]),
+                        }
+                    )
+        return construct_fields(fields_data)

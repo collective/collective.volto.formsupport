@@ -21,9 +21,6 @@ from collective.volto.formsupport.events import FormSubmittedEvent
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.interfaces import IPostAdapter
 from collective.volto.formsupport.interfaces import IPostEvent
-from collective.volto.formsupport.restapi.services.submit_form.field import (
-    construct_fields,
-)
 from collective.volto.formsupport.utils import get_blocks
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
@@ -75,29 +72,6 @@ class SubmitPost(Service):
         alsoProvides(self.request, IDisableCSRFProtection)
 
         notify(PostEventService(self.context, self.form_data))
-
-        # Construct self.fieldss
-        fields_data = []
-        for submitted_field in self.form_data.get("data", []):
-            # TODO: Review if fields submitted without a field_id should be included. Is breaking change if we remove it
-            if submitted_field.get("field_id") is None:
-                fields_data.append(submitted_field)
-                continue
-            for field in self.block.get("subblocks", []):
-                if field.get("id", field.get("field_id")) == submitted_field.get(
-                    "field_id"
-                ):
-                    fields_data.append(
-                        {
-                            **field,
-                            **submitted_field,
-                            "display_value_mapping": field.get("display_values"),
-                            "custom_field_id": self.block.get(field["field_id"]),
-                        }
-                    )
-        self.fields = construct_fields(fields_data)
-        for field in self.fields:
-            field.validate(request=self.request)
 
         if send_action or self.get_bcc():
             try:
@@ -396,7 +370,7 @@ class SubmitPost(Service):
         output = BytesIO()
         xmlRoot = Element("form")
 
-        for field in self.form_data_adapter.filter_parameters():
+        for field in self.form_data_adapter.format_fields():
             SubElement(xmlRoot, "field", name=field.field_id).text = str(
                 field.internal_value
             )
