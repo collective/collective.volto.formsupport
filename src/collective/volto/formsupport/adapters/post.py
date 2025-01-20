@@ -6,7 +6,6 @@ from collective.volto.otp.utils import validate_email_token
 from copy import deepcopy
 from plone import api
 from plone.restapi.deserializer import json_body
-from plone.schema.email import _isemail
 from zExceptions import BadRequest
 from zope.component import adapter
 from zope.component import getMultiAdapter
