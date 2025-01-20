@@ -61,6 +61,9 @@ class FormDataExportGet(Service):
             data = data.encode("utf-8")
         self.request.response.write(data)
 
+    def get_fields_labels(self, item):
+        return item.attrs.get("fields_labels", {})
+
     def get_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
         sbuf = StringIO()
@@ -70,7 +73,7 @@ class FormDataExportGet(Service):
         rows = []
         for item in store.search():
             data = {}
-            fields_labels = item.attrs.get("fields_labels", {})
+            fields_labels = self.get_fields_labels(item)
             for k in self.get_ordered_keys(item):
                 if k in SKIP_ATTRS:
                     continue

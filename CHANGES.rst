@@ -1,8 +1,49 @@
 Changelog
 =========
 
-3.1.4 (unreleased)
+3.2.2 (unreleased)
 ------------------
+
+- Nothing changed yet.
+
+
+3.2.1 (2025-01-09)
+------------------
+
+- Adapt email subject templating functionality to different value types.
+  [folix-01]
+
+
+3.2.0 (2024-11-15)
+------------------
+
+- Added an adapter (`IDataAdapter`) to allow information to be added as a return value 
+  to the form-data expander. This allows addons that integrate information to be added 
+  rather than overwriting the expander each time.
+  [mamico]
+
+- Add FormSubmittedEvent to handle the new compiled forms.
+  [folix-01]
+
+- Add PostAdapter to predispose the customization of data handling by other add-ons.
+  [folix-01]
+
+
+3.1.5 (2024-10-24)
+------------------
+
+- Fix otp verification logic: do not break if otp is not in POST call
+  [cekk]
+
+
+3.1.4 (2024-09-27)
+------------------
+
+- Add missing collective.volto.otp include for pip environment setup
+  [folix-01]
+
+- Switchable email bcc fields OTP verification.
+  [folix-01]
 
 - Added ISO formatted strings being allowed as date inputs
   [JeffersonBledsoe]
