@@ -44,7 +44,7 @@ class FormDataStore:
             data = self.request.form
         return data.get("block_id", "")
 
-    def get_form_fields(self):
+    def get_block(self):
         blocks = get_blocks(self.context)
 
         if not blocks:
@@ -58,6 +58,11 @@ class FormDataStore:
                 form_block = deepcopy(block)
         if not form_block:
             return {}
+
+        return form_block
+
+    def get_form_fields(self):
+        form_block = self.get_block()
 
         subblocks = form_block.get("subblocks", [])
 
@@ -97,6 +102,8 @@ class FormDataStore:
         record.attrs["fields_labels"] = fields_labels
         record.attrs["fields_order"] = fields_order
         record.attrs["date"] = datetime.now()
+        if self.get_block()['sendAdditionalInfo']:
+            record.attrs["url"] = self.context.absolute_url_path()
         record.attrs["block_id"] = self.block_id
         return self.soup.add(record)
 

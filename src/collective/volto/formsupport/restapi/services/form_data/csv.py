@@ -68,6 +68,8 @@ class FormDataExportGet(Service):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
         sbuf = StringIO()
         fixed_columns = ["date"]
+        if "currentUrl" in self.form_block['sendAdditionalInfo']:
+            fixed_columns.append("url")
         columns = []
 
         rows = []
