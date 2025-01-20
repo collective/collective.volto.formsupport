@@ -1,12 +1,14 @@
 from collective.volto.formsupport import _
 from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import IPostAdapter
+from collective.volto.formsupport.restapi.services.submit_form.field import (
+    construct_fields,
+)
 from collective.volto.formsupport.utils import get_blocks
 from collective.volto.otp.utils import validate_email_token
 from copy import deepcopy
 from plone import api
 from plone.restapi.deserializer import json_body
-from plone.schema.email import _isemail
 from zExceptions import BadRequest
 from zope.component import adapter
 from zope.component import getMultiAdapter
@@ -42,6 +44,9 @@ class PostAdapter:
 
         self.validate_form()
 
+        for field in self.filter_parameters():
+            field.validate(request=self.request)
+
         return self.form_data
 
     def extract_data_from_request(self):
@@ -52,9 +57,13 @@ class PostAdapter:
 
         block = self.get_block_data(block_id=form_data.get("block_id", ""))
         block_fields = [x.get("field_id", "") for x in block.get("subblocks", [])]
+        custom_block_fields = [
+            block.get(field_id) for field_id in block_fields if block.get(field_id)
+        ]
 
         for form_field in form_data.get("data", []):
-            if form_field.get("field_id", "") not in block_fields:
+            field_id = form_field.get("custom_field_id", form_field.get("field_id", ""))
+            if field_id not in block_fields and field_id not in custom_block_fields:
                 # unknown field, skip it
                 continue
             new_field = deepcopy(form_field)
@@ -137,31 +146,7 @@ class PostAdapter:
                 name=self.block["captcha"],
             ).verify(self.form_data.get("captcha"))
 
-        self.validate_email_fields()
         self.validate_bcc()
-
-    def validate_email_fields(self):
-        email_fields = [
-            x.get("field_id", "")
-            for x in self.block.get("subblocks", [])
-            if x.get("field_type", "") == "from"
-        ]
-        for form_field in self.form_data.get("data", []):
-            if form_field.get("field_id", "") not in email_fields:
-                continue
-            if _isemail(form_field.get("value", "")) is None:
-                raise BadRequest(
-                    translate(
-                        _(
-                            "wrong_email",
-                            default='Email not valid in "${field}" field.',
-                            mapping={
-                                "field": form_field.get("label", ""),
-                            },
-                        ),
-                        context=self.request,
-                    )
-                )
 
     def validate_bcc(self):
         """
@@ -240,32 +225,25 @@ class PostAdapter:
         """
         do not send attachments fields.
         """
-        result = []
-
-        for field in self.block.get("subblocks", []):
-            if field.get("field_type", "") == "attachment":
-                continue
-
-            for item in self.form_data.get("data", []):
-                if item.get("field_id", "") == field.get("field_id", ""):
-                    result.append(item)
-
-        return result
+        return [field for field in self.format_fields() if field.send_in_email]
 
     def format_fields(self):
-        fields = self.filter_parameters()
-        formatted_fields = []
-        field_ids = [field.get("field_id") for field in self.block.get("subblocks", [])]
-
-        for field in fields:
-            field_id = field.get("field_id", "")
-
-            if field_id:
-                field_index = field_ids.index(field_id)
-
-                if self.block["subblocks"][field_index].get("field_type") == "date":
-                    field["value"] = api.portal.get_localized_time(field["value"])
-
-            formatted_fields.append(field)
-
-        return formatted_fields
+        fields_data = []
+        for submitted_field in self.form_data.get("data", []):
+            # TODO: Review if fields submitted without a field_id should be included. Is breaking change if we remove it
+            if submitted_field.get("field_id") is None:
+                fields_data.append(submitted_field)
+                continue
+            for field in self.block.get("subblocks", []):
+                if field.get("id", field.get("field_id")) == submitted_field.get(
+                    "field_id"
+                ):
+                    fields_data.append(
+                        {
+                            **field,
+                            **submitted_field,
+                            "display_value_mapping": field.get("display_values"),
+                            "custom_field_id": self.block.get(field["field_id"]),
+                        }
+                    )
+        return construct_fields(fields_data)
