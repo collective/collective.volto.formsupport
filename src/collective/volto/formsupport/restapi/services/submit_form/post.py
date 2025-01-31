@@ -56,7 +56,7 @@ class SubmitPost(Service):
         self.form_data_adapter = getMultiAdapter(
             (self.context, self.request), IPostAdapter
         )
-        # We've already done all the work to get this data, let's re-use it.
+        # We've already done all the work to get this data, let's reuse it.
         self.form_data = self.form_data_adapter.form_data
         self.block_id = self.form_data_adapter.block_id
         self.block = self.form_data_adapter.block
