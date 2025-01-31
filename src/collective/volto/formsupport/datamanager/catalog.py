@@ -102,7 +102,7 @@ class FormDataStore:
         record.attrs["fields_labels"] = fields_labels
         record.attrs["fields_order"] = fields_order
         record.attrs["date"] = datetime.now()
-        if self.get_block()['sendAdditionalInfo']:
+        if self.get_block().get('sendAdditionalInfo'):
             record.attrs["url"] = self.context.absolute_url_path()
         record.attrs["block_id"] = self.block_id
         return self.soup.add(record)

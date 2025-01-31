@@ -229,7 +229,7 @@ class PostAdapter:
         """
         fields = [field for field in self.format_fields() if field.send_in_email]
 
-        additionalInfo = self.block['sendAdditionalInfo']
+        additionalInfo = self.block.get('sendAdditionalInfo', [])
 
         if "date" in additionalInfo:
             fields.append(construct_field({'field_id': 'date', 'label': 'Date', 'field_type': 'date', 'value': datetime.now()}))
