@@ -5,14 +5,15 @@ from zope.interface import Interface, provider
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleVocabulary
 
-from collective.volto.formsupport.validation.custom_validators import custom_validators
-from collective.volto.formsupport.validation.definition import ValidationDefinition
 
 try:
     from Products.validation.validators.BaseValidators import baseValidators
+    from collective.volto.formsupport.validation.custom_validators import custom_validators
+    from collective.volto.formsupport.validation.definition import ValidationDefinition
 except ImportError:  # Products.validation is optional
     validation = None
     baseValidators = None
+    custom_validators = []
 
 
 IGNORED_VALIDATION_DEFINITION_ARGUMENTS = [
