@@ -20,6 +20,7 @@ from zope.interface import Interface
 import math
 import os
 from datetime import datetime
+from urllib.parse import urlparse
 
 
 @implementer(IPostAdapter)
@@ -231,12 +232,22 @@ class PostAdapter:
 
         additionalInfo = self.block.get('sendAdditionalInfo', [])
 
+        # Using the referer rather than self.context as the context doesn't always match up to the current page depending on the form setup.
+        pageUrl = self.request.get("HTTP_REFERER")
+        parsedUrl = urlparse(pageUrl)
+        content_object_for_path = api.content.get(parsedUrl.path)
+
         if "date" in additionalInfo:
             fields.append(construct_field({'field_id': 'date', 'label': 'Date', 'field_type': 'date', 'value': datetime.now()}))
         if "time" in additionalInfo:
             fields.append(construct_field({'field_id': 'time', 'label': 'Time','field_type': 'time', 'value': datetime.now()}))
         if "currentUrl" in additionalInfo:
-            fields.append(construct_field({'field_id': 'url', 'label': 'URL', 'value': self.context.absolute_url_path()}))
+            fields.append(construct_field({'field_id': 'url', 'label': 'URL', 'value': parsedUrl.path}))
+        if "title" in additionalInfo:
+            if content_object_for_path:
+                fields.append(construct_field({'field_id': 'url', 'label': 'URL', 'value': content_object_for_path.title}))
+            else:
+                print("FAILED TO GET CONTENT OBJECT")
 
         return fields
 
