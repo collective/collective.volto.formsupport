@@ -82,21 +82,22 @@ class PostAdapter:
 
     def get_block_data(self, block_id, global_form_id):
         blocks = get_blocks(self.context)
+        global_form_id = global_form_id
+        if global_form_id:
+            global_forms = api.portal.get_registry_record(
+                GLOBAL_FORM_REGISTRY_RECORD_ID
+            )
+            if global_forms:
+                blocks = {**blocks, **global_forms}
         if not blocks:
-            global_form_id = global_form_id
-            if global_form_id:
-                global_forms = api.portal.get_registry_record(
-                    GLOBAL_FORM_REGISTRY_RECORD_ID
-                )
-                if global_forms:
-                    blocks = global_forms
-                else:
-                    return {}
-            else:
-                return {}
+            return {}
         for id, block in blocks.items():
             # Prefer local forms it they're available, fall back to global form
-            if id != block_id and id != global_form_id and block.get("global_form_id") != global_form_id:
+            if (
+                id != block_id
+                and id != global_form_id
+                and block.get("global_form_id") != global_form_id
+            ):
                 continue
             block_type = block.get("@type", "")
             if block_type != "form":
