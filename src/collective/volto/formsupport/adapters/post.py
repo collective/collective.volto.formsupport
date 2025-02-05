@@ -245,7 +245,7 @@ class PostAdapter:
             fields.append(construct_field({'field_id': 'url', 'label': 'URL', 'value': parsedUrl.path}))
         if "title" in additionalInfo:
             if content_object_for_path:
-                fields.append(construct_field({'field_id': 'url', 'label': 'URL', 'value': content_object_for_path.title}))
+                fields.append(construct_field({'field_id': 'current_page_title', 'label': 'Page title', 'value': content_object_for_path.title}))
             else:
                 print("FAILED TO GET CONTENT OBJECT")
 
