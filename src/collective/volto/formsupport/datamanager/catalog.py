@@ -44,7 +44,7 @@ class FormDataStore:
             data = self.request.form
         return data.get("block_id", "")
 
-    def get_form_fields(self):
+    def get_block(self):
         blocks = get_blocks(self.context)
 
         if not blocks:
@@ -58,6 +58,11 @@ class FormDataStore:
                 form_block = deepcopy(block)
         if not form_block:
             return {}
+
+        return form_block
+
+    def get_form_fields(self):
+        form_block = self.get_block()
 
         subblocks = form_block.get("subblocks", [])
 
@@ -77,17 +82,19 @@ class FormDataStore:
                 )
             )
             return None
+        fields = {}
+        for field in form_fields:
+            custom_field_id = field.get("custom_field_id")
+            field_id = custom_field_id if custom_field_id else field["field_id"]
+            fields[field_id] = field.get("label", field_id)
 
-        fields = {
-            x["field_id"]: x.get("custom_field_id", x.get("label", x["field_id"]))
-            for x in form_fields
-        }
         record = Record()
         fields_labels = {}
         fields_order = []
         for field_data in data:
-            field_id = field_data.get("field_id", "")
-            value = field_data.get("value", "")
+            field_id = field_data.field_id
+            # TODO: not nice using the protected member to access the real internal value, but easiest way.
+            value = field_data.internal_value
             if field_id in fields:
                 record.attrs[field_id] = value
                 fields_labels[field_id] = fields[field_id]
@@ -95,6 +102,8 @@ class FormDataStore:
         record.attrs["fields_labels"] = fields_labels
         record.attrs["fields_order"] = fields_order
         record.attrs["date"] = datetime.now()
+        if self.get_block().get('sendAdditionalInfo'):
+            record.attrs["url"] = self.context.absolute_url_path()
         record.attrs["block_id"] = self.block_id
         return self.soup.add(record)
 

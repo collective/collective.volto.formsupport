@@ -14,7 +14,7 @@
   <ul>
     <tal:field repeat="field parameters">
       <li tal:define="
-            value field/value|nothing;
+            value field/display_value|nothing;
             label field/label|nothing;
           ">
         <p>
