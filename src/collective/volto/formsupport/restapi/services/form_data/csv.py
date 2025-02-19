@@ -29,25 +29,6 @@ class FormDataExportGet(Service):
                 field_id = field["field_id"]
                 self.form_fields_order.append(field_id)
 
-    def get_ordered_keys(self, record):
-        """
-        We need this method because we want to maintain the fields order set in the form.
-        The form can also change during time, and each record can have different fields stored in it.
-        """
-        record_order = record.attrs.get("fields_order", [])
-        if record_order:
-            return record_order
-        order = []
-        # first add the keys that are currently in the form
-        for k in self.form_fields_order:
-            if k in record.attrs:
-                order.append(k)
-        # finally append the keys stored in the record but that are not in the form (maybe the form changed during time)
-        for k in record.attrs.keys():
-            if k not in order and k not in SKIP_ATTRS:
-                order.append(k)
-        return order
-
     def render(self):
         self.check_permission()
 
@@ -74,7 +55,7 @@ class FormDataExportGet(Service):
         for item in store.search():
             data = {}
             fields_labels = self.get_fields_labels(item)
-            for k in self.get_ordered_keys(item):
+            for k in self.form_fields_order:
                 if k in SKIP_ATTRS:
                     continue
                 value = item.attrs.get(k, None)
@@ -87,6 +68,7 @@ class FormDataExportGet(Service):
                 value = item.attrs.get(k, None)
                 data[k] = json_compatible(value)
             rows.append(data)
+
         columns.extend(fixed_columns)
         writer = csv.DictWriter(sbuf, fieldnames=columns, quoting=csv.QUOTE_ALL)
         writer.writeheader()

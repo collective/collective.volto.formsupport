@@ -4,7 +4,8 @@ Changelog
 3.2.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Use confugured forms fields as CSV export columns.
+  [folix-01]
 
 
 3.2.1 (2025-01-09)
