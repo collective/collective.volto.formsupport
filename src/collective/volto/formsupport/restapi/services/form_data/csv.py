@@ -1,5 +1,6 @@
 from collective.volto.formsupport.interfaces import IFormDataStore
 from io import StringIO
+from plone import api
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
 from zope.component import getMultiAdapter
@@ -14,6 +15,7 @@ class FormDataExportGet(Service):
     def __init__(self, context, request):
         super().__init__(context, request)
         self.form_fields_order = []
+        self.form_fields_type = {}
         self.form_block = {}
 
         blocks = getattr(context, "blocks", {})
@@ -28,6 +30,7 @@ class FormDataExportGet(Service):
             for field in self.form_block.get("subblocks", []):
                 field_id = field["field_id"]
                 self.form_fields_order.append(field_id)
+                self.form_fields_type[field_id] = field.get("field_type", "text")
 
     def get_ordered_keys(self, record):
         """
@@ -64,6 +67,9 @@ class FormDataExportGet(Service):
     def get_fields_labels(self, item):
         return item.attrs.get("fields_labels", {})
 
+    def format_date(self, value):
+        return api.portal.get_localized_time(value)
+
     def get_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
         sbuf = StringIO()
@@ -81,7 +87,10 @@ class FormDataExportGet(Service):
                 label = fields_labels.get(k, k)
                 if label not in columns and label not in fixed_columns:
                     columns.append(label)
-                data[label] = json_compatible(value)
+                if self.form_fields_type.get(k) == "date":
+                    data[label] = self.format_date(value)
+                else:
+                    data[label] = json_compatible(value)
             for k in fixed_columns:
                 # add fixed columns values
                 value = item.attrs.get(k, None)
