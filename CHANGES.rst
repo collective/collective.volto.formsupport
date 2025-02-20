@@ -4,7 +4,7 @@ Changelog
 3.2.1 (unreleased)
 ------------------
 
-- formate date in csv (as in email)
+- format date in csv (as in email)
   [mamico]
 
 
