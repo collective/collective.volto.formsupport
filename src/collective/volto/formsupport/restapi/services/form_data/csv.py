@@ -69,29 +69,44 @@ class FormDataExportGet(Service):
         sbuf = StringIO()
         fixed_columns = ["date"]
         columns = []
-
+        legacy_columns = []
         rows = []
+
         for item in store.search():
             data = {}
             fields_labels = self.get_fields_labels(item)
+
             for k in self.get_ordered_keys(item):
                 if k in SKIP_ATTRS:
                     continue
+
                 value = item.attrs.get(k, None)
                 label = fields_labels.get(k, k)
-                if label not in columns and label not in fixed_columns:
+
+                if k not in self.form_fields_order:
+                    legacy_columns.append(label)
+
+                elif label not in columns and label not in fixed_columns:
                     columns.append(label)
+
                 data[label] = json_compatible(value)
+
             for k in fixed_columns:
                 # add fixed columns values
                 value = item.attrs.get(k, None)
                 data[k] = json_compatible(value)
+
             rows.append(data)
+
         columns.extend(fixed_columns)
+        columns.extend(sorted(legacy_columns))
         writer = csv.DictWriter(sbuf, fieldnames=columns, quoting=csv.QUOTE_ALL)
         writer.writeheader()
+
         for row in rows:
             writer.writerow(row)
+
         res = sbuf.getvalue()
         sbuf.close()
+
         return res

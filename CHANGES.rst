@@ -4,7 +4,8 @@ Changelog
 3.2.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Obsolete columns order in the csv export.
+  [folix-01]
 
 
 3.2.1 (2025-01-09)
@@ -17,8 +18,8 @@ Changelog
 3.2.0 (2024-11-15)
 ------------------
 
-- Added an adapter (`IDataAdapter`) to allow information to be added as a return value 
-  to the form-data expander. This allows addons that integrate information to be added 
+- Added an adapter (`IDataAdapter`) to allow information to be added as a return value
+  to the form-data expander. This allows addons that integrate information to be added
   rather than overwriting the expander each time.
   [mamico]
 
