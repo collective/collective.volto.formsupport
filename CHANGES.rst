@@ -4,7 +4,8 @@ Changelog
 3.2.2 (unreleased)
 ------------------
 
-- Obsolete columns order in the csv export.
+- Now in the CSV export the obsolete records fields are ordered
+  alphabetically after the current form fields.
   [folix-01]
 
 
