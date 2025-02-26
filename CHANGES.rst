@@ -8,6 +8,9 @@ Changelog
   alphabetically after the current form fields.
   [folix-01]
 
+- Add current form columns to CSV export event if field are empty.
+  [folix-01]
+
 
 3.2.1 (2025-01-09)
 ------------------

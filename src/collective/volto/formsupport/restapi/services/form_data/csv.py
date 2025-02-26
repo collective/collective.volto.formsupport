@@ -3,6 +3,8 @@ from io import StringIO
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
 from zope.component import getMultiAdapter
+from collective.volto.formsupport.utils import get_blocks
+from copy import deepcopy
 
 import csv
 
@@ -23,11 +25,36 @@ class FormDataExportGet(Service):
             block_type = block.get("@type", "")
             if block_type == "form":
                 self.form_block = block
+                self.form_block_id = id
 
         if self.form_block:
             for field in self.form_block.get("subblocks", []):
                 field_id = field["field_id"]
                 self.form_fields_order.append(field_id)
+
+    def get_form_fields(self):
+        blocks = get_blocks(self.context)
+
+        if not blocks:
+            return {}
+        form_block = {}
+        for id, block in blocks.items():
+            if id != self.form_block_id:
+                continue
+            block_type = block.get("@type", "")
+            if block_type == "form":
+                form_block = deepcopy(block)
+        if not form_block:
+            return {}
+
+        subblocks = form_block.get("subblocks", [])
+
+        # Add the 'custom_field_id' field back in as this isn't stored with each subblock
+        for index, field in enumerate(subblocks):
+            if form_block.get(field["field_id"]):
+                subblocks[index]["custom_field_id"] = form_block.get(field["field_id"])
+
+        return subblocks
 
     def get_ordered_keys(self, record):
         """
@@ -61,8 +88,12 @@ class FormDataExportGet(Service):
             data = data.encode("utf-8")
         self.request.response.write(data)
 
-    def get_fields_labels(self, item):
-        return item.attrs.get("fields_labels", {})
+    def get_fields_labels(self):
+        return {
+            x["field_id"]: x.get("custom_field_id", x.get("label", x["field_id"]))
+            for x in self.get_form_fields()
+            if x.get("field_type", "") != "static_text"
+        }
 
     def get_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
@@ -71,23 +102,22 @@ class FormDataExportGet(Service):
         columns = []
         legacy_columns = []
         rows = []
+        fields_labels = self.get_fields_labels()
 
         for item in store.search():
             data = {}
-            fields_labels = self.get_fields_labels(item)
 
             for k in self.get_ordered_keys(item):
                 if k in SKIP_ATTRS:
                     continue
 
                 value = item.attrs.get(k, None)
-                label = fields_labels.get(k, k)
+                label = {**item.attrs.get("fields_labels", {}), **fields_labels}.get(
+                    k, k
+                )
 
-                if k not in self.form_fields_order:
+                if k not in self.form_fields_order and label not in legacy_columns:
                     legacy_columns.append(label)
-
-                elif label not in columns and label not in fixed_columns:
-                    columns.append(label)
 
                 data[label] = json_compatible(value)
 
@@ -98,8 +128,10 @@ class FormDataExportGet(Service):
 
             rows.append(data)
 
+        columns.extend(fields_labels.values())
         columns.extend(fixed_columns)
         columns.extend(sorted(legacy_columns))
+
         writer = csv.DictWriter(sbuf, fieldnames=columns, quoting=csv.QUOTE_ALL)
         writer.writeheader()
 
