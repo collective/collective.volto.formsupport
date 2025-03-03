@@ -149,7 +149,7 @@ class PostAdapter:
         for form_field in self.form_data.get("data", []):
             if form_field.get("field_id", "") not in email_fields:
                 continue
-            if _isemail(form_field.get("value", "")) is None:
+            if not _isemail(form_field.get("value", "")):
                 raise BadRequest(
                     translate(
                         _(
