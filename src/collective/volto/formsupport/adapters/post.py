@@ -262,9 +262,11 @@ class PostAdapter:
 
             if field_id:
                 field_index = field_ids.index(field_id)
-
+                value = field.get("value", "")
+                if isinstance(value, list):
+                    field["value"] = ", ".join(value)
                 if self.block["subblocks"][field_index].get("field_type") == "date":
-                    field["value"] = api.portal.get_localized_time(field["value"])
+                    field["value"] = api.portal.get_localized_time(value)
 
             formatted_fields.append(field)
 
