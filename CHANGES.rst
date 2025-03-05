@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.2.2 (unreleased)
+3.2.2 (2025-03-05)
 ------------------
 
 - Format list values in format_fields as comma separated strings to improve readability on email messages.
