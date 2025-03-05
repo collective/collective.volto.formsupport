@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <metadata>
-  <version>1301</version>
+  <version>1302</version>
   <dependencies>
     <dependency>profile-collective.volto.otp:default</dependency>
   </dependencies>

@@ -1,3 +1,5 @@
+from plone.restapi.controlpanels.interfaces import IControlpanel
+from plone.schema import JSONField
 from zope.interface import Attribute
 from zope.interface import Interface
 from zope.interface.interfaces import IObjectEvent
@@ -69,3 +71,9 @@ IFormData = IPostAdapter
 class IDataAdapter(Interface):
     def __call__(result, block_id=None):
         pass
+
+
+class IGlobalFormStore(IControlpanel):
+    global_forms_config = JSONField(
+        title="Global forms", description="", required=True, default={}
+    )
