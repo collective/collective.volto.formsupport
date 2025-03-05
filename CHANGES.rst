@@ -4,7 +4,8 @@ Changelog
 3.2.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Format list values in format_fields as comma separated strings to improve readability on email messages.
+  [cekk]
 
 
 3.2.1 (2025-01-09)
