@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.2.2 (unreleased)
+3.2.3 (unreleased)
 ------------------
 
 - Now in the CSV export the obsolete records fields are ordered
@@ -10,6 +10,13 @@ Changelog
 
 - Add current form columns to CSV export event if field are empty.
   [folix-01]
+
+
+3.2.2 (2025-03-05)
+------------------
+
+- Format list values in format_fields as comma separated strings to improve readability on email messages.
+  [cekk]
 
 
 3.2.1 (2025-01-09)
