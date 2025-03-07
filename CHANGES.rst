@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.2.3 (unreleased)
+3.2.3 (2025-03-07)
 ------------------
 
 - Now in the CSV export the obsolete records fields are ordered
