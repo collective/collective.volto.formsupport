@@ -4,7 +4,12 @@ Changelog
 3.2.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Now in the CSV export the obsolete records fields are ordered
+  alphabetically after the current form fields.
+  [folix-01]
+
+- Add current form columns to CSV export event if field are empty.
+  [folix-01]
 
 
 3.2.2 (2025-03-05)
@@ -24,8 +29,8 @@ Changelog
 3.2.0 (2024-11-15)
 ------------------
 
-- Added an adapter (`IDataAdapter`) to allow information to be added as a return value 
-  to the form-data expander. This allows addons that integrate information to be added 
+- Added an adapter (`IDataAdapter`) to allow information to be added as a return value
+  to the form-data expander. This allows addons that integrate information to be added
   rather than overwriting the expander each time.
   [mamico]
 
