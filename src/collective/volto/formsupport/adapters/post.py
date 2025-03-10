@@ -18,6 +18,11 @@ import math
 import os
 
 
+GLOBAL_FORM_REGISTRY_RECORD_ID = (
+    "collective.volto.formsupport.interfaces.IGlobalFormStore.global_forms_config"
+)
+
+
 @implementer(IPostAdapter)
 @adapter(Interface, Interface)
 class PostAdapter:
@@ -29,8 +34,12 @@ class PostAdapter:
         self.request = request
         self.form_data = self.extract_data_from_request()
         self.block_id = self.form_data.get("block_id", "")
+        self.global_form_id = self.extract_data_from_request().get("global_form_id", "")
         if self.block_id:
-            self.block = self.get_block_data(block_id=self.block_id)
+            self.block = self.get_block_data(
+                block_id=self.block_id,
+                global_form_id=self.form_data.get("global_form_id"),
+            )
 
     def __call__(self):
         """
@@ -50,7 +59,10 @@ class PostAdapter:
         fixed_fields = []
         transforms = api.portal.get_tool(name="portal_transforms")
 
-        block = self.get_block_data(block_id=form_data.get("block_id", ""))
+        block = self.get_block_data(
+            block_id=form_data.get("block_id", ""),
+            global_form_id=form_data.get("global_form_id"),
+        )
         block_fields = [x.get("field_id", "") for x in block.get("subblocks", [])]
 
         for form_field in form_data.get("data", []):
@@ -68,12 +80,24 @@ class PostAdapter:
 
         return form_data
 
-    def get_block_data(self, block_id):
+    def get_block_data(self, block_id, global_form_id):
         blocks = get_blocks(self.context)
+        global_form_id = global_form_id
+        if global_form_id:
+            global_forms = api.portal.get_registry_record(
+                GLOBAL_FORM_REGISTRY_RECORD_ID
+            )
+            if global_forms:
+                blocks = {**blocks, **global_forms}
         if not blocks:
             return {}
         for id, block in blocks.items():
-            if id != block_id:
+            # Prefer local forms it they're available, fall back to global form
+            if (
+                id != block_id
+                and id != global_form_id
+                and block.get("global_form_id") != global_form_id
+            ):
                 continue
             block_type = block.get("@type", "")
             if block_type != "form":

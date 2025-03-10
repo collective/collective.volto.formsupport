@@ -40,4 +40,12 @@
       handler=".upgrades.to_1301"
       />
 
+  <genericsetup:upgradeDepends
+      title="Add global form registry entry"
+      profile="collective.volto.formsupport:default"
+      source="1301"
+      destination="1302"
+      import_steps="plone.app.registry"
+      />
+
 </configure>

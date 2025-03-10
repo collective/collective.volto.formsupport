@@ -56,11 +56,10 @@ class SubmitPost(Service):
         self.form_data_adapter = getMultiAdapter(
             (self.context, self.request), IPostAdapter
         )
-        self.form_data = self.get_form_data()
-        self.block_id = self.form_data.get("block_id", "")
-
-        if self.block_id:
-            self.block = self.get_block_data(block_id=self.block_id)
+        # We've already done all the work to get this data, let's reuse it.
+        self.form_data = self.form_data_adapter.form_data
+        self.block_id = self.form_data_adapter.block_id
+        self.block = self.form_data_adapter.block
 
     def reply(self):
         store_action = self.block.get("store", False)
