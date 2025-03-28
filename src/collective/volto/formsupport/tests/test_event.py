@@ -19,7 +19,7 @@ import unittest
 
 def event_handler(event):
     event.data["data"].append(
-        {"label": "Reply", "value": "hello"},
+        {"label": "Reply", "value": "hello", "field_id": "message"},
     )
 
 

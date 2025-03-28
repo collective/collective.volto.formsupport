@@ -10,6 +10,7 @@ from plone.testing import z2
 import collective.honeypot
 import collective.MockMailHost
 import collective.volto.formsupport
+import collective.volto.otp
 import plone.restapi
 
 
@@ -24,6 +25,7 @@ class VoltoFormsupportLayer(PloneSandboxLayer):
 
         self.loadZCML(package=plone.restapi)
         self.loadZCML(package=collective.volto.formsupport)
+        self.loadZCML(package=collective.volto.otp)
 
     def setUpPloneSite(self, portal):
         applyProfile(portal, "plone.restapi:blocks")
@@ -62,6 +64,7 @@ class VoltoFormsupportRestApiLayer(PloneRestApiDXLayer):
         self.loadZCML(package=plone.restapi)
         self.loadZCML(package=collective.honeypot)
         self.loadZCML(package=collective.volto.formsupport)
+        self.loadZCML(package=collective.volto.otp)
 
     def setUpPloneSite(self, portal):
         applyProfile(portal, "collective.volto.formsupport:default")

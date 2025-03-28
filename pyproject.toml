@@ -84,12 +84,13 @@ Zope = [
 ]
 python-dateutil = ['dateutil']
 'souper.plone' = ['souper', 'repoze.catalog']
+beautifulsoup4 = ['bs4']
 # extra packages
 ignore-packages = [
   # these are packages defined in extras_require
   'collective.honeypot', 'plone.formwidget.hcaptcha', 'plone.formwidget.recaptcha',
   'collective.volto.blocksfield', 'collective.z3cform.norobots',
-  'plone.app.iterate',
+  'plone.app.iterate', 'plone.app.upgrade',
   # XXX: This is a temporary fix for make the package usable with Plone  5.2 and 6.0
   'plone.base', 'Products.CMFPlone',
 ]

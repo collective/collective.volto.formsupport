@@ -1,3 +1,4 @@
+from collective.volto.formsupport.interfaces import IDataAdapter
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.utils import get_blocks
 from datetime import datetime
@@ -9,6 +10,7 @@ from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
 from zope.component import adapter
+from zope.component import getAdapters
 from zope.component import getMultiAdapter
 from zope.interface import implementer
 from zope.interface import Interface
@@ -32,6 +34,7 @@ class FormData:
             store = getMultiAdapter((self.context, self.request), IFormDataStore)
             remove_data_after_days = int(block.get("remove_data_after_days") or 0)
             data = store.search()
+
             if remove_data_after_days > 0:
                 expire_date = datetime.now() - timedelta(days=remove_data_after_days)
             else:
@@ -71,6 +74,9 @@ class FormData:
             "items_total": len(items),
             "expired_total": expired_total,
         }
+        adapters = getAdapters((self.context, self.request), provided=IDataAdapter)
+        for _, adpt in adapters:
+            result = adpt(result, block_id=self.block_id)
         return result
 
     @property

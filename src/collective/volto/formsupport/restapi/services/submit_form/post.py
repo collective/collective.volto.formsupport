@@ -1,27 +1,30 @@
-from collective.volto.formsupport import _
-from collective.volto.formsupport.interfaces import ICaptchaSupport
-from collective.volto.formsupport.interfaces import IFormDataStore
-from collective.volto.formsupport.interfaces import IPostEvent
-from collective.volto.formsupport.utils import get_blocks
-from collective.volto.formsupport.utils import validate_email_token
-from copy import deepcopy
+from bs4 import BeautifulSoup
 from datetime import datetime
 from email import policy
 from email.message import EmailMessage
 from io import BytesIO
 from plone import api
 
+import codecs
+import logging
+import os
+import re
+import base64
 
 try:
     from plone.base.interfaces.controlpanel import IMailSchema
 except ImportError:
     from Products.CMFPlone.interfaces.controlpanel import IMailSchema
 
+from collective.volto.formsupport import _
+from collective.volto.formsupport.events import FormSubmittedEvent
+from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.interfaces import IPostAdapter
+from collective.volto.formsupport.interfaces import IPostEvent
+from collective.volto.formsupport.utils import get_blocks
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
-from plone.restapi.deserializer import json_body
 from plone.restapi.services import Service
-from plone.schema.email import _isemail
 from xml.etree.ElementTree import Element
 from xml.etree.ElementTree import ElementTree
 from xml.etree.ElementTree import SubElement
@@ -32,12 +35,6 @@ from zope.event import notify
 from zope.i18n import translate
 from zope.interface import alsoProvides
 from zope.interface import implementer
-
-import base64
-import codecs
-import logging
-import math
-import os
 
 
 logger = logging.getLogger(__name__)
@@ -56,14 +53,16 @@ class SubmitPost(Service):
         super().__init__(context, request)
 
         self.block = {}
-        self.form_data = self.cleanup_data()
+        self.form_data_adapter = getMultiAdapter(
+            (self.context, self.request), IPostAdapter
+        )
+        self.form_data = self.get_form_data()
         self.block_id = self.form_data.get("block_id", "")
+
         if self.block_id:
             self.block = self.get_block_data(block_id=self.block_id)
 
     def reply(self):
-        self.validate_form()
-
         store_action = self.block.get("store", False)
         send_action = self.block.get("send", [])
 
@@ -72,7 +71,7 @@ class SubmitPost(Service):
 
         notify(PostEventService(self.context, self.form_data))
 
-        if send_action:
+        if send_action or self.get_bcc():
             try:
                 self.send_data()
             except BadRequest as e:
@@ -88,190 +87,16 @@ class SubmitPost(Service):
                 )
                 self.request.response.setStatus(500)
                 return dict(type="InternalServerError", message=message)
+
+        notify(FormSubmittedEvent(self.context, self.block, self.form_data))
+
         if store_action:
             self.store_data()
 
         return {"data": self.form_data.get("data", [])}
 
-    def cleanup_data(self):
-        """
-        Avoid XSS injections and other attacks.
-
-        - cleanup HTML with plone transform
-        - remove from data, fields not defined in form schema
-        """
-        form_data = json_body(self.request)
-        fixed_fields = []
-        transforms = api.portal.get_tool(name="portal_transforms")
-
-        block = self.get_block_data(block_id=form_data.get("block_id", ""))
-        block_fields = [x.get("field_id", "") for x in block.get("subblocks", [])]
-
-        for form_field in form_data.get("data", []):
-            if form_field.get("field_id", "") not in block_fields:
-                # unknown field, skip it
-                continue
-            new_field = deepcopy(form_field)
-            value = new_field.get("value", "")
-            if isinstance(value, str):
-                stream = transforms.convertTo("text/plain", value, mimetype="text/html")
-                new_field["value"] = stream.getData().strip()
-            fixed_fields.append(new_field)
-        form_data["data"] = fixed_fields
-        return form_data
-
-    def validate_form(self):
-        """
-        check all required fields and parameters
-        """
-        if not self.block_id:
-            raise BadRequest(
-                translate(
-                    _("missing_blockid_label", default="Missing block_id"),
-                    context=self.request,
-                )
-            )
-        if not self.block:
-            raise BadRequest(
-                translate(
-                    _(
-                        "block_form_not_found_label",
-                        default='Block with @type "form" and id "$block" not found in this context: $context',
-                        mapping={
-                            "block": self.block_id,
-                            "context": self.context.absolute_url(),
-                        },
-                    ),
-                    context=self.request,
-                ),
-            )
-
-        if not self.block.get("store", False) and not self.block.get("send", []):
-            raise BadRequest(
-                translate(
-                    _(
-                        "missing_action",
-                        default='You need to set at least one form action between "send" and "store".',  # noqa
-                    ),
-                    context=self.request,
-                )
-            )
-
-        if not self.form_data.get("data") and not self.form_data.get("attachments"):
-            raise BadRequest(
-                translate(
-                    _(
-                        "empty_form_data",
-                        default="Empty form data.",
-                    ),
-                    context=self.request,
-                )
-            )
-
-        self.validate_attachments()
-        if self.block.get("captcha", False):
-            getMultiAdapter(
-                (self.context, self.request),
-                ICaptchaSupport,
-                name=self.block["captcha"],
-            ).verify(self.form_data.get("captcha"))
-
-        self.validate_email_fields()
-        self.validate_bcc()
-
-    def validate_email_fields(self):
-        email_fields = [
-            x.get("field_id", "")
-            for x in self.block.get("subblocks", [])
-            if x.get("field_type", "") == "from"
-        ]
-        for form_field in self.form_data.get("data", []):
-            if form_field.get("field_id", "") not in email_fields:
-                continue
-            if _isemail(form_field.get("value", "")) is None:
-                raise BadRequest(
-                    translate(
-                        _(
-                            "wrong_email",
-                            default='Email not valid in "${field}" field.',
-                            mapping={
-                                "field": form_field.get("label", ""),
-                            },
-                        ),
-                        context=self.request,
-                    )
-                )
-
-    def validate_attachments(self):
-        """
-        * validate attachments size (total size of all attachments must be less
-          than FORM_ATTACHMENTS_LIMIT)
-        """
-        attachments_limit = os.environ.get("FORM_ATTACHMENTS_LIMIT", "")
-        if not attachments_limit:
-            return
-        attachments = self.form_data.get("attachments", {})
-        attachments_len = 0
-        for value in attachments.values():
-            data = value.get("data", "")
-            if value.get("encoding") == "base64":
-                attachments_len += len(base64.b64decode(data))
-            else:
-                attachments_len += len(data)
-        if attachments_len > float(attachments_limit) * pow(1024, 2):
-            size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-            i = int(math.floor(math.log(attachments_len, 1024)))
-            p = math.pow(1024, i)
-            s = round(attachments_len / p, 2)
-            uploaded_str = f"{s} {size_name[i]}"
-            raise BadRequest(
-                translate(
-                    _(
-                        "attachments_too_big",
-                        default="Attachments too big. You uploaded ${uploaded_str},"
-                        " but limit is ${max} MB. Try to compress files.",
-                        mapping={
-                            "max": attachments_limit,
-                            "uploaded_str": uploaded_str,
-                        },
-                    ),
-                    context=self.request,
-                )
-            )
-
-    def validate_bcc(self):
-        bcc_fields = []
-        for field in self.block.get("subblocks", []):
-            if field.get("use_as_bcc", False):
-                field_id = field.get("field_id", "")
-                if field_id not in bcc_fields:
-                    bcc_fields.append(field_id)
-
-        for data in self.form_data.get("data", []):
-            value = data.get("value", "")
-            if not value:
-                continue
-
-            if data.get("field_id", "") in bcc_fields:
-                if not validate_email_token(
-                    self.form_data.get("block_id", ""), data["value"], data["otp"]
-                ):
-                    raise BadRequest(
-                        _("{email}'s OTP is wrong").format(email=data["value"])
-                    )
-
-    def get_block_data(self, block_id):
-        blocks = get_blocks(self.context)
-        if not blocks:
-            return {}
-        for id, block in blocks.items():
-            if id != block_id:
-                continue
-            block_type = block.get("@type", "")
-            if block_type != "form":
-                continue
-            return block
-        return {}
+    def get_form_data(self):
+        return self.form_data_adapter()
 
     def get_reply_to(self):
         """This method retrieves the correct field to be used as 'reply to'.
@@ -296,6 +121,19 @@ class SubmitPost(Service):
                                 return data.get("value", "")
 
         return self.form_data.get("from", "") or self.block.get("default_from", "")
+
+    def get_block_data(self, block_id):
+        blocks = get_blocks(self.context)
+        if not blocks:
+            return {}
+        for id, block in blocks.items():
+            if id != block_id:
+                continue
+            block_type = block.get("@type", "")
+            if block_type != "form":
+                continue
+            return block
+        return {}
 
     def get_bcc(self):
         bcc = []
@@ -328,13 +166,19 @@ class SubmitPost(Service):
         )
 
         for i in self.form_data.get("data", []):
-            # Handle `field_name_321323` kind of id used by frontend package
-            field_id = i.get("field_id", "").split("_")[-1]
+
+            field_id = i.get("field_id")
 
             if not field_id:
                 continue
 
-            subject = subject.replace("${" + i.get("field_id") + "}", i.get("value"))
+            # Handle this kind of id format: `field_name_123321, whichj is used by frontend package logics
+            pattern = r"\$\{[^}]+\}"
+            matches = re.findall(pattern, subject)
+
+            for match in matches:
+                if field_id in match:
+                    subject = subject.replace(match, str(i.get("value")))
 
         return subject
 
@@ -366,9 +210,10 @@ class SubmitPost(Service):
         registry = getUtility(IRegistry)
         mail_settings = registry.forInterface(IMailSchema, prefix="plone")
         charset = registry.get("plone.email_charset", "utf-8")
-
         should_send = self.block.get("send", [])
-        if should_send:
+        bcc = self.get_bcc()
+
+        if should_send or bcc:
             portal_transforms = api.portal.get_tool(name="portal_transforms")
             mto = self.block.get("default_to", mail_settings.email_from_address)
             message = self.prepare_message()
@@ -393,11 +238,11 @@ class SubmitPost(Service):
 
             self.manage_attachments(msg=msg)
 
-            if isinstance(should_send, list):
+            if should_send and isinstance(should_send, list):
                 if "recipient" in self.block.get("send", []):
                     self.send_mail(msg=msg, charset=charset)
                 # Backwards compatibility for forms before 'acknowledgement' sending
-            else:
+            elif should_send:
                 self.send_mail(msg=msg, charset=charset)
 
             # send a copy also to the fields with bcc flag
@@ -426,6 +271,33 @@ class SubmitPost(Service):
                 self.send_mail(msg=acknowledgement_mail, charset=charset)
 
     def prepare_message(self):
+
+        mail_header = self.block.get("mail_header", {}).get("data", "")
+        mail_footer = self.block.get("mail_footer", {}).get("data", "")
+
+        # Check if there is content
+        bs_mail_header = BeautifulSoup(mail_header)
+        bs_mail_footer = BeautifulSoup(mail_footer)
+
+        portal = getMultiAdapter(
+            (self.context, self.request), name="plone_portal_state"
+        ).portal()
+
+        frontend_domain = api.portal.get_registry_record(
+            name="volto.frontend_domain", default=""
+        )
+
+        for snippet in [bs_mail_header, bs_mail_footer]:
+            if snippet:
+                for link in snippet.find_all("a"):
+                    if link.get("href", "").startswith("/"):
+                        link["href"] = (
+                            frontend_domain or portal.absolute_url()
+                        ) + link["href"]
+
+        mail_header = bs_mail_header.get_text() and bs_mail_header.prettify() or None
+        mail_footer = bs_mail_footer.get_text() and bs_mail_footer.prettify() or None
+
         email_format_page_template_mapping = {
             "list": "send_mail_template",
             "table": "send_mail_template_table",
@@ -441,28 +313,13 @@ class SubmitPost(Service):
             request=self.request,
         )
         parameters = {
-            "parameters": self.filter_parameters(),
+            "parameters": self.form_data_adapter.format_fields(),
             "url": self.context.absolute_url(),
             "title": self.context.Title(),
+            "mail_header": mail_header,
+            "mail_footer": mail_footer,
         }
         return message_template(**parameters)
-
-    def filter_parameters(self):
-        """
-        do not send attachments fields.
-
-        Used for email message body, and xml attachment (?)
-        """
-        skip_fields = [
-            x.get("field_id", "")
-            for x in self.block.get("subblocks", [])
-            if x.get("field_type", "") == "attachment"
-        ]
-        return [
-            x
-            for x in self.form_data.get("data", [])
-            if x.get("field_id", "") not in skip_fields
-        ]
 
     def send_mail(self, msg, charset):
         host = api.portal.get_tool(name="MailHost")
@@ -515,7 +372,7 @@ class SubmitPost(Service):
         output = BytesIO()
         xmlRoot = Element("form")
 
-        for field in self.filter_parameters():
+        for field in self.form_data_adapter.filter_parameters():
             SubElement(
                 xmlRoot, "field", name=field.get("custom_field_id", field["label"])
             ).text = str(field.get("value", ""))
@@ -532,13 +389,14 @@ class SubmitPost(Service):
 
     def store_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
-        # XXX: in the future data and attachments could be merged in a single field
-        data = self.form_data.get("data") or []
+        import pdb;pdb.set_trace()
+        data = self.form_data_adapter.filter_parameters()
         if self.form_data.get("attachments"):
             data += [
                 {"field_id": a["field_id"], "value": a}
                 for a in self.form_data["attachments"].values()
             ]
         res = store.add(data=data)
+
         if not res:
             raise BadRequest("Unable to store data")

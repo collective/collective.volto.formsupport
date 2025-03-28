@@ -14,12 +14,14 @@
   -->
   <!--<includeDependencies package="." />-->
 
+  <include package="collective.volto.otp" />
   <include package="souper.plone" />
 
   <include package=".browser" />
   <include package=".datamanager" />
   <include package=".restapi" />
   <include package=".captcha" />
+  <include package=".adapters" />
 
   <include file="permissions.zcml" />
   <include file="upgrades.zcml" />

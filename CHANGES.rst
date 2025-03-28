@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.0.3 (unreleased)
+3.2.4 (unreleased)
 ------------------
 
 - Save attachments as blobfile in the storage adapter, add a view to download them, returns
@@ -12,7 +12,109 @@ Changelog
   [mamico]
 - Subject templating
   [folix-01]
+- Nothing changed yet.
+
+
+3.2.3 (2025-03-07)
+------------------
+
+- Now in the CSV export the obsolete records fields are ordered
+  alphabetically after the current form fields.
+  [folix-01]
+
+- Add current form columns to CSV export event if field are empty.
+  [folix-01]
+
+
+3.2.2 (2025-03-05)
+------------------
+
+- Format list values in format_fields as comma separated strings to improve readability on email messages.
+  [cekk]
+
+
+3.2.1 (2025-01-09)
+------------------
+
+- Adapt email subject templating functionality to different value types.
+  [folix-01]
+
+
+3.2.0 (2024-11-15)
+------------------
+
+- Added an adapter (`IDataAdapter`) to allow information to be added as a return value
+  to the form-data expander. This allows addons that integrate information to be added
+  rather than overwriting the expander each time.
+  [mamico]
+
+- Add FormSubmittedEvent to handle the new compiled forms.
+  [folix-01]
+
+- Add PostAdapter to predispose the customization of data handling by other add-ons.
+  [folix-01]
+
+
+3.1.5 (2024-10-24)
+------------------
+
+- Fix otp verification logic: do not break if otp is not in POST call
+  [cekk]
+
+
+3.1.4 (2024-09-27)
+------------------
+
+- Add missing collective.volto.otp include for pip environment setup
+  [folix-01]
+
+- Switchable email bcc fields OTP verification.
+  [folix-01]
+
+- Added ISO formatted strings being allowed as date inputs
+  [JeffersonBledsoe]
+
+
+3.1.3 (2024-09-11)
+------------------
+
+- Send messages to emails signed as 'use_as_bcc' independently from 'send' flag.
+  [folix-01]
+
+- Update Italian translations.
+  [cekk]
+
+
+3.1.2 (2024-08-08)
+------------------
+
+- Fix upgradestep from version.
+  [folix-01]
+
+
+3.1.1 (2024-08-08)
+------------------
+
+- Fix mail header and footer links.
+  [folix-01]
+- Plone5 compatibility in the upgradesteps
+  [folix-01]
+- Install otp package by upgradestep
+  [folix-01]
+- Maintain the fields order in email message.
+  [folix-01]
+- Remove otp logics (moved to collective.volto.otp)
+  [folix-01]
+
+3.1.0 (2024-07-04)
+------------------
+
+- Configurable header and footer for email message.
+  [folix-01]
+- Subject templating
 - Handle the edge cases where the `blocks` attribute is not set.
+  [mamico]
+- Configuring with plone/meta
   [mamico]
 
 
