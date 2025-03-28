@@ -10,6 +10,7 @@ import logging
 import os
 import re
 
+
 try:
     from plone.base.interfaces.controlpanel import IMailSchema
 except ImportError:
@@ -165,7 +166,6 @@ class SubmitPost(Service):
         )
 
         for i in self.form_data.get("data", []):
-
             field_id = i.get("field_id")
 
             if not field_id:
@@ -182,7 +182,6 @@ class SubmitPost(Service):
         return subject
 
     def send_data(self):
-
         subject = self.get_subject()
 
         mfrom = self.form_data.get("from", "") or self.block.get("default_from", "")
@@ -270,7 +269,6 @@ class SubmitPost(Service):
                 self.send_mail(msg=acknowledgement_mail, charset=charset)
 
     def prepare_message(self):
-
         mail_header = self.block.get("mail_header", {}).get("data", "")
         mail_footer = self.block.get("mail_footer", {}).get("data", "")
 
