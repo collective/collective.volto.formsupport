@@ -126,7 +126,10 @@ class FormDataExportGet(Service):
                 if k not in self.form_fields_order and label not in legacy_columns:
                     legacy_columns.append(label)
 
-                data[label] = json_compatible(value)
+                if isinstance(value, NamedBlobFile):
+                    data[label] = value.filename
+                else:
+                    data[label] = json_compatible(value)
 
             for k in fixed_columns:
                 # add fixed columns values

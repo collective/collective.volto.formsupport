@@ -23,7 +23,6 @@ import transaction
     help="--dryrun (default) simulate, --no-dryrun actually save the changes",
 )
 def main(dryrun):
-    # import pdb;pdb.set_trace()
     if dryrun:
         print("CHECK ONLY")
     catalog = api.portal.get_tool("portal_catalog")

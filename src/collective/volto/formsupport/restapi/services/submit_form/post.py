@@ -9,7 +9,6 @@ import codecs
 import logging
 import os
 import re
-import base64
 
 try:
     from plone.base.interfaces.controlpanel import IMailSchema
@@ -389,7 +388,6 @@ class SubmitPost(Service):
 
     def store_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
-        import pdb;pdb.set_trace()
         data = self.form_data_adapter.filter_parameters()
         if self.form_data.get("attachments"):
             data += [
