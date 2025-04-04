@@ -176,22 +176,13 @@ class TestMailStore(unittest.TestCase):
         self.assertEqual(len(data["items"]), 1)
         self.assertEqual(
             sorted(data["items"][0].keys()),
-            [
-                "__expired",
-                "block_id",
-                "date",
-                "field_type",
-                "file",
-                "id",
-                "message",
-                "name",
-            ],
+            ["__expired", "block_id", "date", "file", "id", "message", "name"],
         )
         self.assertEqual(
             data["items"][0]["message"],
-            {"label": "Message", "value": "just want to say hi"},
+            {"label": "Message", "value": "just want to say hi", "field_type": "text"},
         )
-        self.assertEqual(data["items"][0]["name"], {"label": "Name", "value": "John"})
+        self.assertEqual(data["items"][0]["name"], {"label": "Name", "value": "John", "field_type": "text"})
         response = self.submit_form(
             data={
                 "from": "sally@doe.com",
@@ -210,20 +201,11 @@ class TestMailStore(unittest.TestCase):
         self.assertEqual(len(data["items"]), 2)
         self.assertEqual(
             sorted(data["items"][0].keys()),
-            ["__expired", "block_id", "date", "field_type", "id", "message", "name"],
+            ["__expired", "block_id", "date", "id", "message", "name"],
         )
         self.assertEqual(
             sorted(data["items"][1].keys()),
-            [
-                "__expired",
-                "block_id",
-                "date",
-                "field_type",
-                "file",
-                "id",
-                "message",
-                "name",
-            ],
+            ["__expired", "block_id", "date", "file", "id", "message", "name"],
         )
         # sorted_data = sorted(data["items"], key=lambda x: x["name"]["value"])
         self.assertEqual(data["items"][0]["name"]["value"], "Sally")
