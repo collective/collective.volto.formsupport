@@ -182,7 +182,10 @@ class TestMailStore(unittest.TestCase):
             data["items"][0]["message"],
             {"label": "Message", "value": "just want to say hi", "field_type": "text"},
         )
-        self.assertEqual(data["items"][0]["name"], {"label": "Name", "value": "John", "field_type": "text"})
+        self.assertEqual(
+            data["items"][0]["name"],
+            {"label": "Name", "value": "John", "field_type": "text"},
+        )
         response = self.submit_form(
             data={
                 "from": "sally@doe.com",
