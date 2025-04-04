@@ -176,7 +176,16 @@ class TestMailStore(unittest.TestCase):
         self.assertEqual(len(data["items"]), 1)
         self.assertEqual(
             sorted(data["items"][0].keys()),
-            ["__expired", "block_id", "date", "file", "id", "message", "name"],
+            [
+                "__expired",
+                "block_id",
+                "date",
+                "field_type",
+                "file",
+                "id",
+                "message",
+                "name",
+            ],
         )
         self.assertEqual(
             data["items"][0]["message"],
@@ -201,11 +210,20 @@ class TestMailStore(unittest.TestCase):
         self.assertEqual(len(data["items"]), 2)
         self.assertEqual(
             sorted(data["items"][0].keys()),
-            ["__expired", "block_id", "date", "id", "message", "name"],
+            ["__expired", "block_id", "date", "field_type", "id", "message", "name"],
         )
         self.assertEqual(
             sorted(data["items"][1].keys()),
-            ["__expired", "block_id", "date", "file", "id", "message", "name"],
+            [
+                "__expired",
+                "block_id",
+                "date",
+                "field_type",
+                "file",
+                "id",
+                "message",
+                "name",
+            ],
         )
         # sorted_data = sorted(data["items"], key=lambda x: x["name"]["value"])
         self.assertEqual(data["items"][0]["name"]["value"], "Sally")
