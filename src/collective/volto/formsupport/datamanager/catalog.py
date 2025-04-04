@@ -97,6 +97,7 @@ class FormDataStore:
             if field_id in fields:
                 field = fields[field_id]
                 record.attrs[field_id] = self.storedValue(value, field["type"])
+                record.attrs["field_type"] = field.get("type", "")
                 fields_labels[field_id] = field["label"]
                 fields_order.append(field_id)
             # else: skip the field

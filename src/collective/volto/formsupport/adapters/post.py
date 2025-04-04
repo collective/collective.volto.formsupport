@@ -267,16 +267,17 @@ class PostAdapter:
         field_ids = [field.get("field_id") for field in self.block.get("subblocks", [])]
 
         for field in fields:
-            field_id = field.get("field_id", "")
+            field_data = deepcopy(field)
+            field_id = field_data.get("field_id", "")
 
             if field_id:
                 field_index = field_ids.index(field_id)
-                value = field.get("value", "")
+                value = field_data.get("value", "")
                 if isinstance(value, list):
-                    field["value"] = ", ".join(value)
+                    field_data["value"] = ", ".join(value)
                 if self.block["subblocks"][field_index].get("field_type") == "date":
-                    field["value"] = api.portal.get_localized_time(value)
+                    field_data["value"] = api.portal.get_localized_time(value)
 
-            formatted_fields.append(field)
+            formatted_fields.append(field_data)
 
         return formatted_fields
