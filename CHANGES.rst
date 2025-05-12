@@ -4,8 +4,8 @@ Changelog
 3.2.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Do not set values in __init__ in *SubmitPost* because the user there is not already set and can lead to problems.
+  [cekk]
 
 3.2.3 (2025-03-07)
 ------------------
