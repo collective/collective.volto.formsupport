@@ -5,6 +5,7 @@ from datetime import datetime
 from datetime import timedelta
 from plone import api
 from plone.memoize import view
+from plone.namedfile import NamedBlobFile
 from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
@@ -99,14 +100,24 @@ class FormData:
 
     def expand_records(self, record):
         fields_labels = record.attrs.get("fields_labels", {})
+        fields_types = record.attrs.get("fields_types", {})
         data = {}
         for k, v in record.attrs.items():
-            if k in ["fields_labels", "fields_order"]:
+            if k in ["fields_labels", "fields_order", "fields_types"]:
                 continue
             data[k] = {
-                "value": json_compatible(v),
+                "field_type": fields_types.get(k, ""),
                 "label": fields_labels.get(k, k),
             }
+            if isinstance(v, NamedBlobFile):
+                data[k]["value"] = {
+                    "url": f"{self.context.absolute_url()}/saved_data/@@download/{record.intid}/{k}/{v.filename}",
+                    "filename": v.filename,
+                    "contentType": v.contentType,
+                    "size": v.getSize(),
+                }
+            else:
+                data[k]["value"] = json_compatible(v)
         data["id"] = record.intid
         return data
 

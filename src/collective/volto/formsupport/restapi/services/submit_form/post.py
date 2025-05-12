@@ -166,7 +166,6 @@ class SubmitPost(Service):
         )
 
         for i in self.form_data.get("data", []):
-
             field_id = i.get("field_id")
 
             if not field_id:
@@ -183,7 +182,6 @@ class SubmitPost(Service):
         return subject
 
     def send_data(self):
-
         subject = self.get_subject()
 
         mfrom = self.form_data.get("from", "") or self.block.get("default_from", "")
@@ -271,7 +269,6 @@ class SubmitPost(Service):
                 self.send_mail(msg=acknowledgement_mail, charset=charset)
 
     def prepare_message(self):
-
         mail_header = self.block.get("mail_header", {}).get("data", "")
         mail_footer = self.block.get("mail_footer", {}).get("data", "")
 
@@ -328,14 +325,15 @@ class SubmitPost(Service):
         host.send(msg, charset=charset, immediate=True)
 
     def manage_attachments(self, msg):
-        attachments = self.form_data.get("attachments", {})
-
+        """
+        add attachments as mime parts to the message
+        """
         if self.block.get("attachXml", False):
             self.attach_xml(msg=msg)
 
-        if not attachments:
-            return []
-        for key, value in attachments.items():
+        attachments = self.form_data.get("attachments") or {}
+        # TODO: skip attachment if not found in form fields
+        for value in attachments.values():
             content_type = "application/octet-stream"
             filename = None
             if isinstance(value, dict):
@@ -388,8 +386,13 @@ class SubmitPost(Service):
 
     def store_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
-
-        res = store.add(data=self.form_data_adapter.filter_parameters())
+        data = self.form_data_adapter.filter_parameters()
+        if self.form_data.get("attachments"):
+            data += [
+                {"field_id": a["field_id"], "value": a}
+                for a in self.form_data["attachments"].values()
+            ]
+        res = store.add(data=data)
 
         if not res:
             raise BadRequest("Unable to store data")

@@ -146,7 +146,7 @@ If block is set to store data, we store it into the content that has that block 
 
 The store is an adapter registered for *IFormDataStore* interface, so you can override it easily.
 
-Only fields that are also in block settings are stored. Missing ones will be skipped.
+Only fields that are also in block settings are stored (also attachments). Missing ones will be skipped.
 
 Each Record stores also two *service* attributes:
 
@@ -154,6 +154,12 @@ Each Record stores also two *service* attributes:
 - **fields_order**: sorted list of field ids. This can be used in csv export to keep the order of fields.
 
 We store these attributes because the form can change over time and we want to have a snapshot of the fields in the Record.
+
+When an attachment is stored, there is a view (@@download) that allow to download the file from the context, for example::
+
+    https://nohost/page/saved_data/@@download/record_id/field_id/filename
+
+This view is accessible only for users that can edit the context (Modify portal content permission).
 
 Data ID Mapping
 ^^^^^^^^^^^^^^^

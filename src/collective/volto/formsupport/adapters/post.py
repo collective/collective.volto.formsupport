@@ -14,6 +14,7 @@ from zope.i18n import translate
 from zope.interface import implementer
 from zope.interface import Interface
 
+import base64
 import math
 import os
 
@@ -118,7 +119,7 @@ class PostAdapter:
                 )
             )
 
-        if not self.form_data.get("data", []):
+        if not self.form_data.get("data", []) and not self.form_data.get("attachments"):
             raise BadRequest(
                 translate(
                     _(
@@ -207,14 +208,21 @@ class PostAdapter:
                 )
 
     def validate_attachments(self):
+        """
+        * validate attachments size (total size of all attachments must be less
+          than FORM_ATTACHMENTS_LIMIT)
+        """
         attachments_limit = os.environ.get("FORM_ATTACHMENTS_LIMIT", "")
         if not attachments_limit:
             return
         attachments = self.form_data.get("attachments", {})
         attachments_len = 0
-        for attachment in attachments.values():
-            data = attachment.get("data", "")
-            attachments_len += (len(data) * 3) / 4 - data.count("=", -2)
+        for value in attachments.values():
+            data = value.get("data", "")
+            if value.get("encoding") == "base64":
+                attachments_len += len(base64.b64decode(data))
+            else:
+                attachments_len += len(data)
         if attachments_len > float(attachments_limit) * pow(1024, 2):
             size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
             i = int(math.floor(math.log(attachments_len, 1024)))
@@ -239,6 +247,7 @@ class PostAdapter:
     def filter_parameters(self):
         """
         do not send attachments fields.
+        Used for email message body, and xml attachment (?)
         """
         result = []
 
@@ -258,16 +267,17 @@ class PostAdapter:
         field_ids = [field.get("field_id") for field in self.block.get("subblocks", [])]
 
         for field in fields:
-            field_id = field.get("field_id", "")
+            field_data = deepcopy(field)
+            field_id = field_data.get("field_id", "")
 
             if field_id:
                 field_index = field_ids.index(field_id)
-                value = field.get("value", "")
+                value = field_data.get("value", "")
                 if isinstance(value, list):
-                    field["value"] = ", ".join(value)
+                    field_data["value"] = ", ".join(value)
                 if self.block["subblocks"][field_index].get("field_type") == "date":
-                    field["value"] = api.portal.get_localized_time(value)
+                    field_data["value"] = api.portal.get_localized_time(value)
 
-            formatted_fields.append(field)
+            formatted_fields.append(field_data)
 
         return formatted_fields

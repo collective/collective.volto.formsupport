@@ -4,6 +4,14 @@ Changelog
 3.2.4 (unreleased)
 ------------------
 
+- Save attachments as blobfile in the storage adapter, add a view to download them, returns
+  attachment info in the restapi @form-data endpoint.
+  [mamico]
+- Fix: if there are multiple forms on a page, each csv button downloads the record of all the forms,
+  now if there is a block_id parameter, the csv is filtered on that.
+  [mamico]
+- Subject templating
+  [folix-01]
 - Do not set values in __init__ in *SubmitPost* because the user there is not already set and can lead to problems.
   [cekk]
 

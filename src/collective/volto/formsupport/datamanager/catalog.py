@@ -1,9 +1,11 @@
+from base64 import b64decode
 from collective.volto.formsupport import logger
 from collective.volto.formsupport.interfaces import IFormDataStore
 from collective.volto.formsupport.utils import get_blocks
 from copy import deepcopy
 from datetime import datetime
 from plone.dexterity.interfaces import IDexterityContent
+from plone.namedfile import NamedBlobFile
 from plone.restapi.deserializer import json_body
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.indexes.field import CatalogFieldIndex
@@ -79,24 +81,47 @@ class FormDataStore:
             return None
 
         fields = {
-            x["field_id"]: x.get("custom_field_id", x.get("label", x["field_id"]))
-            for x in form_fields
+            f["field_id"]: {
+                "label": f.get("custom_field_id", f.get("label", f["field_id"])),
+                "type": f.get("field_type", "text"),
+            }
+            for f in form_fields
         }
+
         record = Record()
         fields_labels = {}
         fields_order = []
+        fields_types = {}
         for field_data in data:
             field_id = field_data.get("field_id", "")
             value = field_data.get("value", "")
             if field_id in fields:
-                record.attrs[field_id] = value
-                fields_labels[field_id] = fields[field_id]
+                field = fields[field_id]
+                record.attrs[field_id] = self.storedValue(value, field["type"])
+                fields_types[field_id] = field.get("type", "")
+                fields_labels[field_id] = field["label"]
                 fields_order.append(field_id)
+            # else: skip the field
         record.attrs["fields_labels"] = fields_labels
         record.attrs["fields_order"] = fields_order
+        record.attrs["fields_types"] = fields_types
         record.attrs["date"] = datetime.now()
         record.attrs["block_id"] = self.block_id
         return self.soup.add(record)
+
+    def storedValue(self, value, type):
+        if type == "attachment":
+            if value:
+                if value.get("encoding") == "base64":
+                    data = b64decode(value["data"])
+                else:
+                    data = value["data"]
+                return NamedBlobFile(
+                    data=data,
+                    filename=value.get("filename"),
+                    contentType=value.get("content-type", "application/octet-stream"),
+                )
+        return value
 
     def length(self):
         return len([x for x in self.soup.data.values()])
