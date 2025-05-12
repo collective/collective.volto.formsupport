@@ -1,6 +1,12 @@
 Changelog
 =========
 
+3.3.1 (unreleased)
+------------------
+
+- Nothing changed yet.
+
+
 3.3.0 (2025-05-12)
 ------------------
 - BREAKING CHANGE: these new features needs volto-form-block >= v3.13.0.
