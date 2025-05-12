@@ -146,7 +146,7 @@ If block is set to store data, we store it into the content that has that block 
 
 The store is an adapter registered for *IFormDataStore* interface, so you can override it easily.
 
-Only fields that are also in block settings are stored. Missing ones will be skipped.
+Only fields that are also in block settings are stored (also attachments). Missing ones will be skipped.
 
 Each Record stores also two *service* attributes:
 
