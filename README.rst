@@ -155,6 +155,11 @@ Each Record stores also two *service* attributes:
 
 We store these attributes because the form can change over time and we want to have a snapshot of the fields in the Record.
 
+When an attachment is stored, there is a view (@@download) that allow to download the file fron the context, for example::
+
+    https://nohost/page/saved_data/@@download/record_id/field_id/filename
+
+
 Data ID Mapping
 ^^^^^^^^^^^^^^^
 
