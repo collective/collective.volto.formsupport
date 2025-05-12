@@ -49,10 +49,12 @@ class PostEventService:
 
 
 class SubmitPost(Service):
-    def __init__(self, context, request):
-        super().__init__(context, request)
+    block = {}
+    block_id = ""
+    form_data_adapter = None
+    form_data = {}
 
-        self.block = {}
+    def reply(self):
         self.form_data_adapter = getMultiAdapter(
             (self.context, self.request), IPostAdapter
         )
@@ -61,8 +63,6 @@ class SubmitPost(Service):
 
         if self.block_id:
             self.block = self.get_block_data(block_id=self.block_id)
-
-    def reply(self):
         store_action = self.block.get("store", False)
         send_action = self.block.get("send", [])
 
