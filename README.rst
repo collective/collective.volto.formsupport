@@ -28,7 +28,7 @@ Add some helper routes and functionalities for Volto sites with ``form`` blocks 
 volto-form-block version
 ========================
 
-Works with volto-form-block >= v3.8.0
+Works with volto-form-block >= v3.13.0
 
 plone.restapi endpoints
 =======================
