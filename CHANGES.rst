@@ -3,7 +3,8 @@ Changelog
 
 3.2.4 (unreleased)
 ------------------
-
+- BREAKING CHANGE: these new features needs volto-form-block >= v3.13.0.
+  [mamico]
 - Save attachments as blobfile in the storage adapter, add a view to download them, returns
   attachment info in the restapi @form-data endpoint.
   [mamico]
