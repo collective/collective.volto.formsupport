@@ -159,6 +159,7 @@ When an attachment is stored, there is a view (@@download) that allow to downloa
 
     https://nohost/page/saved_data/@@download/record_id/field_id/filename
 
+This view is accessible only for users that can edit the context (Modify portal content permission).
 
 Data ID Mapping
 ^^^^^^^^^^^^^^^
