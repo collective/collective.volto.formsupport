@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.2.4 (unreleased)
+3.3.0 (2025-05-12)
 ------------------
 - BREAKING CHANGE: these new features needs volto-form-block >= v3.13.0.
   [mamico]
