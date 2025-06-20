@@ -3,7 +3,7 @@
   <!-- All validations vocabulary -->
   <utility
       name="collective.volto.formsupport.Validators"
-      component=".validation.ValidatorsVocabularyFactory"
+      component=".vocabulary.ValidatorsVocabularyFactory"
       />
 
 

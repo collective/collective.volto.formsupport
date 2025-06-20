@@ -19,10 +19,10 @@
   <include package=".datamanager" />
   <include package=".restapi" />
   <include package=".captcha" />
+  <include package=".validation" />
 
   <include file="permissions.zcml" />
   <include file="upgrades.zcml" />
-  <include file="validation/validation.zcml" />
 
   <genericsetup:registerProfile
       name="default"

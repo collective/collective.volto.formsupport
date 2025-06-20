@@ -104,10 +104,3 @@ def get_validation_information():
 
     return settings_to_add
 
-
-@provider(IVocabularyFactory)
-def ValidatorsVocabularyFactory(context, **rest):
-    """Field validators vocabulary"""
-    return SimpleVocabulary(
-        [SimpleVocabulary.createTerm(i, i, i) for i, u in getValidations()]
-    )
