@@ -221,7 +221,7 @@ Honeypot configuration
 
 If honeypot dependency is available in the buildout, the honeypot validation is enabled and selectable in forms.
 
-Default field name is `protected_1` and you can change it with an environment variable. See `collective.honeypot <https://github.com/collective/collective.honeypot#id7>`_ for details.
+Default field name is `protected_1` and you can change it with an environment variable. See the `collective.honeypot configuration <https://github.com/collective/collective.honeypot?tab=readme-ov-file#configuration>`_ for details.
 
 Attachments upload limits
 =========================
