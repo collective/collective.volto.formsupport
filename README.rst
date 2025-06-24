@@ -122,22 +122,22 @@ If there is an ``attachments`` field in the POST data, these files will be attac
 XML attachments
 ^^^^^^^^^^^^^^^
 
-An XML copy of the data can be optionally attached to the sent email by configuring the volto block's `attachXml` option.
+An XML copy of the data can be optionally attached to the sent email by configuring the Volto block's `attachXml` option.
 
-The sent XML follows the same format as the feature in [collective.easyform](https://github.com/collective/collective.easyform). An example is shown below:
+The sent XML follows the same format as the feature in `collective.easyform <https://github.com/collective/collective.easyform>`_. An example is shown below:
 
 ```xml
 <?xml version='1.0' encoding='utf-8'?><form><field name="Custom field label">My value</field></form>
 ```
 
-The field names in the XML will utilise the Data ID Mapping feature if it is used. Read more about this feature in the following Store section of the documentation.
+The field names in the XML will use the Data ID Mapping feature if it is used. Read more about this feature in the following Store section of the documentation.
 
 Acknowledgement email
 ^^^^^^^^^^^^^^^^^^^^^
 
 It is possible to also send an email to the user who filled in the form.
 
-Set the 'Send to' value to include `acknowledgement` to enable this behaviour. The additional block field `acknowledgementMessage` can then be used to write the message being sent to the user and the `acknowledgementFields` block field used to choose the field that will contain the email address the acknowledgement will be sent to.
+Set the 'Send to' value to include `acknowledgement` to enable this behavior. The additional block field `acknowledgementMessage` can then be used to write the message being sent to the user and the `acknowledgementFields` block field used to choose the field that will contain the email address the acknowledgement will be sent to.
 
 Store
 -----
@@ -197,10 +197,10 @@ Captcha support
 Captcha support requires a specific name adapter that implements ``ICaptchaSupport``.
 This product contains implementations for:
 
-- HCaptcha (plone.formwidget.hcaptcha)
-- Google ReCaptcha (plone.formwidget.recaptcha)
-- Custom questions and answers (collective.z3cform.norobots)
-- Honeypot (collective.honeypot)
+- HCaptcha (`plone.formwidget.hcaptcha <https://github.com/plone/plone.formwidget.hcaptcha>`_)
+- Google ReCaptcha (`plone.formwidget.recaptcha <https://github.com/plone/plone.formwidget.recaptcha>`_).
+- Custom questions and answers (`collective.z3cform.norobots <https://github.com/collective/collective.z3cform.norobots>`_).
+- Honeypot (`collective.honeypot <https://github.com/collective/collective.honeypot>`_).
 
 
 Each implementation must be included, installed and configured separately.
@@ -229,7 +229,7 @@ Attachments upload limits
 Forms can have one or more attachment field to allow users to upload some files.
 
 These files will be sent via mail, so it could be a good idea setting a limit to them.
-For example if you use Gmail as mail server, you can't send messages with attachments > 25MB.
+For example if you use GMail as mail server, you can't send messages with attachments > 25MB.
 
 There is an environment variable that you can use to set that limit (in MB)::
 
@@ -263,9 +263,9 @@ You can also interpolate the form values to the email subject using the field id
 
 
 Header forwarding
-=========================
+=================
 
-It is possible to configure some headers from the form POST request to be included in the email's headers by configuring the `httpHeaders` field in your volto block.
+It is possible to configure some headers from the form POST request to be included in the email's headers by configuring the `httpHeaders` field in your Volto block.
 
 [volto-formblock](https://github.com/collective/volto-form-block) allows the following headers to be forwarded:
 
@@ -313,11 +313,15 @@ This product has been translated into
 
 - Spanish
 
+- Brazilian Portuguese
+
+- German
+
 
 Installation
 ============
 
-Install collective.volto.formsupport by adding it to your buildout::
+Install ``collective.volto.formsupport`` by adding it to your buildout::
 
     [buildout]
 

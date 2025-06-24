@@ -4,6 +4,9 @@ Changelog
 3.3.1 (unreleased)
 ------------------
 
+- Fix README file.
+  [macagua]
+
 - Updated Spanish translation.
   [macagua]
 
