@@ -48,6 +48,8 @@ local.cfg
 /venv/
 .installed.txt
 
+# visual code editor
+*.code-workspace
 
 ##
 # Add extra configuration options in .meta.toml:
