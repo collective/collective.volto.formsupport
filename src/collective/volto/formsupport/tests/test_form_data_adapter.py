@@ -42,4 +42,5 @@ class TestFormDataAdapter(unittest.TestCase):
         )
         adapter = getMultiAdapter((self.document, self.request), IPostAdapter)
 
-        self.assertEqual(adapter.format_fields()[0]["value"], "a, b")
+        self.assertEqual(adapter.format_fields()[0].internal_value, ["a", "b"])
+        self.assertEqual(adapter.format_fields()[0].display_value, "a, b")

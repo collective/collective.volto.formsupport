@@ -1,7 +1,12 @@
 import re
 from typing import Any
 
+from collective.volto.formsupport import _
 from collective.volto.formsupport.validation import getValidations
+from plone import api
+from plone.schema.email import _isemail
+from zExceptions import BadRequest
+from zope.i18n import translate
 
 validation_message_matcher = re.compile("Validation failed\(([^\)]+)\): ")
 
@@ -53,14 +58,16 @@ class Field:
         self._field_id = field_data.get("field_id", "")
 
     @property
-    def value(self):
+    def display_value(self):
         if self._display_value_mapping:
             return self._display_value_mapping.get(self._value, self._value)
+        if isinstance(self._value, list):
+            return  ", ".join(self._value)
         return self._value
 
-    @value.setter
-    def value(self, value):
-        self._value = value
+    @property
+    def internal_value(self):
+        return self._value
 
     def should_show(self, show_when_is, target_value):
         always_show_validator = show_when_validators["always"]
@@ -75,19 +82,11 @@ class Field:
     def label(self):
         return self._label if self._label else self.field_id
 
-    @label.setter
-    def label(self, label):
-        self._label = label
-
     @property
     def field_id(self):
         if self._custom_field_id:
             return self._custom_field_id
         return self._field_id if self._field_id else self._label
-
-    @field_id.setter
-    def field_id(self, field_id):
-        self._field_id = field_id
 
     @property
     def send_in_email(self):
@@ -126,17 +125,13 @@ class Field:
 
 class YesNoField(Field):
     @property
-    def value(self):
-        if self._display_value_mapping:
-            if self._value is True:
-                return self._display_value_mapping.get("yes")
-            elif self._value is False:
-                return self._display_value_mapping.get("no")
-        return self._value
-
-    @property
-    def send_in_email(self):
-        return True
+    def display_value(self):
+        if not self._display_value_mapping:
+            return self.internal_value
+        if self.internal_value is True:
+            return self._display_value_mapping.get("yes")
+        elif self.internal_value is False:
+            return self._display_value_mapping.get("no")
 
 
 class AttachmentField(Field):
@@ -145,11 +140,39 @@ class AttachmentField(Field):
         return False
 
 
+class EmailField(Field):
+    def validate(self, request):
+        super().validate(request=request)
+
+        if not _isemail(self.internal_value):
+            raise BadRequest(
+                translate(
+                    _(
+                        "wrong_email",
+                        default='Email not valid in "${field}" field.',
+                        mapping={
+                            "field": self.label,
+                        },
+                    ),
+                    context=request,
+                )
+            )
+
+
+class DateField(Field):
+    def display_value(self):
+        return api.portal.get_localized_time(self.internal_value)
+
+
 def construct_field(field_data):
     if field_data.get("widget") == "single_choice":
         return YesNoField(field_data)
     elif field_data.get("field_type") == "attachment":
         return AttachmentField(field_data)
+    elif field_data.get("field_type") in ["from", "email"]:
+        return EmailField(field_data)
+    elif field_data.get("field_type") == "date":
+        return DateField(field_data)
 
     return Field(field_data)
 

@@ -243,7 +243,6 @@ class SubmitPost(Service):
         )
 
         for i in self.form_data.get("data", []):
-
             field_id = i.get("field_id")
 
             if not field_id:
@@ -260,7 +259,6 @@ class SubmitPost(Service):
         return subject
 
     def send_data(self):
-
         subject = self.get_subject()
 
         mfrom = self.form_data.get("from", "") or self.block.get("default_from", "")
@@ -348,7 +346,6 @@ class SubmitPost(Service):
                 self.send_mail(msg=acknowledgement_mail, charset=charset)
 
     def prepare_message(self):
-
         mail_header = self.block.get("mail_header", {}).get("data", "")
         mail_footer = self.block.get("mail_footer", {}).get("data", "")
 
@@ -390,7 +387,7 @@ class SubmitPost(Service):
             request=self.request,
         )
         parameters = {
-            "parameters": self.form_data_adapter.format_fields(),
+            "parameters": self.form_data_adapter.filter_parameters(),
             "url": self.context.absolute_url(),
             "title": self.context.Title(),
             "mail_header": mail_header,
@@ -448,10 +445,11 @@ class SubmitPost(Service):
         output = BytesIO()
         xmlRoot = Element("form")
 
-        for field in self.form_data_adapter.filter_parameters():
-            SubElement(
-                xmlRoot, "field", name=field.field_id
-            ).text = str(field._value)
+
+        for field in self.form_data_adapter.format_fields():
+            SubElement(xmlRoot, "field", name=field.field_id).text = str(
+                field.internal_value
+            )
 
         doc = ElementTree(xmlRoot)
         doc.write(output, encoding="utf-8", xml_declaration=True)
