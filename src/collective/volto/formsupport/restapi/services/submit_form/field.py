@@ -30,6 +30,8 @@ class Field:
     def display_value(self):
         if self._display_value_mapping:
             return self._display_value_mapping.get(self._value, self._value)
+        if isinstance(self._value, list):
+            return  ", ".join(self._value)
         return self._value
 
     @property
@@ -75,7 +77,7 @@ class EmailField(Field):
     def validate(self, request):
         super().validate(request=request)
 
-        if _isemail(self.internal_value) is None:
+        if not _isemail(self.internal_value):
             raise BadRequest(
                 translate(
                     _(
