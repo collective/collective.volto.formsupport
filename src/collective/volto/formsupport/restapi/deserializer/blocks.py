@@ -42,3 +42,8 @@ class FormBlockDeserializerBase:
 class FormBlockDeserializer(FormBlockDeserializerBase):
     """Deserializer for content-types that implements IBlocks behavior"""
 
+
+@adapter(IPloneSiteRoot, IBrowserRequest)
+@implementer(IBlockFieldDeserializationTransformer)
+class FormBlockDeserializerRoot(FormBlockDeserializerBase):
+    """Deserializer for site root"""
