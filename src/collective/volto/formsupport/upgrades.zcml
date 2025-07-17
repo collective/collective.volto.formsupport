@@ -1,20 +1,23 @@
 <configure
-  xmlns="http://namespaces.zope.org/zope"
-  xmlns:genericsetup="http://namespaces.zope.org/genericsetup">
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    >
 
   <genericsetup:upgradeSteps
-    source="1000"
-    destination="1100"
-    profile="collective.volto.formsupport:default">
+      profile="collective.volto.formsupport:default"
+      source="1000"
+      destination="1100"
+      >
     <genericsetup:upgradeStep
         title="Convert field types"
         handler=".upgrades.to_1100"
         />
   </genericsetup:upgradeSteps>
   <genericsetup:upgradeSteps
-    source="1100"
-    destination="1200"
-    profile="collective.volto.formsupport:default">
+      profile="collective.volto.formsupport:default"
+      source="1100"
+      destination="1200"
+      >
     <genericsetup:upgradeStep
         title="Store fieldid in records"
         handler=".upgrades.to_1200"
@@ -24,9 +27,17 @@
   <genericsetup:upgradeStep
       title="Convert send from a bool into a list of who to send to"
       profile="collective.volto.formsupport:default"
-      source="*"
+      source="1200"
       destination="1300"
       handler=".upgrades.to_1300"
+      />
+
+  <genericsetup:upgradeStep
+      title="Install otp package"
+      profile="collective.volto.formsupport:default"
+      source="1300"
+      destination="1301"
+      handler=".upgrades.to_1301"
       />
 
 </configure>

@@ -1,29 +1,34 @@
-from plone.base.interfaces import IPloneSiteRoot
-from plone.restapi.behaviors import IBlocks
+from plone.dexterity.interfaces import IDexterityContent
+from plone.restapi.bbb import IPloneSiteRoot
 from plone.restapi.interfaces import IBlockFieldDeserializationTransformer
+from Products.PortalTransforms.transforms.safe_html import SafeHTML
 from zope.component import adapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
 
 
-@adapter(IBlocks, IBrowserRequest)
 class FormBlockDeserializerBase:
-    block_type = "form"
+    """FormBlockDeserializerBase."""
+
     order = 100
+
+    block_type = "form"
 
     def __init__(self, context, request):
         self.context = context
         self.request = request
 
-    def __call__(self, block):
-        return self._process_data(block)
+    def __call__(self, value):
+        """
+        Do not store html but only plaintext
+        """
+        if value.get("send_message", ""):
+            transform = SafeHTML()
+            value["send_message"] = transform.scrub_html(value["send_message"])
 
-    def _process_data(
-        self,
-        data,
-    ):
-        self._update_validations(data)
-        return data
+        self._update_validations(value)
+
+        return value
 
     def _update_validations(self, data):
         for field in data.get("subblocks"):
@@ -32,13 +37,8 @@ class FormBlockDeserializerBase:
                 field["validationSettings"] = {}
 
 
+@adapter(IDexterityContent, IBrowserRequest)
 @implementer(IBlockFieldDeserializationTransformer)
-@adapter(IBlocks, IBrowserRequest)
 class FormBlockDeserializer(FormBlockDeserializerBase):
-    """Serializer for content-types with IBlocks behavior"""
+    """Deserializer for content-types that implements IBlocks behavior"""
 
-
-@implementer(IBlockFieldDeserializationTransformer)
-@adapter(IPloneSiteRoot, IBrowserRequest)
-class FormBlockDeserializerRoot(FormBlockDeserializerBase):
-    """Serializer for site root"""

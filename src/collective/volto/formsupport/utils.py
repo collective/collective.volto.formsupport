@@ -2,7 +2,9 @@ from collections import deque
 
 import copy
 import json
-import six
+
+
+EMAIL_OTP_LIFETIME = 5 * 60
 
 
 def flatten_block_hierachy(blocks):
@@ -31,9 +33,9 @@ def get_blocks(context):
     """Returns all blocks from a context, including those coming from slots"""
 
     blocks = copy.deepcopy(getattr(context, "blocks", {}))
-    if isinstance(blocks, six.text_type):
+    if isinstance(blocks, str):
         blocks = json.loads(blocks)
 
-    flat = list(flatten_block_hierachy(blocks))
+    flat = list(flatten_block_hierachy(blocks)) if blocks else []
 
     return dict(flat)

@@ -1,45 +1,52 @@
-# -*- coding: utf-8 -*-
-
+from bs4 import BeautifulSoup
+from datetime import datetime
+from email import policy
+from email.message import EmailMessage
+from io import BytesIO
+from plone import api
 
 import codecs
 import logging
-import math
 import os
-from datetime import datetime
-from email.message import EmailMessage
-from xml.etree.ElementTree import Element, ElementTree, SubElement
+import re
 
-import six
-from plone import api
-from plone.protect.interfaces import IDisableCSRFProtection
-from plone.registry.interfaces import IRegistry
-from plone.restapi.deserializer import json_body
-from plone.restapi.serializer.converters import json_compatible
-from plone.restapi.services import Service
-from Products.CMFPlone.interfaces.controlpanel import IMailSchema
-from zExceptions import BadRequest
-from zope.component import getMultiAdapter, getUtility
-from zope.event import notify
-from zope.i18n import translate
-from zope.interface import alsoProvides, implementer
+
+try:
+    from plone.base.interfaces.controlpanel import IMailSchema
+except ImportError:
+    from Products.CMFPlone.interfaces.controlpanel import IMailSchema
 
 from collective.volto.formsupport import _
-from collective.volto.formsupport.interfaces import (
-    ICaptchaSupport,
-    IFormDataStore,
-    IPostEvent,
-)
+from collective.volto.formsupport.events import FormSubmittedEvent
+from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.interfaces import IPostAdapter
+from collective.volto.formsupport.interfaces import IPostEvent
 from collective.volto.formsupport.restapi.services.submit_form.field import (
     construct_fields,
 )
 from collective.volto.formsupport.utils import get_blocks
+from plone.protect.interfaces import IDisableCSRFProtection
+from plone.registry.interfaces import IRegistry
+from plone.restapi.serializer.converters import json_compatible
+from plone.restapi.services import Service
+from xml.etree.ElementTree import Element
+from xml.etree.ElementTree import ElementTree
+from xml.etree.ElementTree import SubElement
+from zExceptions import BadRequest
+from zope.component import getMultiAdapter
+from zope.component import getUtility
+from zope.event import notify
+from zope.i18n import translate
+from zope.interface import alsoProvides
+from zope.interface import implementer
+
 
 logger = logging.getLogger(__name__)
 CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
 
 
 @implementer(IPostEvent)
-class PostEventService(object):
+class PostEventService:
     def __init__(self, context, data):
         self.context = context
         self.data = data
@@ -49,17 +56,19 @@ class SubmitPost(Service):
     fields = []
 
     def __init__(self, context, request):
-        super(SubmitPost, self).__init__(context, request)
+        super().__init__(context, request)
 
         self.block = {}
-        self.form_data = json_body(self.request)
+        self.form_data_adapter = getMultiAdapter(
+            (self.context, self.request), IPostAdapter
+        )
+        self.form_data = self.get_form_data()
         self.block_id = self.form_data.get("block_id", "")
+
         if self.block_id:
             self.block = self.get_block_data(block_id=self.block_id)
 
     def reply(self):
-        self.validate_form()
-
         store_action = self.block.get("store", False)
         send_action = self.block.get("send", [])
 
@@ -139,7 +148,7 @@ class SubmitPost(Service):
                 }
             )
 
-        if send_action:
+        if send_action or self.get_bcc():
             try:
                 self.send_data()
             except BadRequest as e:
@@ -149,115 +158,22 @@ class SubmitPost(Service):
                 message = translate(
                     _(
                         "mail_send_exception",
-                        default="Unable to send confirm email. Please retry later or contact site administator.",
+                        default="Unable to send confirm email. Please retry later or contact site administrator.",
                     ),
                     context=self.request,
                 )
                 self.request.response.setStatus(500)
                 return dict(type="InternalServerError", message=message)
+
+        notify(FormSubmittedEvent(self.context, self.block, self.form_data))
+
         if store_action:
             self.store_data()
 
-        return self.reply_no_content()
+        return {"data": self.form_data.get("data", [])}
 
-    def validate_form(self):
-        """
-        check all required fields and parameters
-        """
-        if not self.block_id:
-            raise BadRequest(
-                translate(
-                    _("missing_blockid_label", default="Missing block_id"),
-                    context=self.request,
-                )
-            )
-        if not self.block:
-            raise BadRequest(
-                translate(
-                    _(
-                        "block_form_not_found_label",
-                        default='Block with @type "form" and id "$block" not found in this context: $context',
-                        mapping={
-                            "block": self.block_id,
-                            "context": self.context.absolute_url(),
-                        },
-                    ),
-                    context=self.request,
-                ),
-            )
-
-        if not self.block.get("store", False) and not self.block.get("send", []):
-            raise BadRequest(
-                translate(
-                    _(
-                        "missing_action",
-                        default='You need to set at least one form action between "send" and "store".',  # noqa
-                    ),
-                    context=self.request,
-                )
-            )
-
-        if not self.form_data.get("data", []):
-            raise BadRequest(
-                translate(
-                    _(
-                        "empty_form_data",
-                        default="Empty form data.",
-                    ),
-                    context=self.request,
-                )
-            )
-
-        self.validate_attachments()
-        if self.block.get("captcha", False):
-            getMultiAdapter(
-                (self.context, self.request),
-                ICaptchaSupport,
-                name=self.block["captcha"],
-            ).verify(self.form_data.get("captcha"))
-
-    def validate_attachments(self):
-        attachments_limit = os.environ.get("FORM_ATTACHMENTS_LIMIT", "")
-        if not attachments_limit:
-            return
-        attachments = self.form_data.get("attachments", {})
-        attachments_len = 0
-        for attachment in attachments.values():
-            data = attachment.get("data", "")
-            attachments_len += (len(data) * 3) / 4 - data.count("=", -2)
-        if attachments_len > float(attachments_limit) * pow(1024, 2):
-            size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-            i = int(math.floor(math.log(attachments_len, 1024)))
-            p = math.pow(1024, i)
-            s = round(attachments_len / p, 2)
-            uploaded_str = "{} {}".format(s, size_name[i])
-            raise BadRequest(
-                translate(
-                    _(
-                        "attachments_too_big",
-                        default="Attachments too big. You uploaded ${uploaded_str},"
-                        " but limit is ${max} MB. Try to compress files.",
-                        mapping={
-                            "max": attachments_limit,
-                            "uploaded_str": uploaded_str,
-                        },
-                    ),
-                    context=self.request,
-                )
-            )
-
-    def get_block_data(self, block_id):
-        blocks = get_blocks(self.context)
-        if not blocks:
-            return {}
-        for id, block in blocks.items():
-            if id != block_id:
-                continue
-            block_type = block.get("@type", "")
-            if block_type != "form":
-                continue
-            return block
-        return {}
+    def get_form_data(self):
+        return self.form_data_adapter()
 
     def get_reply_to(self):
         """This method retrieves the correct field to be used as 'reply to'.
@@ -282,6 +198,19 @@ class SubmitPost(Service):
                                 return data.get("value", "")
 
         return self.form_data.get("from", "") or self.block.get("default_from", "")
+
+    def get_block_data(self, block_id):
+        blocks = get_blocks(self.context)
+        if not blocks:
+            return {}
+        for id, block in blocks.items():
+            if id != block_id:
+                continue
+            block_type = block.get("@type", "")
+            if block_type != "form":
+                continue
+            return block
+        return {}
 
     def get_bcc(self):
         bcc = []
@@ -308,10 +237,31 @@ class SubmitPost(Service):
                     if data.get("field_id", "") == field.get("field_id"):
                         return data.get("value")
 
-    def send_data(self):
+    def get_subject(self):
         subject = self.form_data.get("subject", "") or self.block.get(
             "default_subject", ""
         )
+
+        for i in self.form_data.get("data", []):
+
+            field_id = i.get("field_id")
+
+            if not field_id:
+                continue
+
+            # Handle this kind of id format: `field_name_123321, whichj is used by frontend package logics
+            pattern = r"\$\{[^}]+\}"
+            matches = re.findall(pattern, subject)
+
+            for match in matches:
+                if field_id in match:
+                    subject = subject.replace(match, str(i.get("value")))
+
+        return subject
+
+    def send_data(self):
+
+        subject = self.get_subject()
 
         mfrom = self.form_data.get("from", "") or self.block.get("default_from", "")
         mreply_to = self.get_reply_to()
@@ -337,19 +287,25 @@ class SubmitPost(Service):
         registry = getUtility(IRegistry)
         mail_settings = registry.forInterface(IMailSchema, prefix="plone")
         charset = registry.get("plone.email_charset", "utf-8")
-
         should_send = self.block.get("send", [])
-        if should_send:
+        bcc = self.get_bcc()
+
+        if should_send or bcc:
+            portal_transforms = api.portal.get_tool(name="portal_transforms")
             mto = self.block.get("default_to", mail_settings.email_from_address)
             message = self.prepare_message()
-
-            msg = EmailMessage()
-            msg.set_content(message, charset=charset, subtype="html", cte=CTE)
+            text_message = (
+                portal_transforms.convertTo("text/plain", message, mimetype="text/html")
+                .getData()
+                .strip()
+            )
+            msg = EmailMessage(policy=policy.SMTP)
+            msg.set_content(text_message, cte=CTE)
+            msg.add_alternative(message, subtype="html", cte=CTE)
             msg["Subject"] = subject
             msg["From"] = mfrom
             msg["To"] = mto
             msg["Reply-To"] = mreply_to
-            msg.replace_header("Content-Type", 'text/html; charset="utf-8"')
 
             headers_to_forward = self.block.get("httpHeaders", [])
             for header in headers_to_forward:
@@ -359,11 +315,11 @@ class SubmitPost(Service):
 
             self.manage_attachments(msg=msg)
 
-            if isinstance(should_send, list):
+            if should_send and isinstance(should_send, list):
                 if "recipient" in self.block.get("send", []):
                     self.send_mail(msg=msg, charset=charset)
                 # Backwards compatibility for forms before 'acknowledgement' sending
-            else:
+            elif should_send:
                 self.send_mail(msg=msg, charset=charset)
 
             # send a copy also to the fields with bcc flag
@@ -375,16 +331,50 @@ class SubmitPost(Service):
         if acknowledgement_message and "acknowledgement" in self.block.get("send", []):
             acknowledgement_address = self.get_acknowledgement_field_value()
             if acknowledgement_address:
-                acknowledgement_mail = EmailMessage()
+                acknowledgement_mail = EmailMessage(policy=policy.SMTP)
                 acknowledgement_mail["Subject"] = subject
                 acknowledgement_mail["From"] = mfrom
                 acknowledgement_mail["To"] = acknowledgement_address
-                acknowledgement_mail.set_content(
-                    acknowledgement_message.get("data"), subtype="html", charset="utf-8"
+                ack_msg = acknowledgement_message.get("data")
+                ack_msg_text = (
+                    portal_transforms.convertTo(
+                        "text/plain", ack_msg, mimetype="text/html"
+                    )
+                    .getData()
+                    .strip()
                 )
+                acknowledgement_mail.set_content(ack_msg_text, cte=CTE)
+                acknowledgement_mail.add_alternative(ack_msg, subtype="html", cte=CTE)
                 self.send_mail(msg=acknowledgement_mail, charset=charset)
 
     def prepare_message(self):
+
+        mail_header = self.block.get("mail_header", {}).get("data", "")
+        mail_footer = self.block.get("mail_footer", {}).get("data", "")
+
+        # Check if there is content
+        bs_mail_header = BeautifulSoup(mail_header)
+        bs_mail_footer = BeautifulSoup(mail_footer)
+
+        portal = getMultiAdapter(
+            (self.context, self.request), name="plone_portal_state"
+        ).portal()
+
+        frontend_domain = api.portal.get_registry_record(
+            name="volto.frontend_domain", default=""
+        )
+
+        for snippet in [bs_mail_header, bs_mail_footer]:
+            if snippet:
+                for link in snippet.find_all("a"):
+                    if link.get("href", "").startswith("/"):
+                        link["href"] = (
+                            frontend_domain or portal.absolute_url()
+                        ) + link["href"]
+
+        mail_header = bs_mail_header.get_text() and bs_mail_header.prettify() or None
+        mail_footer = bs_mail_footer.get_text() and bs_mail_footer.prettify() or None
+
         email_format_page_template_mapping = {
             "list": "send_mail_template",
             "table": "send_mail_template_table",
@@ -400,17 +390,13 @@ class SubmitPost(Service):
             request=self.request,
         )
         parameters = {
-            "parameters": self.filter_parameters(),
+            "parameters": self.form_data_adapter.format_fields(),
             "url": self.context.absolute_url(),
             "title": self.context.Title(),
+            "mail_header": mail_header,
+            "mail_footer": mail_footer,
         }
         return message_template(**parameters)
-
-    def filter_parameters(self):
-        """
-        do not send attachments fields.
-        """
-        return [field for field in self.fields if field.send_in_email]
 
     def send_mail(self, msg, charset):
         host = api.portal.get_tool(name="MailHost")
@@ -435,11 +421,11 @@ class SubmitPost(Service):
                     continue
                 content_type = value.get("content-type", content_type)
                 filename = value.get("filename", filename)
-                if isinstance(file_data, six.text_type):
+                if isinstance(file_data, str):
                     file_data = file_data.encode("utf-8")
                 if "encoding" in value:
                     file_data = codecs.decode(file_data, value["encoding"])
-                if isinstance(file_data, six.text_type):
+                if isinstance(file_data, str):
                     file_data = file_data.encode("utf-8")
             else:
                 file_data = value
@@ -459,11 +445,13 @@ class SubmitPost(Service):
             .replace(":", "")
         )
         filename = f"formdata_{now}.xml"
-        output = six.BytesIO()
+        output = BytesIO()
         xmlRoot = Element("form")
 
-        for field in self.filter_parameters():
-            SubElement(xmlRoot, "field", name=field.field_id).text = str(field._value)
+        for field in self.form_data_adapter.filter_parameters():
+            SubElement(
+                xmlRoot, "field", name=field.field_id
+            ).text = str(field._value)
 
         doc = ElementTree(xmlRoot)
         doc.write(output, encoding="utf-8", xml_declaration=True)
@@ -477,6 +465,8 @@ class SubmitPost(Service):
 
     def store_data(self):
         store = getMultiAdapter((self.context, self.request), IFormDataStore)
-        res = store.add(data=self.filter_parameters())
+
+        res = store.add(data=self.form_data_adapter.filter_parameters())
+
         if not res:
             raise BadRequest("Unable to store data")

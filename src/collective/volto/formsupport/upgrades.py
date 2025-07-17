@@ -1,16 +1,18 @@
-# -*- coding: utf-8 -*-
-from copy import deepcopy
-
 from Acquisition import aq_base
+from collective.volto.formsupport.interfaces import IFormDataStore
+from copy import deepcopy
 from plone import api
+from plone.app.upgrade.utils import installOrReinstallProduct
 from plone.dexterity.utils import iterSchemata
 from plone.i18n.normalizer.interfaces import IIDNormalizer
 from souper.soup import Record
-from zope.component import getMultiAdapter, getUtility
+from zope.component import getMultiAdapter
+from zope.component import getUtility
 from zope.globalrequest import getRequest
 from zope.schema import getFields
 
-from collective.volto.formsupport.interfaces import IFormDataStore
+import json
+
 
 try:
     from collective.volto.blocksfield.field import BlocksField
@@ -19,9 +21,8 @@ try:
 except ImportError:
     HAS_BLOCKSFIELD = False
 
-import json
-
 from collective.volto.formsupport import logger
+
 
 DEFAULT_PROFILE = "profile-collective.volto.formsupport:default"
 
@@ -39,6 +40,10 @@ def _get_all_content_with_blocks():
     portal = api.portal.get()
     portal_blocks = getattr(portal, "blocks", "")
     if portal_blocks:
+        portal_blocks = (
+            type(portal_blocks) is str and json.loads(portal_blocks) or portal_blocks
+        )
+
         if _has_block_form(portal_blocks):
             content.append(portal)
 
@@ -48,7 +53,7 @@ def _get_all_content_with_blocks():
 
     for i, brain in enumerate(brains):
         if i % 100 == 0:
-            logger.info("Progress: {}/{}".format(i + 1, total))
+            logger.info(f"Progress: {i + 1}/{total}")
         item = brain.getObject()
         for schema in iterSchemata(item.aq_base):
             for name, field in getFields(schema).items():
@@ -75,7 +80,7 @@ def to_1100(context):  # noqa: C901 # pragma: no cover
                     field["field_type"] = "simple_choice"
                     found = True
             if found:
-                logger.info("[CONVERTED] - {}".format(url))
+                logger.info(f"[CONVERTED] - {url}")
 
     # fix root
     portal = api.portal.get()
@@ -93,7 +98,7 @@ def to_1100(context):  # noqa: C901 # pragma: no cover
     for brain in brains:
         i += 1
         if i % 1000 == 0:
-            logger.info("Progress: {}/{}".format(i, tot))
+            logger.info(f"Progress: {i}/{tot}")
         item = aq_base(brain.getObject())
         for schema in iterSchemata(item):
             for name, field in getFields(schema).items():
@@ -174,7 +179,7 @@ def to_1200(context):  # noqa: C901 # pragma: no cover
     for brain in brains:
         i += 1
         if i % 100 == 0:
-            logger.info("Progress: {}/{}".format(i, tot))
+            logger.info(f"Progress: {i}/{tot}")
         item = brain.getObject()
         for schema in iterSchemata(item.aq_base):
             for name, field in getFields(schema).items():
@@ -195,9 +200,9 @@ def to_1200(context):  # noqa: C901 # pragma: no cover
                         res = fix_data(blocks, item)
                         if res:
                             fixed_contents.append(brain.getPath())
-    logger.info("Fixed {} contents:".format(len(fixed_contents)))
+    logger.info(f"Fixed {len(fixed_contents)} contents:")
     for path in fixed_contents:
-        logger.info("- {}".format(path))
+        logger.info(f"- {path}")
 
 
 def to_1300(context):  # noqa: C901 # pragma: no cover
@@ -231,3 +236,7 @@ def to_1300(context):  # noqa: C901 # pragma: no cover
     logger.info("### FINISHED UPGRADE SEND FROM STRING TO ARRAY ###")
 
     # self.block.get("send")
+
+
+def to_1301(context):
+    installOrReinstallProduct(api.portal.get(), "collective.volto.otp")

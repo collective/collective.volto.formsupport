@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
@@ -13,13 +12,14 @@ from Products.MailHost.interfaces import IMailHost
 from zope.component import getUtility
 from zope.configuration import xmlconfig
 
+import re
 import transaction
 import unittest
 
 
 def event_handler(event):
     event.data["data"].append(
-        {"label": "Reply", "value": "hello"},
+        {"label": "Reply", "value": "hello", "field_id": "message"},
     )
 
 
@@ -79,7 +79,7 @@ class TestEvent(unittest.TestCase):
         transaction.commit()
 
     def submit_form(self, data):
-        url = "{}/@submit-form".format(self.document_url)
+        url = f"{self.document_url}/@submit-form"
         response = self.api_session.post(
             url,
             json=data,
@@ -103,6 +103,10 @@ class TestEvent(unittest.TestCase):
                         "field_type": "from",
                         "use_as_bcc": True,
                     },
+                    {
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
                 ],
             },
         }
@@ -111,19 +115,24 @@ class TestEvent(unittest.TestCase):
         response = self.submit_form(
             data={
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
                 ],
                 "block_id": "form-id",
             },
         )
         transaction.commit()
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(len(self.mailhost.messages), 1)
         msg = self.mailhost.messages[0]
         if isinstance(msg, bytes) and bytes is not str:
             # Python 3 with Products.MailHost 4.10+
             msg = msg.decode("utf-8")
+        msg = re.sub(r"\s+", " ", msg)
         self.assertIn("To: site_addr@plone.com", msg)
         self.assertNotIn("To: smith@doe.com", msg)
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)

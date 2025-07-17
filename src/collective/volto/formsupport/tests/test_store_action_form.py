@@ -1,27 +1,23 @@
-# -*- coding: utf-8 -*-
-import csv
-import unittest
+from collective.volto.formsupport.testing import (  # noqa: E501,
+    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
+)
 from datetime import datetime
 from io import StringIO
-
-import transaction
 from plone import api
-from plone.app.testing import (
-    SITE_OWNER_NAME,
-    SITE_OWNER_PASSWORD,
-    TEST_USER_ID,
-    setRoles,
-)
+from plone.app.testing import setRoles
+from plone.app.testing import SITE_OWNER_NAME
+from plone.app.testing import SITE_OWNER_PASSWORD
+from plone.app.testing import TEST_USER_ID
 from plone.restapi.testing import RelativeSession
 from Products.MailHost.interfaces import IMailHost
 from zope.component import getUtility
 
-from collective.volto.formsupport.testing import (  # noqa: E501,
-    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
-)
+import csv
+import transaction
+import unittest
 
 
-class TestMailSend(unittest.TestCase):
+class TestMailStore(unittest.TestCase):
     layer = VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING
 
     def setUp(self):
@@ -63,7 +59,7 @@ class TestMailSend(unittest.TestCase):
         transaction.commit()
 
     def submit_form(self, data):
-        url = "{}/@submit-form".format(self.document_url)
+        url = f"{self.document_url}/@submit-form"
         response = self.api_session.post(
             url,
             json=data,
@@ -72,25 +68,27 @@ class TestMailSend(unittest.TestCase):
         return response
 
     def export_data(self):
-        url = "{}/@form-data".format(self.document_url)
+        url = f"{self.document_url}/@form-data"
         response = self.api_session.get(url)
         return response
 
     def export_csv(self):
-        url = "{}/@form-data-export".format(self.document_url)
+        url = f"{self.document_url}/@form-data-export"
         response = self.api_session.get(url)
         return response
 
     def clear_data(self):
-        url = "{}/@form-data-clear".format(self.document_url)
-        response = self.api_session.get(url)
-        # transaction.commit()
+        url = f"{self.document_url}/@form-data-clear"
+        response = self.api_session.delete(url)
         return response
 
     def test_unable_to_store_data(self):
         """form schema not defined, unable to store data"""
         self.document.blocks = {
-            "form-id": {"@type": "form", "store": True},
+            "form-id": {
+                "@type": "form",
+                "store": True,
+            },
         }
         transaction.commit()
 
@@ -98,8 +96,12 @@ class TestMailSend(unittest.TestCase):
             data={
                 "from": "john@doe.com",
                 "data": [
-                    {"label": "Message", "value": "just want to say hi"},
-                    {"label": "Name", "value": "John"},
+                    {
+                        "field_id": "message",
+                        "label": "Message",
+                        "value": "just want to say hi",
+                    },
+                    {"field_id": "name", "label": "Name", "value": "John"},
                 ],
                 "subject": "test subject",
                 "block_id": "form-id",
@@ -107,7 +109,7 @@ class TestMailSend(unittest.TestCase):
         )
         transaction.commit()
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["message"], "Unable to store data")
+        self.assertEqual(response.json()["message"], "Empty form data.")
         response = self.export_csv()
 
     def test_store_data(self):
@@ -125,7 +127,6 @@ class TestMailSend(unittest.TestCase):
                         "label": "Name",
                         "field_id": "name",
                         "field_type": "text",
-                        "display_values": "Custom name",
                     },
                 ],
             },
@@ -145,13 +146,14 @@ class TestMailSend(unittest.TestCase):
             },
         )
         transaction.commit()
-        self.assertEqual(response.status_code, 204)
+
+        self.assertEqual(response.status_code, 200)
         response = self.export_data()
         data = response.json()
         self.assertEqual(len(data["items"]), 1)
         self.assertEqual(
             sorted(data["items"][0].keys()),
-            ["block_id", "date", "id", "message", "name"],
+            ["__expired", "block_id", "date", "id", "message", "name"],
         )
         self.assertEqual(
             data["items"][0]["message"],
@@ -170,17 +172,17 @@ class TestMailSend(unittest.TestCase):
             },
         )
         transaction.commit()
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         response = self.export_data()
         data = response.json()
         self.assertEqual(len(data["items"]), 2)
         self.assertEqual(
             sorted(data["items"][0].keys()),
-            ["block_id", "date", "id", "message", "name"],
+            ["__expired", "block_id", "date", "id", "message", "name"],
         )
         self.assertEqual(
             sorted(data["items"][1].keys()),
-            ["block_id", "date", "id", "message", "name"],
+            ["__expired", "block_id", "date", "id", "message", "name"],
         )
         sorted_data = sorted(data["items"], key=lambda x: x["name"]["value"])
         self.assertEqual(sorted_data[0]["name"]["value"], "John")
@@ -241,7 +243,7 @@ class TestMailSend(unittest.TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         response = self.export_csv()
         data = [*csv.reader(StringIO(response.text), delimiter=",")]
         self.assertEqual(len(data), 3)
@@ -251,7 +253,7 @@ class TestMailSend(unittest.TestCase):
         self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John"])
 
         # check date column. Skip seconds because can change during test
-        now = datetime.utcnow().strftime("%Y-%m-%dT%H:%M")
+        now = datetime.now().strftime("%Y-%m-%dT%H:%M")
         self.assertTrue(sorted_data[0][-1].startswith(now))
         self.assertTrue(sorted_data[1][-1].startswith(now))
 
@@ -300,78 +302,17 @@ class TestMailSend(unittest.TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
         response = self.export_csv()
         data = [*csv.reader(StringIO(response.text), delimiter=",")]
         self.assertEqual(len(data), 3)
-        # Check that 'test-field' got correctly mapped to it's label
-        self.assertEqual(data[0], ["Message", "Test field", "date"])
+        # Check that 'test-field' got renamed
+        self.assertEqual(data[0], ["Message", "renamed-field", "date"])
         sorted_data = sorted(data[1:])
         self.assertEqual(sorted_data[0][:-1], ["bye", "Sally"])
         self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John"])
 
         # check date column. Skip seconds because can change during test
-        now = datetime.utcnow().strftime("%Y-%m-%dT%H:%M")
-        self.assertTrue(sorted_data[0][-1].startswith(now))
-        self.assertTrue(sorted_data[1][-1].startswith(now))
-
-    def test_display_values(self):
-        self.document.blocks = {
-            "form-id": {
-                "@type": "form",
-                "store": True,
-                "test-field": "renamed-field",
-                "subblocks": [
-                    {
-                        "field_id": "message",
-                        "label": "Message",
-                        "field_type": "text",
-                    },
-                    {
-                        "field_id": "test-field",
-                        "label": "Test field",
-                        "field_type": "text",
-                        "display_values": {"John": "Paul", "Sally": "Jack"},
-                    },
-                ],
-            },
-        }
-        transaction.commit()
-        response = self.submit_form(
-            data={
-                "from": "john@doe.com",
-                "data": [
-                    {"field_id": "message", "value": "just want to say hi"},
-                    {"field_id": "test-field", "value": "John"},
-                ],
-                "subject": "test subject",
-                "block_id": "form-id",
-            },
-        )
-
-        response = self.submit_form(
-            data={
-                "from": "sally@doe.com",
-                "data": [
-                    {"field_id": "message", "value": "bye"},
-                    {"field_id": "test-field", "value": "Sally"},
-                ],
-                "subject": "test subject",
-                "block_id": "form-id",
-            },
-        )
-
-        self.assertEqual(response.status_code, 204)
-        response = self.export_csv()
-        data = [*csv.reader(StringIO(response.text), delimiter=",")]
-        self.assertEqual(len(data), 3)
-        # Check that 'test-field' got correctly mapped to it's label
-        self.assertEqual(data[0], ["Message", "Test field", "date"])
-        sorted_data = sorted(data[1:])
-        self.assertEqual(sorted_data[0][:-1], ["bye", "Sally"])
-        self.assertEqual(sorted_data[1][:-1], ["just want to say hi", "John"])
-
-        # check date column. Skip seconds because can change during test
-        now = datetime.utcnow().strftime("%Y-%m-%dT%H:%M")
+        now = datetime.now().strftime("%Y-%m-%dT%H:%M")
         self.assertTrue(sorted_data[0][-1].startswith(now))
         self.assertTrue(sorted_data[1][-1].startswith(now))

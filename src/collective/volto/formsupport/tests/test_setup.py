@@ -1,5 +1,5 @@
-# -*- coding: utf-8 -*-
 """Setup tests for this package."""
+
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_INTEGRATION_TESTING,
 )
@@ -11,9 +11,9 @@ import unittest
 
 
 try:
-    from Products.CMFPlone.utils import get_installer
+    from plone.base.utils import get_installer
 except ImportError:
-    get_installer = None
+    from Products.CMFPlone.utils import get_installer
 
 
 class TestSetup(unittest.TestCase):
@@ -24,10 +24,7 @@ class TestSetup(unittest.TestCase):
     def setUp(self):
         """Custom shared utility setup for tests."""
         self.portal = self.layer["portal"]
-        if get_installer:
-            self.installer = get_installer(self.portal, self.layer["request"])
-        else:
-            self.installer = api.portal.get_tool("portal_quickinstaller")
+        self.installer = get_installer(self.portal, self.layer["request"])
 
     def test_product_installed(self):
         """Test if collective.volto.formsupport is installed."""

@@ -1,16 +1,14 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
     xmlns:zcml="http://namespaces.zope.org/zcml"
-    i18n_domain="plone.restapi"
     >
 
   <subscriber
-      factory="collective.volto.formsupport.restapi.deserializer.FormBlockDeserializer"
+      factory=".blocks.FormBlockDeserializer"
       provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
       />
   <subscriber
-      factory="collective.volto.formsupport.restapi.deserializer.FormBlockDeserializerRoot"
+      factory=".blocks.FormBlockDeserializerRoot"
       provides="plone.restapi.interfaces.IBlockFieldDeserializationTransformer"
       />
-
 </configure>

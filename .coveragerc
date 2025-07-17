@@ -20,3 +20,4 @@ omit =
     */lib/*
     *.txt
     *.rst
+    */upgrades.py
