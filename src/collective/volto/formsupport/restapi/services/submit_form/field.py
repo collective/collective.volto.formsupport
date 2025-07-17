@@ -53,6 +53,19 @@ class Field:
         return True
 
     def validate(self, request):
+        if self.required and not self.internal_value:
+            raise BadRequest(
+                translate(
+                    _(
+                        "required_field",
+                        default='"${field}" is required.',
+                        mapping={
+                            "field": self.label,
+                        },
+                    ),
+                    context=request,
+                )
+            )
         return
 
 
@@ -76,8 +89,9 @@ class AttachmentField(Field):
 class EmailField(Field):
     def validate(self, request):
         super().validate(request=request)
-
-        if not _isemail(self.internal_value):
+        if not self.internal_value:
+            return
+        if not _isemail(self.internal_value or ''):
             raise BadRequest(
                 translate(
                     _(
@@ -94,7 +108,7 @@ class EmailField(Field):
 
 class DateField(Field):
     def display_value(self):
-        return api.portal.get_localized_time(self.internal_value)
+        return api.portal.get_localized_time(self.internal_value or '')
 
 
 def construct_field(field_data):
