@@ -50,11 +50,11 @@ class Field:
         _attribute("use_as_reply_to")
         _attribute("use_as_reply_bcc")
         self.required = field_data.get("required")
-        self.validations = field_data.get("validations")
+        self.validations = field_data.get("validations", {})
         self._display_value_mapping = field_data.get("dislpay_value_mapping")
         self._value = field_data.get("value", "")
         self._custom_field_id = field_data.get("custom_field_id")
-        self._label = field_data.get("label")
+        self._label = field_data.get("label", "")
         self._field_id = field_data.get("field_id", "")
 
     @property
@@ -62,7 +62,7 @@ class Field:
         if self._display_value_mapping:
             return self._display_value_mapping.get(self._value, self._value)
         if isinstance(self._value, list):
-            return  ", ".join(self._value)
+            return ", ".join(self._value)
         return self._value
 
     @property
@@ -92,14 +92,14 @@ class Field:
     def send_in_email(self):
         return True
 
-    def validate(self):
+    def validate(self, request):
         # Making sure we've got a validation that actually exists.
         if not self._value and not self.required:
             return
         errors = {}
 
         if self.required and not self.internal_value:
-            errors['required'] = 'This field is required'
+            errors["required"] = "This field is required"
 
         available_validations = [
             validation
@@ -119,7 +119,7 @@ class Field:
                 errors[validation._name] = error
 
         return (
-            errors if errors else None
+            errors
         )  # Return None to match how errors normally return in z3c.form
 
 
@@ -142,26 +142,26 @@ class AttachmentField(Field):
 
 class EmailField(Field):
     def validate(self, request):
-        super().validate(request=request)
-
-        if not _isemail(self.internal_value):
-            raise BadRequest(
-                translate(
-                    _(
-                        "wrong_email",
-                        default='Email not valid in "${field}" field.',
-                        mapping={
-                            "field": self.label,
-                        },
-                    ),
-                    context=request,
-                )
+        errors = super().validate(request=request)
+        if not self.internal_value:
+            return
+        if not _isemail(self.internal_value or ""):
+            errors["validation"] = translate(
+                _(
+                    "wrong_email",
+                    default='Email not valid in "${field}" field.',
+                    mapping={
+                        "field": self.label,
+                    },
+                ),
+                context=request,
             )
+        return errors
 
 
 class DateField(Field):
     def display_value(self):
-        return api.portal.get_localized_time(self.internal_value)
+        return api.portal.get_localized_time(self.internal_value or "")
 
 
 def construct_field(field_data):

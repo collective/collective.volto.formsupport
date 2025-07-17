@@ -132,7 +132,7 @@ class SubmitPost(Service):
                 )
 
             if should_show:
-                field_errors = field.validate()
+                field_errors = field.validate(self.request)
 
                 if field_errors:
                     errors[field.field_id] = field_errors
