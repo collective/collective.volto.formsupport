@@ -19,13 +19,13 @@ class FormDataExportGet(Service):
         super().__init__(context, request)
         self.form_fields_order = []
         self.form_block = None
-        self.block_id = self.request.get("block_id")
+        self.form_block_id = self.request.get("block_id")
 
         blocks = getattr(context, "blocks", {})
         if not blocks:
             raise NotFound("No blocks found")
         for id, block in blocks.items():
-            if self.block_id and id != self.block_id:
+            if self.form_block_id and id != self.form_block_id:
                 continue
             block_type = block.get("@type", "")
             if block_type == "form":
@@ -110,7 +110,7 @@ class FormDataExportGet(Service):
         fields_labels = self.get_fields_labels()
 
         for item in store.search():
-            if self.block_id and item.attrs.get("block_id") != self.block_id:
+            if self.form_block_id and item.attrs.get("block_id") != self.form_block_id:
                 continue
             data = {}
 
