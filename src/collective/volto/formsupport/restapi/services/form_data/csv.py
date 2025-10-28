@@ -20,11 +20,10 @@ class FormDataExportGet(Service):
         self.form_fields_order = []
         self.form_block = None
         self.block_id = self.request.get("block_id")
-
         blocks = getattr(context, "blocks", {})
         if not blocks:
             raise NotFound("No blocks found")
-        for id, block in blocks.items():
+        for id, block in get_blocks(self.context).items():
             if self.block_id and id != self.block_id:
                 continue
             block_type = block.get("@type", "")
