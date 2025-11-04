@@ -1,0 +1,1 @@
+Update hCaptcha integration to use the new submit signature without remoteip, aligning with plone.formwidget.hcaptcha privacy (GDPR/LGPD) change. @alexandreIFB

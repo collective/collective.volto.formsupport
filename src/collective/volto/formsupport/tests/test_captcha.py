@@ -276,7 +276,7 @@ class TestCaptcha(unittest.TestCase):
                 },
             )
             transaction.commit()
-            mock_submit.assert_called_once_with("12345", "private", "127.0.0.1")
+            mock_submit.assert_called_once_with("12345", "private")
             self.assertEqual(response.status_code, 400)
             self.assertEqual(
                 response.json()["message"],
@@ -301,7 +301,7 @@ class TestCaptcha(unittest.TestCase):
                 },
             )
             transaction.commit()
-            mock_submit.assert_called_once_with("12345", "private", "127.0.0.1")
+            mock_submit.assert_called_once_with("12345", "private")
             self.assertEqual(response.status_code, 200)
 
     def test_get_vocabulary(self):
