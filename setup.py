@@ -73,7 +73,7 @@ setup(
     ],
     extras_require={
         "hcaptcha": [
-            "plone.formwidget.hcaptcha>=1.0.1",
+            "plone.formwidget.hcaptcha>=1.0.3",
         ],
         "recaptcha": [
             "plone.formwidget.recaptcha",
