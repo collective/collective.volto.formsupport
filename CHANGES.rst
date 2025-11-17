@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.3.1 (unreleased)
+3.3.1 (2025-11-17)
 ------------------
 
 - Fix README file.
