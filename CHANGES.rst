@@ -10,6 +10,12 @@ Changelog
 - Updated Spanish translation.
   [macagua]
 
+- Update hCaptcha integration to use the new submit signature without remoteip, aligning with plone.formwidget.hcaptcha privacy (GDPR/LGPD) change.
+  [alexandreIFB]
+
+- Update Brazilian Portuguese translation.
+  [@ericof]
+
 3.3.0 (2025-05-12)
 ------------------
 - BREAKING CHANGE: these new features needs volto-form-block >= v3.13.0.
