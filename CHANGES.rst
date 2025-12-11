@@ -4,7 +4,8 @@ Changelog
 3.3.2 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix csv export: always insert fixed_columns as latest ones.
+  [cekk]
 
 
 3.3.1 (2025-11-17)
