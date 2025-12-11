@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.3.2 (unreleased)
+3.3.2 (2025-12-11)
 ------------------
 
 - Fix csv export: always insert fixed_columns as latest ones.
