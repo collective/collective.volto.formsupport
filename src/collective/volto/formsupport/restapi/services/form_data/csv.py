@@ -138,8 +138,8 @@ class FormDataExportGet(Service):
             rows.append(data)
 
         columns.extend(fields_labels.values())
-        columns.extend(fixed_columns)
         columns.extend(sorted(legacy_columns))
+        columns.extend(fixed_columns)
 
         writer = csv.DictWriter(sbuf, fieldnames=columns, quoting=csv.QUOTE_ALL)
         writer.writeheader()

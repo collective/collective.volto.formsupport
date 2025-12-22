@@ -46,10 +46,7 @@ class HCaptchaSupport(CaptchaSupport):
                 )
             )
         token = data["token"]
-        remote_addr = self.request.get("HTTP_X_FORWARDED_FOR", "").split(",")[0]
-        if not remote_addr:
-            remote_addr = self.request.get("REMOTE_ADDR")
-        res = submit(token, self.settings.private_key, remote_addr)
+        res = submit(token, self.settings.private_key)
         if not res.is_valid:
             raise BadRequest(
                 translate(

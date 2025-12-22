@@ -1,7 +1,20 @@
 Changelog
 =========
 
-3.3.1 (unreleased)
+3.3.3 (unreleased)
+------------------
+
+- Nothing changed yet.
+
+
+3.3.2 (2025-12-11)
+------------------
+
+- Fix csv export: always insert fixed_columns as latest ones.
+  [cekk]
+
+
+3.3.1 (2025-11-17)
 ------------------
 
 - Fix README file.
@@ -9,6 +22,12 @@ Changelog
 
 - Updated Spanish translation.
   [macagua]
+
+- Update hCaptcha integration to use the new submit signature without remoteip, aligning with plone.formwidget.hcaptcha privacy (GDPR/LGPD) change.
+  [alexandreIFB]
+
+- Update Brazilian Portuguese translation.
+  [@ericof]
 
 3.3.0 (2025-05-12)
 ------------------
