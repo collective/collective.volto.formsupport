@@ -4,7 +4,8 @@ Changelog
 3.3.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Fix csv export when form block is nested.
+  [mbarde]
 
 
 3.3.2 (2025-12-11)
