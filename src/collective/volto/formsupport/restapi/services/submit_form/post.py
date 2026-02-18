@@ -121,19 +121,6 @@ class SubmitPost(Service):
 
         return self.form_data.get("from", "") or self.block.get("default_from", "")
 
-    def get_block_data(self, block_id):
-        blocks = get_blocks(self.context)
-        if not blocks:
-            return {}
-        for id, block in blocks.items():
-            if id != block_id:
-                continue
-            block_type = block.get("@type", "")
-            if block_type != "form":
-                continue
-            return block
-        return {}
-
     def get_bcc(self):
         bcc = []
         bcc_fields = []
