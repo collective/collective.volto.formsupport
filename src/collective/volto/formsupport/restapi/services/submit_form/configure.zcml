@@ -4,10 +4,12 @@
     xmlns:zcml="http://namespaces.zope.org/zcml"
     >
 
+  <!-- Was for "plone.restapi.behaviors.IBlocks" but global forms
+         means any content can potentially have a form -->
   <plone:service
       method="POST"
       factory=".post.SubmitPost"
-      for="plone.restapi.behaviors.IBlocks"
+      for="plone.dexterity.interfaces.IDexterityContent"
       permission="zope2.View"
       layer="collective.volto.formsupport.interfaces.ICollectiveVoltoFormsupportLayer"
       name="@submit-form"
