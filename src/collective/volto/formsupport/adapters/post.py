@@ -1,6 +1,7 @@
 from collective.volto.formsupport import _
 from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import IPostAdapter
+from collective.volto.formsupport.restapi import GLOBAL_FORM_REGISTRY_RECORD_ID
 from collective.volto.formsupport.utils import get_blocks
 from collective.volto.otp.utils import validate_email_token
 from copy import deepcopy
@@ -16,11 +17,6 @@ from zope.interface import Interface
 
 import math
 import os
-
-
-GLOBAL_FORM_REGISTRY_RECORD_ID = (
-    "collective.volto.formsupport.interfaces.IGlobalFormStore.global_forms_config"
-)
 
 
 @implementer(IPostAdapter)

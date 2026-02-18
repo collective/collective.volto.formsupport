@@ -1,19 +1,15 @@
+from collective.volto.formsupport.restapi import GLOBAL_FORM_REGISTRY_RECORD_ID
 from plone.api.portal import get_registry_record
 from plone.api.portal import set_registry_record
 from plone.dexterity.interfaces import IDexterityContent
 from plone.restapi.bbb import IPloneSiteRoot
 from plone.restapi.interfaces import IBlockFieldDeserializationTransformer
 from Products.PortalTransforms.transforms.safe_html import SafeHTML
-from uuid import uuid4
 from zope.component import adapter
 from zope.interface import implementer
 from zope.publisher.interfaces.browser import IBrowserRequest
 
-
-GLOBAL_FORM_REGISTRY_RECORD_ID = (
-    "collective.volto.formsupport.interfaces.IGlobalFormStore.global_forms_config"
-)
-
+from uuid import uuid4
 
 def update_global_forms(value):
     global_form_id = value.get("global_form_id")
