@@ -48,6 +48,15 @@
       zcml:condition="installed collective.honeypot"
       />
 
+  <adapter
+      factory=".rercaptcha.RercaptchaSupport"
+      provides="..interfaces.ICaptchaSupport"
+      for="*
+           zope.publisher.interfaces.browser.IBrowserRequest"
+      name="rercaptcha"
+      zcml:condition="installed collective.rercaptcha"
+      />
+
   <utility
       name="collective.volto.formsupport.captcha.providers"
       component=".vocabularies.captcha_providers_vocabulary_factory"
