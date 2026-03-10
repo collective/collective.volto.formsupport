@@ -1,14 +1,11 @@
 """Setup tests for this package."""
 
-from collective.volto.formsupport.testing import (  # noqa: E501,
-    VOLTO_FORMSUPPORT_INTEGRATION_TESTING,
-)
-from plone import api
-from plone.app.testing import setRoles
-from plone.app.testing import TEST_USER_ID
-
 import unittest
 
+from collective.volto.formsupport.testing import \
+    VOLTO_FORMSUPPORT_INTEGRATION_TESTING  # noqa: E501,
+from plone import api
+from plone.app.testing import TEST_USER_ID, setRoles
 
 try:
     from plone.base.utils import get_installer
@@ -39,9 +36,8 @@ class TestSetup(unittest.TestCase):
 
     def test_browserlayer(self):
         """Test that ICollectiveVoltoFormsupportLayer is registered."""
-        from collective.volto.formsupport.interfaces import (
-            ICollectiveVoltoFormsupportLayer,
-        )
+        from collective.volto.formsupport.interfaces import \
+            ICollectiveVoltoFormsupportLayer
         from plone.browserlayer import utils
 
         self.assertIn(ICollectiveVoltoFormsupportLayer, utils.registered_layers())
@@ -77,9 +73,8 @@ class TestUninstall(unittest.TestCase):
 
     def test_browserlayer_removed(self):
         """Test that ICollectiveVoltoFormsupportLayer is removed."""
-        from collective.volto.formsupport.interfaces import (
-            ICollectiveVoltoFormsupportLayer,
-        )
+        from collective.volto.formsupport.interfaces import \
+            ICollectiveVoltoFormsupportLayer
         from plone.browserlayer import utils
 
         self.assertNotIn(ICollectiveVoltoFormsupportLayer, utils.registered_layers())

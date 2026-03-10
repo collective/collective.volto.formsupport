@@ -1,6 +1,5 @@
 from collective.volto.formsupport.interfaces import IFormDataStore
-from plone.namedfile.utils import set_headers
-from plone.namedfile.utils import stream_data
+from plone.namedfile.utils import set_headers, stream_data
 from Products.Five.browser import BrowserView
 from zExceptions import NotFound
 from zope.component import getMultiAdapter

@@ -1,20 +1,17 @@
-from collective.volto.formsupport.testing import (  # noqa: E501,
-    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
-)
+import os
+import unittest
+
+import transaction
+from collective.volto.formsupport.testing import \
+    VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING  # noqa: E501,
 from plone import api
-from plone.app.testing import setRoles
-from plone.app.testing import SITE_OWNER_NAME
-from plone.app.testing import SITE_OWNER_PASSWORD
-from plone.app.testing import TEST_USER_ID
+from plone.app.testing import (SITE_OWNER_NAME, SITE_OWNER_PASSWORD,
+                               TEST_USER_ID, setRoles)
 from plone.formwidget.hcaptcha.interfaces import IHCaptchaSettings
 from plone.formwidget.recaptcha.interfaces import IReCaptchaSettings
 from plone.registry.interfaces import IRegistry
 from plone.restapi.testing import RelativeSession
 from zope.component import getUtility
-
-import os
-import transaction
-import unittest
 
 
 class TestBlockSerialization(unittest.TestCase):

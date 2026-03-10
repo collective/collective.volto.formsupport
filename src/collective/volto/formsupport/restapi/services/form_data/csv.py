@@ -1,15 +1,14 @@
-from collective.volto.formsupport.interfaces import IFormDataStore
-from collective.volto.formsupport.utils import get_blocks
+import csv
 from copy import deepcopy
 from io import StringIO
+
+from collective.volto.formsupport.interfaces import IFormDataStore
+from collective.volto.formsupport.utils import get_blocks
 from plone.namedfile import NamedBlobFile
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
 from zExceptions import NotFound
 from zope.component import getMultiAdapter
-
-import csv
-
 
 SKIP_ATTRS = ["block_id", "fields_labels", "fields_order"]
 

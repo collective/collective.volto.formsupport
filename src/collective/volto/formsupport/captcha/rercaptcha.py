@@ -1,9 +1,9 @@
-from collective.volto.formsupport.captcha import CaptchaSupport
+from collective.rercaptcha.eventsubscribers import (is_captcha_enabled,
+                                                    is_valid_rercaptcha)
 from collective.volto.formsupport import _
-from collective.rercaptcha.eventsubscribers import is_valid_rercaptcha
-from collective.rercaptcha.eventsubscribers import is_captcha_enabled
-from zope.i18n import translate
+from collective.volto.formsupport.captcha import CaptchaSupport
 from zExceptions import BadRequest
+from zope.i18n import translate
 
 
 class RercaptchaSupport(CaptchaSupport):

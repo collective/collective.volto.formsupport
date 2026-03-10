@@ -1,41 +1,35 @@
-from bs4 import BeautifulSoup
-from datetime import datetime
-from email import policy
-from email.message import EmailMessage
-from io import BytesIO
-from plone import api
-
 import codecs
 import logging
 import os
 import re
+from datetime import datetime
+from email import policy
+from email.message import EmailMessage
+from io import BytesIO
 
+from bs4 import BeautifulSoup
+from plone import api
 
 try:
     from plone.base.interfaces.controlpanel import IMailSchema
 except ImportError:
     from Products.CMFPlone.interfaces.controlpanel import IMailSchema
 
+from xml.etree.ElementTree import Element, ElementTree, SubElement
+
 from collective.volto.formsupport import _
 from collective.volto.formsupport.events import FormSubmittedEvent
-from collective.volto.formsupport.interfaces import IFormDataStore
-from collective.volto.formsupport.interfaces import IPostAdapter
-from collective.volto.formsupport.interfaces import IPostEvent
+from collective.volto.formsupport.interfaces import (IFormDataStore,
+                                                     IPostAdapter, IPostEvent)
 from collective.volto.formsupport.utils import get_blocks
 from plone.protect.interfaces import IDisableCSRFProtection
 from plone.registry.interfaces import IRegistry
 from plone.restapi.services import Service
-from xml.etree.ElementTree import Element
-from xml.etree.ElementTree import ElementTree
-from xml.etree.ElementTree import SubElement
 from zExceptions import BadRequest
-from zope.component import getMultiAdapter
-from zope.component import getUtility
+from zope.component import getMultiAdapter, getUtility
 from zope.event import notify
 from zope.i18n import translate
-from zope.interface import alsoProvides
-from zope.interface import implementer
-
+from zope.interface import alsoProvides, implementer
 
 logger = logging.getLogger(__name__)
 CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)

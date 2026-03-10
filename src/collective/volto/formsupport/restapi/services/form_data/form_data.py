@@ -1,21 +1,17 @@
-from collective.volto.formsupport.interfaces import IDataAdapter
-from collective.volto.formsupport.interfaces import IFormDataStore
+import json
+from datetime import datetime, timedelta
+
+from collective.volto.formsupport.interfaces import (IDataAdapter,
+                                                     IFormDataStore)
 from collective.volto.formsupport.utils import get_blocks
-from datetime import datetime
-from datetime import timedelta
 from plone import api
 from plone.memoize import view
 from plone.namedfile import NamedBlobFile
 from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
-from zope.component import adapter
-from zope.component import getAdapters
-from zope.component import getMultiAdapter
-from zope.interface import implementer
-from zope.interface import Interface
-
-import json
+from zope.component import adapter, getAdapters, getMultiAdapter
+from zope.interface import Interface, implementer
 
 
 @implementer(IExpandableElement)

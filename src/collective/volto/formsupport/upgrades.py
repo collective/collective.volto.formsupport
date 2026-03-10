@@ -1,18 +1,16 @@
+import json
+from copy import deepcopy
+
 from Acquisition import aq_base
 from collective.volto.formsupport.interfaces import IFormDataStore
-from copy import deepcopy
 from plone import api
 from plone.app.upgrade.utils import installOrReinstallProduct
 from plone.dexterity.utils import iterSchemata
 from plone.i18n.normalizer.interfaces import IIDNormalizer
 from souper.soup import Record
-from zope.component import getMultiAdapter
-from zope.component import getUtility
+from zope.component import getMultiAdapter, getUtility
 from zope.globalrequest import getRequest
 from zope.schema import getFields
-
-import json
-
 
 try:
     from collective.volto.blocksfield.field import BlocksField
@@ -22,7 +20,6 @@ except ImportError:
     HAS_BLOCKSFIELD = False
 
 from collective.volto.formsupport import logger
-
 
 DEFAULT_PROFILE = "profile-collective.volto.formsupport:default"
 

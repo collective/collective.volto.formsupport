@@ -1,20 +1,18 @@
-from collective.volto.formsupport.interfaces import ICaptchaSupport
-from collective.volto.formsupport.interfaces import ICollectiveVoltoFormsupportLayer
+from collective.volto.formsupport.interfaces import (
+    ICaptchaSupport, ICollectiveVoltoFormsupportLayer)
 from plone import api
-
 
 try:
     from plone.base.interfaces import IPloneSiteRoot
 except ImportError:
     from Products.CMFPlone.interfaces import IPloneSiteRoot
 
+import os
+
 from plone.restapi.behaviors import IBlocks
 from plone.restapi.interfaces import IBlockFieldSerializationTransformer
-from zope.component import adapter
-from zope.component import getMultiAdapter
+from zope.component import adapter, getMultiAdapter
 from zope.interface import implementer
-
-import os
 
 
 class FormSerializer:

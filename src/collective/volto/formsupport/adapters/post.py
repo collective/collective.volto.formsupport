@@ -1,22 +1,20 @@
+import base64
+import math
+import os
+from copy import deepcopy
+
 from collective.volto.formsupport import _
-from collective.volto.formsupport.interfaces import ICaptchaSupport
-from collective.volto.formsupport.interfaces import IPostAdapter
+from collective.volto.formsupport.interfaces import (ICaptchaSupport,
+                                                     IPostAdapter)
 from collective.volto.formsupport.utils import get_blocks
 from collective.volto.otp.utils import validate_email_token
-from copy import deepcopy
 from plone import api
 from plone.restapi.deserializer import json_body
 from plone.schema.email import _isemail
 from zExceptions import BadRequest
-from zope.component import adapter
-from zope.component import getMultiAdapter
+from zope.component import adapter, getMultiAdapter
 from zope.i18n import translate
-from zope.interface import implementer
-from zope.interface import Interface
-
-import base64
-import math
-import os
+from zope.interface import Interface, implementer
 
 
 @implementer(IPostAdapter)

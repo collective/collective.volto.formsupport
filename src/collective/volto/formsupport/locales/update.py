@@ -1,7 +1,7 @@
 import os
-import pkg_resources
 import subprocess
 
+import pkg_resources
 
 domain = "collective.volto.formsupport"
 os.chdir(pkg_resources.resource_filename(domain, ""))
