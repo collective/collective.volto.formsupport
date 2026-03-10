@@ -1,13 +1,12 @@
-import sys
-
-import click
-import transaction
 from collective.volto.formsupport.interfaces import IFormDataStore
-from collective.volto.formsupport.restapi.services.form_data.form_data import \
-    FormData
+from collective.volto.formsupport.restapi.services.form_data.form_data import FormData
 from plone import api
 from zope.component import getMultiAdapter
 from zope.globalrequest import getRequest
+
+import click
+import sys
+import transaction
 
 
 @click.command(

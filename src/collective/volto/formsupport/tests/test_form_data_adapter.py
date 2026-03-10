@@ -1,11 +1,11 @@
-import unittest
-
 from collective.volto.formsupport.interfaces import IPostAdapter
-from collective.volto.formsupport.testing import \
-    VOLTO_FORMSUPPORT_INTEGRATION_TESTING
+from collective.volto.formsupport.testing import VOLTO_FORMSUPPORT_INTEGRATION_TESTING
 from plone import api
-from plone.app.testing import TEST_USER_ID, setRoles
+from plone.app.testing import setRoles
+from plone.app.testing import TEST_USER_ID
 from zope.component import getMultiAdapter
+
+import unittest
 
 
 class TestFormDataAdapter(unittest.TestCase):
