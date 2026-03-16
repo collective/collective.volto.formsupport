@@ -16,9 +16,7 @@ class RercaptchaSupport(CaptchaSupport):
         return is_captcha_enabled()
 
     def verify(self, data):
-        import pdb
 
-        pdb.set_trace()
         if not is_valid_rercaptcha(data):
             raise BadRequest(
                 translate(
