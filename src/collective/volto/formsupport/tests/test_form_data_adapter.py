@@ -37,9 +37,9 @@ class TestFormDataAdapter(unittest.TestCase):
         }
 
     def test_format_fields_join_list_values(self):
-        self.request["BODY"] = (
-            b'{"data": [{"field_id": "xxx", "value": ["a", "b"]}], "block_id": "form-id"}'
-        )
+        self.request[
+            "BODY"
+        ] = b'{"data": [{"field_id": "xxx", "value": ["a", "b"]}], "block_id": "form-id"}'
         adapter = getMultiAdapter((self.document, self.request), IPostAdapter)
 
         self.assertEqual(adapter.format_fields()[0]["value"], "a, b")

@@ -15,8 +15,13 @@ class RercaptchaSupport(CaptchaSupport):
         """
         return is_captcha_enabled()
 
-    def verify(self, data):
+    def serialize(self):
+        if not is_captcha_enabled():
+            return {}
 
+        return {"provider": "recaptcha"}
+
+    def verify(self, data):
         if not is_valid_rercaptcha(data):
             raise BadRequest(
                 translate(
