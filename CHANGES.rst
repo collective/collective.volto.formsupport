@@ -4,8 +4,8 @@ Changelog
 3.3.3 (unreleased)
 ------------------
 
-- Nothing changed yet.
-
+- Do not break when an email field is an empty string in validate_email_fields. Required fields are already checked.
+  [cekk]
 
 3.3.2 (2025-12-11)
 ------------------
