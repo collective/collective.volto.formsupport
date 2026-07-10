@@ -1560,3 +1560,71 @@ class TestMailSend(unittest.TestCase):
             msg,
         )
         self.assertIn("<strong>Name:</strong> alert(=E2=80=98XSS=E2=80=99) foo", msg)
+
+    def test_email_sent_with_empty_email_field_if_not_required(self):
+        self.document.blocks = {
+            "form-id": {
+                "@type": "form",
+                "send": ["recipient"],
+                "subblocks": [
+                    {
+                        "field_id": "foo",
+                        "field_type": "text",
+                    },
+                    {
+                        "field_id": "email",
+                        "field_type": "from",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "block_id": "form-id",
+                "subject": "test subject",
+                "data": [
+                    {"label": "email", "value": "", "field_id": "email"},
+                    {"label": "foo", "value": "foo", "field_id": "foo"},
+                ],
+            },
+        )
+        transaction.commit()
+        self.assertEqual(response.status_code, 200)
+
+    def test_email_not_sent_with_wrong_email_field(self):
+        self.document.blocks = {
+            "form-id": {
+                "@type": "form",
+                "send": ["recipient"],
+                "subblocks": [
+                    {
+                        "field_id": "foo",
+                        "field_type": "text",
+                    },
+                    {
+                        "field_id": "email",
+                        "field_type": "from",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "block_id": "form-id",
+                "subject": "test subject",
+                "data": [
+                    {"label": "email", "value": "xxx", "field_id": "email"},
+                    {"label": "foo", "value": "foo", "field_id": "foo"},
+                ],
+            },
+        )
+        transaction.commit()
+        self.assertEqual(response.status_code, 400)
+        res = response.json()
+        self.assertEqual(res["message"], 'Email not valid in "email" field.')
