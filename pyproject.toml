@@ -1,8 +1,46 @@
 # Generated from:
-# https://github.com/plone/meta/tree/main/config/default
+# https://github.com/plone/meta/tree/2.x/src/plone/meta/default
 # See the inline comments on how to expand/tweak this configuration file
 [build-system]
-requires = ["setuptools>=68.2"]
+requires = ["setuptools>=68.2,<82", "wheel"]
+
+
+
+[tool.towncrier]
+directory = "news/"
+filename = "CHANGES.rst"
+title_format = "{version} ({project_date})"
+underlines = ["-", ""]
+
+[[tool.towncrier.type]]
+directory = "breaking"
+name = "Breaking changes:"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "feature"
+name = "New features:"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "bugfix"
+name = "Bug fixes:"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "internal"
+name = "Internal:"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "documentation"
+name = "Documentation:"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "tests"
+name = "Tests:"
+showcontent = true
 
 ##
 # Add extra configuration options in .meta.toml:
@@ -24,7 +62,7 @@ profile = "plone"
 ##
 
 [tool.black]
-target-version = ["py38"]
+target-version = ["py39"]
 
 ##
 # Add extra configuration options in .meta.toml:
@@ -35,7 +73,7 @@ target-version = ["py38"]
 ##
 
 [tool.codespell]
-ignore-words-list = "discreet,"
+ignore-words-list = "discreet,assertin,thet,"
 skip = "*.po,"
 ##
 # Add extra configuration options in .meta.toml:
@@ -83,17 +121,7 @@ Zope = [
   'Products.CMFCore', 'Products.CMFDynamicViewFTI',
 ]
 python-dateutil = ['dateutil']
-'souper.plone' = ['souper', 'repoze.catalog']
-beautifulsoup4 = ['bs4']
-# extra packages
-ignore-packages = [
-  # these are packages defined in extras_require
-  'collective.honeypot', 'plone.formwidget.hcaptcha', 'plone.formwidget.recaptcha',
-  'collective.volto.blocksfield', 'collective.z3cform.norobots',
-  'plone.app.iterate', 'plone.app.upgrade',
-  # XXX: This is a temporary fix for make the package usable with Plone  5.2 and 6.0
-  'plone.base', 'Products.CMFPlone',
-]
+pytest-plone = ['pytest', 'zope.pytestlayer', 'plone.testing', 'plone.app.testing']
 
 ##
 # Add extra configuration options in .meta.toml:
