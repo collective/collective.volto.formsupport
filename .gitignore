@@ -1,5 +1,5 @@
 # Generated from:
-# https://github.com/plone/meta/tree/main/config/default
+# https://github.com/plone/meta/tree/2.x/src/plone/meta/default
 # See the inline comments on how to expand/tweak this configuration file
 # python related
 *.egg-info
@@ -18,8 +18,10 @@ dist/
 docs/_build
 __pycache__/
 .tox
+.vscode/
 node_modules/
-forest.*
+forest.dot
+forest.json
 
 # venv / buildout related
 bin/
@@ -36,7 +38,6 @@ parts/
 pyvenv.cfg
 var/
 local.cfg
-.python-version
 
 # mxdev
 /instance/
@@ -47,8 +48,6 @@ local.cfg
 /venv/
 .installed.txt
 
-# visual code editor
-*.code-workspace
 
 ##
 # Add extra configuration options in .meta.toml:
@@ -57,8 +56,3 @@ local.cfg
 #  _your own configuration lines_
 #  """
 ##
-temp_auto_push.bat
-temp_interactive_push.bat
-.gitignore
-.vscode/
-public/
