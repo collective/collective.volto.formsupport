@@ -4,3 +4,11 @@
 [meta]
 template = "default"
 commit-id = "2.10.0"
+
+[pyproject]
+dependencies_ignores = "['collective.honeypot', 'plone.formwidget.hcaptcha', 'plone.formwidget.recaptcha', 'collective.volto.blocksfield', 'collective.z3cform.norobots', 'plone.app.iterate', 'plone.app.upgrade', 'plone.base', 'Products.CMFPlone']"
+dependencies_mappings = [
+    "'souper.plone' = ['souper', 'repoze.catalog']",
+    "beautifulsoup4 = ['bs4']",
+    "setuptools = ['pkg_resources']",
+]
