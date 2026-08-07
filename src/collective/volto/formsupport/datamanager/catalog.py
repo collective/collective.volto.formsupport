@@ -9,6 +9,10 @@ from plone.namedfile import NamedBlobFile
 from plone.restapi.deserializer import json_body
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.indexes.field import CatalogFieldIndex
+from repoze.catalog.query import And
+from repoze.catalog.query import Eq
+from repoze.catalog.query import Ge
+from repoze.catalog.query import Le
 from souper.interfaces import ICatalogFactory
 from souper.soup import get_soup
 from souper.soup import NodeAttributeIndexer
@@ -25,6 +29,11 @@ class FormDataSoupCatalogFactory:
         catalog = Catalog()
         block_id_indexer = NodeAttributeIndexer("block_id")
         catalog["block_id"] = CatalogFieldIndex(block_id_indexer)
+
+        # add the date index
+        date_indexer = NodeAttributeIndexer("date")
+        catalog["date"] = CatalogFieldIndex(date_indexer)
+
         return catalog
 
 
@@ -37,7 +46,23 @@ class FormDataStore:
 
     @property
     def soup(self):
-        return get_soup("form_data", self.context)
+
+        soup = get_soup("form_data", self.context)
+        self._ensure_date_index(soup)
+        return soup
+
+    def _ensure_date_index(self, soup):
+        """
+        Add the missing date index in case
+        """
+
+        catalog = soup.catalog
+        if "date" in catalog:
+            return
+        date_indexer = NodeAttributeIndexer("date")
+        catalog["date"] = CatalogFieldIndex(date_indexer)
+        for record in soup.data.values():
+            catalog["date"].index_doc(record.intid, record)
 
     @property
     def block_id(self):
@@ -101,7 +126,7 @@ class FormDataStore:
                 fields_types[field_id] = field.get("type", "")
                 fields_labels[field_id] = field["label"]
                 fields_order.append(field_id)
-            # else: skip the field
+
         record.attrs["fields_labels"] = fields_labels
         record.attrs["fields_order"] = fields_order
         record.attrs["fields_types"] = fields_types
@@ -123,17 +148,40 @@ class FormDataStore:
                 )
         return value
 
-    def length(self):
-        return len([x for x in self.soup.data.values()])
+    def length(self, query=None):
+        return len(self._get_docids(query))
 
     def search(self, query=None):
-        if not query:
-            records = sorted(
-                self.soup.data.values(),
-                key=lambda k: k.attrs.get("date", ""),
-                reverse=True,
-            )
-        return records
+
+        docids = self._get_docids(query)
+        return [self.soup.data[docid] for docid in docids]
+
+    def _get_docids(self, query=None):
+
+        query = query or {}
+        block_id = query.get("block_id")
+        start_date = query.get("start_date")
+        end_date = query.get("end_date")
+
+        clauses = []
+        if block_id:
+            clauses.append(Eq("block_id", block_id))
+        if start_date:
+            clauses.append(Ge("date", start_date))
+        if end_date:
+            clauses.append(Le("date", end_date))
+
+        if clauses:
+            catalog_query = clauses[0]
+            for clause in clauses[1:]:
+                catalog_query = And(catalog_query, clause)
+        else:
+            catalog_query = Ge("date", datetime.min)
+
+        _, docids = self.soup.catalog.query(
+            catalog_query, sort_index="date", reverse=True
+        )
+        return list(docids)
 
     def delete(self, id):
         record = self.soup.get(id)

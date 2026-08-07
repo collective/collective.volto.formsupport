@@ -6,6 +6,8 @@ Changelog
 
 - Do not break when an email field is an empty string in validate_email_fields. Required fields are already checked.
   [cekk]
+- Added date index into repoze catalog to get data from @form-data by using structured query
+  [daniele]
 
 3.3.2 (2025-12-11)
 ------------------

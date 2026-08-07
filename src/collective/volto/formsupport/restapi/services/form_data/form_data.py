@@ -6,12 +6,15 @@ from datetime import timedelta
 from plone import api
 from plone.memoize import view
 from plone.namedfile import NamedBlobFile
+from plone.protect.interfaces import IDisableCSRFProtection
+from plone.restapi.batching import HypermediaBatch
 from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.serializer.converters import json_compatible
 from plone.restapi.services import Service
 from zope.component import adapter
 from zope.component import getAdapters
 from zope.component import getMultiAdapter
+from zope.interface import alsoProvides
 from zope.interface import implementer
 from zope.interface import Interface
 
@@ -26,6 +29,25 @@ class FormData:
         self.request = request
         self.block_id = block_id or self.request.get("block_id")
 
+    def parse_date(self, value):
+
+        if not value:
+            return None
+        if isinstance(value, datetime):
+            return value.replace(tzinfo=None)
+        try:
+            value = value.replace("Z", "+00:00")
+            parsed = datetime.fromisoformat(value)
+        except (ValueError, TypeError):
+            return None
+        return parsed.replace(tzinfo=None)
+
+    def get_date_range(self):
+
+        start_date = self.parse_date(self.request.get("start_date"))
+        end_date = self.parse_date(self.request.get("end_date"))
+        return start_date, end_date
+
     @view.memoize
     def get_items(self):
         block = self.form_block
@@ -33,19 +55,30 @@ class FormData:
         if block:
             store = getMultiAdapter((self.context, self.request), IFormDataStore)
             remove_data_after_days = int(block.get("remove_data_after_days") or 0)
-            data = store.search()
+
+            start_date, end_date = self.get_date_range()
+            query = {}
+            if self.block_id:
+                query["block_id"] = self.block_id
+            if start_date:
+                query["start_date"] = start_date
+            if end_date:
+                query["end_date"] = end_date
+
+            data = store.search(query=query)
 
             if remove_data_after_days > 0:
                 expire_date = datetime.now() - timedelta(days=remove_data_after_days)
             else:
                 expire_date = None
+
             for record in data:
-                if not self.block_id or record.attrs.get("block_id") == self.block_id:
-                    expanded = self.expand_records(record)
-                    expanded["__expired"] = (
-                        expire_date and record.attrs["date"] < expire_date
-                    )
-                    items.append(expanded)
+                expanded = self.expand_records(record)
+                record_date = record.attrs.get("date")
+                expanded["__expired"] = bool(
+                    expire_date and record_date and record_date < expire_date
+                )
+                items.append(expanded)
         else:
             items = []
         return items
@@ -68,12 +101,20 @@ class FormData:
             return result
         items = self.get_items()
         expired_total = len(self.get_expired_items())
-        result["form_data"] = {
+
+        batch = HypermediaBatch(self.request, items)
+
+        form_data = {
             "@id": f"{self.context.absolute_url()}/@form-data",
-            "items": items,
-            "items_total": len(items),
+            "items": list(batch),
+            "items_total": batch.items_total,
             "expired_total": expired_total,
         }
+        if batch.links:
+            form_data["batching"] = batch.links
+
+        result["form_data"] = form_data
+
         adapters = getAdapters((self.context, self.request), provided=IDataAdapter)
         for _, adpt in adapters:
             result = adpt(result, block_id=self.block_id)
@@ -124,6 +165,9 @@ class FormData:
 
 class FormDataGet(Service):
     def reply(self):
+
+        alsoProvides(self.request, IDisableCSRFProtection)
+
         block_id = self.request.get("block_id")
         form_data = FormData(self.context, self.request, block_id=block_id)
         return form_data(expand=True).get("form_data", {})
