@@ -53,7 +53,11 @@ class FormDataStore:
 
     def _ensure_date_index(self, soup):
         """
-        Add the missing date index in case
+        soups created before the 'date' index only have the
+        'block_id' index persisted in their catalog.
+        Add the missing index (and index existing records)
+        the first time it's needed, so old
+        content keeps working without a formal upgrade step.
         """
 
         catalog = soup.catalog
