@@ -4,6 +4,9 @@ Changelog
 3.3.3 (unreleased)
 ------------------
 
+- Fix README format file.
+  [macagua]
+
 - Do not break when an email field is an empty string in validate_email_fields. Required fields are already checked.
   [cekk]
 
