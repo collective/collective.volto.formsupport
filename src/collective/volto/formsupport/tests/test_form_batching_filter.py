@@ -146,7 +146,7 @@ class TestFormDataBatching(unittest.TestCase):
         all_names = (
             [item["name"]["value"] for item in data["items"]]  # noqa
             + [item["name"]["value"] for item in data_middle["items"]]  # noqa
-            + [item["name"]["value"] for item in data_last["items"]]
+            + [item["name"]["value"] for item in data_last["items"]]  # noqa
         )
         self.assertEqual(sorted(all_names), ["Alice", "Bob", "Charlie", "Dave", "Erin"])
 
