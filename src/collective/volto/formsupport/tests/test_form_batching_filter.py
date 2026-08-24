@@ -144,7 +144,7 @@ class TestFormDataBatching(unittest.TestCase):
 
         # pages don't overlap and together cover all 5 submissions
         all_names = (
-            [item["name"]["value"] for item in data["items"]]
+            [item["name"]["value"] for item in data["items"]]  # noqa
             + [item["name"]["value"] for item in data_middle["items"]]
             + [item["name"]["value"] for item in data_last["items"]]
         )
