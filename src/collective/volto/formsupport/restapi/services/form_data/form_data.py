@@ -29,23 +29,40 @@ class FormData:
         self.request = request
         self.block_id = block_id or self.request.get("block_id")
 
-    def parse_date(self, value):
+    def parse_date(self, value, is_end=False):
+        """
+        Parse a date coming from the request querystring.
+        Accepts ISO-8601 strings, e.g. "2024-01-31" or
+        "2024-01-31T10:00:00" (a trailing "Z" is also tolerated).
+        Returns a naive datetime (tzinfo stripped), since dates
+        stored in the records (souper) are naive datetimes too.
+
+        When `is_end` is True and the value has no time component
+        (e.g. "2024-01-31"), the time is set to 23:59:59.999999 so the
+        whole day is included in the range. Without this, a date-only
+        end_date would be interpreted as midnight of that day and would
+        exclude every record submitted later that same day.
+        """
 
         if not value:
             return None
         if isinstance(value, datetime):
             return value.replace(tzinfo=None)
+        has_time = "T" in value
         try:
-            value = value.replace("Z", "+00:00")
-            parsed = datetime.fromisoformat(value)
+            normalized = value.replace("Z", "+00:00")
+            parsed = datetime.fromisoformat(normalized)
         except (ValueError, TypeError):
             return None
-        return parsed.replace(tzinfo=None)
+        parsed = parsed.replace(tzinfo=None)
+        if is_end and not has_time:
+            parsed = parsed.replace(hour=23, minute=59, second=59, microsecond=999999)
+        return parsed
 
     def get_date_range(self):
 
         start_date = self.parse_date(self.request.get("start_date"))
-        end_date = self.parse_date(self.request.get("end_date"))
+        end_date = self.parse_date(self.request.get("end_date"), is_end=True)
         return start_date, end_date
 
     @view.memoize
