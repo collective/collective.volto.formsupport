@@ -260,6 +260,29 @@ During the form post, the token captcha will be verified with the defined ``capt
 
 For captcha support `volto-form-block`_ version >= 2.4.0 is required.
 
+If you want to know which captcha providers are available, you can call the following endpoint:
+
+.. code-block:: console
+
+    curl http://localhost:3000/++api++/@vocabularies/collective.volto.formsupport.captcha.providers
+
+
+This request should return a JSON object with the available providers, for example:
+
+.. code-block:: json
+
+    {
+    "@id": "http://localhost:8080/@vocabularies/collective.volto.formsupport.captcha.providers",
+    "items": [
+        {
+        "title": "NoRobots ReCaptcha Support",
+        "token": "norobots-captcha"
+        }
+    ],
+    "items_total": 1
+    }
+
+
 Honeypot configuration
 ----------------------
 
