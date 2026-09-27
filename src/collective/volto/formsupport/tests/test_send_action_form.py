@@ -1202,6 +1202,68 @@ class TestMailSend(unittest.TestCase):
         self.assertIn("<strong>Message:</strong> just want to say hi", msg)
         self.assertIn("<strong>Name:</strong> John", msg)
 
+    def test_field_display_values_as_an_ordered_list(self):
+        # display_values may also be an ordered list of {value, label}: the
+        # options of a choice field, each with the value it submits and the
+        # label a person reads. A list of answers is labelled answer by answer.
+        self.document.blocks = {
+            "form-id": {
+                "@type": "form",
+                "send": True,
+                "email_format": "list",
+                "subblocks": [
+                    {
+                        "field_id": "nationality",
+                        "label": "Nationality",
+                        "field_type": "single_choice",
+                        "display_values": [
+                            {"value": "british", "label": "British"},
+                            {"value": "other", "label": "Citizen of another country"},
+                        ],
+                    },
+                    {
+                        "field_id": "contact",
+                        "label": "Contact",
+                        "field_type": "multiple_choice",
+                        "display_values": [
+                            {"value": "email", "label": "By email"},
+                            {"value": "phone", "label": "By phone"},
+                        ],
+                    },
+                    {
+                        "field_id": "extra",
+                        "label": "Extra",
+                        "field_type": "multiple_choice",
+                        "display_values": {"a": "Option A"},
+                    },
+                ],
+            }
+        }
+        transaction.commit()
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": [
+                    {"field_id": "nationality", "label": "Nationality", "value": "other"},
+                    {"field_id": "contact", "label": "Contact", "value": ["email", "phone"]},
+                    {"field_id": "extra", "label": "Extra", "value": ["a", "b"]},
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+        transaction.commit()
+        self.assertEqual(response.status_code, 200)
+        msg = self.mailhost.messages[0]
+        if isinstance(msg, bytes) and bytes is not str:
+            msg = msg.decode("utf-8")
+        message_contents = _get_text_from_message(msg)
+        self.assertIn("Nationality: Citizen of another country", message_contents)
+        self.assertIn("Contact: By email, By phone", message_contents)
+        # A map labels a list of answers too; an answer it does not name
+        # stays as submitted.
+        self.assertIn("Extra: Option A, b", message_contents)
+
     def test_field_custom_display_value(
         self,
     ):
