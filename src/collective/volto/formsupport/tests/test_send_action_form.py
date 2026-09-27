@@ -1616,8 +1616,10 @@ class TestMailSend(unittest.TestCase):
             },
         )
         self.assertEqual(response.status_code, 400)
+        # Errors are reported per field (the frontend shows each by its field).
         self.assertEqual(
-            response.json()["message"], 'Email not valid in "Email" field.'
+            response.json()["error"]["errors"]["contact"],
+            {"validation": 'Email not valid in "Email" field.'},
         )
 
         response = self.submit_form(
@@ -1635,8 +1637,10 @@ class TestMailSend(unittest.TestCase):
             },
         )
         self.assertEqual(response.status_code, 400)
+        # Errors are reported per field (the frontend shows each by its field).
         self.assertEqual(
-            response.json()["message"], 'Email not valid in "Email" field.'
+            response.json()["error"]["errors"]["contact"],
+            {"validation": 'Email not valid in "Email" field.'},
         )
 
         response = self.submit_form(
@@ -1654,8 +1658,10 @@ class TestMailSend(unittest.TestCase):
             },
         )
         self.assertEqual(response.status_code, 400)
+        # Errors are reported per field (the frontend shows each by its field).
         self.assertEqual(
-            response.json()["message"], 'Email not valid in "Email" field.'
+            response.json()["error"]["errors"]["contact"],
+            {"validation": 'Email not valid in "Email" field.'},
         )
 
     def test_submit_return_200_if_correct_email_in_email_field(self):

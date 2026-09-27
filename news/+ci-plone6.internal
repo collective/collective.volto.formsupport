@@ -1,0 +1,1 @@
+Tests run on Plone 6 (Python 3.10 and 3.12) on every push and pull request; three tests updated to the per-field error format, the validationSettings the serializer adds, and dates stored in local time. @djay
