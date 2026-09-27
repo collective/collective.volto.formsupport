@@ -51,7 +51,7 @@ class Field:
         _attribute("use_as_reply_bcc")
         self.required = field_data.get("required")
         self.validations = field_data.get("validations", {})
-        self._display_value_mapping = field_data.get("dislpay_value_mapping")
+        self._display_value_mapping = field_data.get("display_value_mapping")
         self._value = field_data.get("value", "")
         self._custom_field_id = field_data.get("custom_field_id")
         self._label = field_data.get("label", "")
