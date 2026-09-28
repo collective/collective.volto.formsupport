@@ -1,0 +1,1 @@
+A field's stored ``display_values`` reach the email again: the submitted field read ``dislpay_value_mapping`` while the service passes ``display_value_mapping``, so every value was sent as submitted. @djay
