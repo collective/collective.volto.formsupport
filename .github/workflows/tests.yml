@@ -1,0 +1,34 @@
+name: Tests
+
+# The package's tests on Plone 6, as the sites that install this fork run it.
+# (This used to be a Python 3.8 / Plone 5.2 buildout, which no longer
+# installs; and meta.yml only runs on main/master, which this fork's branches
+# are not.)
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
+      - name: Install
+        run: |
+          uv venv .venv
+          uv pip install --python .venv/bin/python \
+            -e ".[test,honeypot,validation,hcaptcha,recaptcha,norobots,blocksfield]" \
+            zope.testrunner \
+            -c https://dist.plone.org/release/6.0-latest/constraints.txt
+      - name: Run tests
+        run: .venv/bin/zope-testrunner --test-path=src --all

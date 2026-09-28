@@ -60,7 +60,10 @@ class TestBlockSerialization(unittest.TestCase):
     def test_serializer_return_full_block_data_to_admin(self):
         response = self.api_session.get(self.document_url)
         res = response.json()
-        self.assertEqual(res["blocks"]["form-id"], self.document.blocks["form-id"])
+        block = dict(res["blocks"]["form-id"])
+        # The serializer adds the validators the site offers, for the editor.
+        self.assertIsInstance(block.pop("validationSettings"), dict)
+        self.assertEqual(block, self.document.blocks["form-id"])
 
     def test_serializer_return_filtered_block_data_to_anon(self):
         response = self.anon_api_session.get(self.document_url)
