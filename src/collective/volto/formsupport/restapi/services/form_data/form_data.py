@@ -118,8 +118,8 @@ class FormData:
         every matching item, unsliced.
         """
         return (
-            self.request.get("b_size") is not None
-            and self.request.get("b_start") is not None
+            self.request.get("b_size") is not None  # noqa
+            and self.request.get("b_start") is not None  # noqa
         )
 
     def __call__(self, expand=False):
