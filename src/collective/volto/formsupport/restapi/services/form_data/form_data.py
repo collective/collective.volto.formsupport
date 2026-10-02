@@ -17,7 +17,6 @@ from zope.component import getMultiAdapter
 from zope.interface import alsoProvides
 from zope.interface import implementer
 from zope.interface import Interface
-
 import json
 
 
@@ -29,7 +28,8 @@ class FormData:
         self.request = request
         self.block_id = block_id or self.request.get("block_id")
 
-    def parse_date(self, value, is_end=False):
+    @staticmethod
+    def parse_date(value, is_end=False):
         """
         Parse a date coming from the request querystring.
         Accepts ISO-8601 strings, e.g. "2024-01-31" or
@@ -43,7 +43,6 @@ class FormData:
         end_date would be interpreted as midnight of that day and would
         exclude every record submitted later that same day.
         """
-
         if not value:
             return None
         if isinstance(value, datetime):
@@ -60,7 +59,12 @@ class FormData:
         return parsed
 
     def get_date_range(self):
-
+        """
+        Return (start_date, end_date) parsed from the "start_date" /
+        "end_date" querystring parameters. Either can be None if not
+        passed or not parsable. A date-only end_date is normalized to
+        the end of that day (see parse_date).
+        """
         start_date = self.parse_date(self.request.get("start_date"))
         end_date = self.parse_date(self.request.get("end_date"), is_end=True)
         return start_date, end_date
@@ -73,6 +77,9 @@ class FormData:
             store = getMultiAdapter((self.context, self.request), IFormDataStore)
             remove_data_after_days = int(block.get("remove_data_after_days") or 0)
 
+            # block_id filtering is delegated to the souper catalog
+            # (repoze.catalog query); date range filtering is NOT
+            # indexed on the catalog.
             start_date, end_date = self.get_date_range()
             query = {}
             if self.block_id:
@@ -104,6 +111,17 @@ class FormData:
     def get_expired_items(self):
         return [item for item in self.get_items() if item["__expired"]]
 
+    def has_batching_params(self):
+        """
+        Pagination is activated only if in if both "b_size" and "b_start"
+        paramsin are passed in. If either one is missing, @form-data returns
+        every matching item, unsliced.
+        """
+        return (
+            self.request.get("b_size") is not None
+            and self.request.get("b_start") is not None
+        )
+
     def __call__(self, expand=False):
         if not self.show_component():
             return {}
@@ -116,19 +134,30 @@ class FormData:
         result = {"form_data": {"@id": service_id}}
         if not expand:
             return result
+
+        # items already filtered by block_id (catalog) and by date
+        # range
         items = self.get_items()
         expired_total = len(self.get_expired_items())
 
-        batch = HypermediaBatch(self.request, items)
+        if self.has_batching_params():
+            batch = HypermediaBatch(self.request, items)
+            result_items = list(batch)
+            items_total = batch.items_total
+            batching_links = batch.links
+        else:
+            result_items = items
+            items_total = len(items)
+            batching_links = None
 
         form_data = {
             "@id": f"{self.context.absolute_url()}/@form-data",
-            "items": list(batch),
-            "items_total": batch.items_total,
+            "items": result_items,
+            "items_total": items_total,
             "expired_total": expired_total,
         }
-        if batch.links:
-            form_data["batching"] = batch.links
+        if batching_links:
+            form_data["batching"] = batching_links
 
         result["form_data"] = form_data
 
@@ -182,7 +211,6 @@ class FormData:
 
 class FormDataGet(Service):
     def reply(self):
-
         alsoProvides(self.request, IDisableCSRFProtection)
 
         block_id = self.request.get("block_id")

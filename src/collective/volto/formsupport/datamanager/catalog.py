@@ -9,10 +9,7 @@ from plone.namedfile import NamedBlobFile
 from plone.restapi.deserializer import json_body
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.indexes.field import CatalogFieldIndex
-from repoze.catalog.query import And
 from repoze.catalog.query import Eq
-from repoze.catalog.query import Ge
-from repoze.catalog.query import Le
 from souper.interfaces import ICatalogFactory
 from souper.soup import get_soup
 from souper.soup import NodeAttributeIndexer
@@ -25,15 +22,10 @@ from zope.interface import Interface
 @implementer(ICatalogFactory)
 class FormDataSoupCatalogFactory:
     def __call__(self, context):
-        #  do not set any index here..maybe on each form
+        #  do not set any index here..maybe on each form
         catalog = Catalog()
         block_id_indexer = NodeAttributeIndexer("block_id")
         catalog["block_id"] = CatalogFieldIndex(block_id_indexer)
-
-        # add the date index
-        date_indexer = NodeAttributeIndexer("date")
-        catalog["date"] = CatalogFieldIndex(date_indexer)
-
         return catalog
 
 
@@ -46,27 +38,20 @@ class FormDataStore:
 
     @property
     def soup(self):
-
         soup = get_soup("form_data", self.context)
-        self._ensure_date_index(soup)
+        self._cleanup_legacy_date_index(soup)
         return soup
 
-    def _ensure_date_index(self, soup):
+    def _cleanup_legacy_date_index(self, soup):
         """
-        soups created before the 'date' index only have the
-        'block_id' index persisted in their catalog.
-        Add the missing index (and index existing records)
-        the first time it's needed, so old
-        content keeps working without a formal upgrade step.
+        BBB: a previous version of this adapter indexed 'date' on the
+        catalog. Date filtering is now done by hand on each record
+        (see search()), so drop the old index if it's still there on
+        existing/persisted soups.
         """
-
         catalog = soup.catalog
         if "date" in catalog:
-            return
-        date_indexer = NodeAttributeIndexer("date")
-        catalog["date"] = CatalogFieldIndex(date_indexer)
-        for record in soup.data.values():
-            catalog["date"].index_doc(record.intid, record)
+            del catalog["date"]
 
     @property
     def block_id(self):
@@ -103,7 +88,7 @@ class FormDataStore:
         form_fields = self.get_form_fields()
         if not form_fields:
             logger.error(
-                'Block with id {} and type "form" not found in context: {}.'.format(
+                'Block with id {} and type "form" not found in context: {}.'.format(
                     self.block_id, self.context.absolute_url()
                 )
             )
@@ -130,7 +115,7 @@ class FormDataStore:
                 fields_types[field_id] = field.get("type", "")
                 fields_labels[field_id] = field["label"]
                 fields_order.append(field_id)
-
+            # else: skip the field
         record.attrs["fields_labels"] = fields_labels
         record.attrs["fields_order"] = fields_order
         record.attrs["fields_types"] = fields_types
@@ -153,39 +138,60 @@ class FormDataStore:
         return value
 
     def length(self, query=None):
-        return len(self._get_docids(query))
+        return len(self.search(query=query))
 
     def search(self, query=None):
+        """
+        @param query: optional mapping with the following optional keys:
+            - block_id: filter records belonging to this form block
+            - start_date: only records with date >= start_date
+            - end_date: only records with date <= end_date
 
-        docids = self._get_docids(query)
-        return [self.soup.data[docid] for docid in docids]
-
-    def _get_docids(self, query=None):
-
+        'block_id' is filtered through the souper/repoze.catalog index
+        (it's indexed). 'date' is NOT indexed on the catalog.
+        """
         query = query or {}
         block_id = query.get("block_id")
         start_date = query.get("start_date")
         end_date = query.get("end_date")
 
-        clauses = []
-        if block_id:
-            clauses.append(Eq("block_id", block_id))
-        if start_date:
-            clauses.append(Ge("date", start_date))
-        if end_date:
-            clauses.append(Le("date", end_date))
+        records = self._records_by_block_id(block_id)
 
-        if clauses:
-            catalog_query = clauses[0]
-            for clause in clauses[1:]:
-                catalog_query = And(catalog_query, clause)
-        else:
-            catalog_query = Ge("date", datetime.min)
+        if start_date or end_date:
+            records = [
+                record
+                for record in records
+                if self._matches_date_range(record, start_date, end_date)
+            ]
 
-        _, docids = self.soup.catalog.query(
-            catalog_query, sort_index="date", reverse=True
-        )
-        return list(docids)
+        records.sort(key=lambda record: record.attrs.get("date"), reverse=True)
+        return records
+
+    def _records_by_block_id(self, block_id):
+        """
+        Return the records for the given block_id (using the catalog
+        index), or every stored record if block_id is not passed.
+        """
+        if not block_id:
+            return list(self.soup.data.values())
+        _, docids = self.soup.catalog.query(Eq("block_id", block_id))
+        return [self.soup.data[docid] for docid in docids]
+
+    @staticmethod
+    def _matches_date_range(record, start_date, end_date):
+        """
+        Whether a single record's stored 'date' attribute falls
+        within [start_date, end_date]. A record with no 'date'
+        attribute never matches a date-range filter.
+        """
+        record_date = record.attrs.get("date")
+        if record_date is None:
+            return False
+        if start_date and record_date < start_date:
+            return False
+        if end_date and record_date > end_date:
+            return False
+        return True
 
     def delete(self, id):
         record = self.soup.get(id)
