@@ -9,7 +9,6 @@ from plone.app.testing import TEST_USER_ID
 
 import unittest
 
-
 try:
     from plone.base.utils import get_installer
 except ImportError:
