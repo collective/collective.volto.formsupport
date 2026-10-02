@@ -3,6 +3,7 @@ from collections import deque
 import copy
 import json
 
+
 EMAIL_OTP_LIFETIME = 5 * 60
 
 
