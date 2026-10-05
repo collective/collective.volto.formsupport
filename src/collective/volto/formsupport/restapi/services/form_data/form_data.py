@@ -6,7 +6,6 @@ from datetime import timedelta
 from plone import api
 from plone.memoize import view
 from plone.namedfile import NamedBlobFile
-from plone.protect.interfaces import IDisableCSRFProtection
 from plone.restapi.batching import HypermediaBatch
 from plone.restapi.interfaces import IExpandableElement
 from plone.restapi.serializer.converters import json_compatible
