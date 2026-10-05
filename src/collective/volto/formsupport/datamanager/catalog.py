@@ -39,19 +39,7 @@ class FormDataStore:
     @property
     def soup(self):
         soup = get_soup("form_data", self.context)
-        self._cleanup_legacy_date_index(soup)
         return soup
-
-    def _cleanup_legacy_date_index(self, soup):
-        """
-        BBB: a previous version of this adapter indexed 'date' on the
-        catalog. Date filtering is now done by hand on each record
-        (see search()), so drop the old index if it's still there on
-        existing/persisted soups.
-        """
-        catalog = soup.catalog
-        if "date" in catalog:
-            del catalog["date"]
 
     @property
     def block_id(self):
