@@ -14,7 +14,6 @@ from plone.restapi.services import Service
 from zope.component import adapter
 from zope.component import getAdapters
 from zope.component import getMultiAdapter
-from zope.interface import alsoProvides
 from zope.interface import implementer
 from zope.interface import Interface
 
@@ -212,8 +211,6 @@ class FormData:
 
 class FormDataGet(Service):
     def reply(self):
-        alsoProvides(self.request, IDisableCSRFProtection)
-
         block_id = self.request.get("block_id")
         form_data = FormData(self.context, self.request, block_id=block_id)
         return form_data(expand=True).get("form_data", {})

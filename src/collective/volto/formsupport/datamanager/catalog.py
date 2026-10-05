@@ -126,7 +126,7 @@ class FormDataStore:
         return value
 
     def length(self, query=None):
-        return len(self.search(query=query))
+        return len([x for x in self.soup.data.values()])
 
     def search(self, query=None):
         """
@@ -152,6 +152,7 @@ class FormDataStore:
                 if self._matches_date_range(record, start_date, end_date)
             ]
 
+        records.sort(key=lambda record: record.attrs.get("date"), reverse=True)
         return records
 
     def _records_by_block_id(self, block_id):
