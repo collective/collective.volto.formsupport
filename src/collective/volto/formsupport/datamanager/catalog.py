@@ -152,7 +152,6 @@ class FormDataStore:
                 if self._matches_date_range(record, start_date, end_date)
             ]
 
-        records.sort(key=lambda record: record.attrs.get("date"), reverse=True)
         return records
 
     def _records_by_block_id(self, block_id):
