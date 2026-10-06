@@ -1,7 +1,7 @@
 Changelog
 =========
 
-3.3.3 (unreleased)
+3.3.3 (2026-10-06)
 ------------------
 
 - Fix README format file.
