@@ -9,6 +9,8 @@ Changelog
 
 - Do not break when an email field is an empty string in validate_email_fields. Required fields are already checked.
   [cekk]
+- Added filtering by date from @form-data service. Added batching on results only if b_size e b_start are both passed in.
+  [daniele]
 
 3.3.2 (2025-12-11)
 ------------------

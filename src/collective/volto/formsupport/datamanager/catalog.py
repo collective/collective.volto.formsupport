@@ -9,6 +9,7 @@ from plone.namedfile import NamedBlobFile
 from plone.restapi.deserializer import json_body
 from repoze.catalog.catalog import Catalog
 from repoze.catalog.indexes.field import CatalogFieldIndex
+from repoze.catalog.query import Eq
 from souper.interfaces import ICatalogFactory
 from souper.soup import get_soup
 from souper.soup import NodeAttributeIndexer
@@ -21,7 +22,7 @@ from zope.interface import Interface
 @implementer(ICatalogFactory)
 class FormDataSoupCatalogFactory:
     def __call__(self, context):
-        #  do not set any index here..maybe on each form
+        #  do not set any index here..maybe on each form
         catalog = Catalog()
         block_id_indexer = NodeAttributeIndexer("block_id")
         catalog["block_id"] = CatalogFieldIndex(block_id_indexer)
@@ -37,7 +38,8 @@ class FormDataStore:
 
     @property
     def soup(self):
-        return get_soup("form_data", self.context)
+        soup = get_soup("form_data", self.context)
+        return soup
 
     @property
     def block_id(self):
@@ -74,7 +76,7 @@ class FormDataStore:
         form_fields = self.get_form_fields()
         if not form_fields:
             logger.error(
-                'Block with id {} and type "form" not found in context: {}.'.format(
+                'Block with id {} and type "form" not found in context: {}.'.format(
                     self.block_id, self.context.absolute_url()
                 )
             )
@@ -123,17 +125,61 @@ class FormDataStore:
                 )
         return value
 
-    def length(self):
+    def length(self, query=None):
         return len([x for x in self.soup.data.values()])
 
     def search(self, query=None):
-        if not query:
-            records = sorted(
-                self.soup.data.values(),
-                key=lambda k: k.attrs.get("date", ""),
-                reverse=True,
-            )
+        """
+        @param query: optional mapping with the following optional keys:
+            - block_id: filter records belonging to this form block
+            - start_date: only records with date >= start_date
+            - end_date: only records with date <= end_date
+
+        'block_id' is filtered through the souper/repoze.catalog index
+        (it's indexed). 'date' is NOT indexed on the catalog.
+        """
+        query = query or {}
+        block_id = query.get("block_id")
+        start_date = query.get("start_date")
+        end_date = query.get("end_date")
+
+        records = self._records_by_block_id(block_id)
+
+        if start_date or end_date:
+            records = [
+                record
+                for record in records
+                if self._matches_date_range(record, start_date, end_date)
+            ]
+
+        records.sort(key=lambda record: record.attrs.get("date"), reverse=True)
         return records
+
+    def _records_by_block_id(self, block_id):
+        """
+        Return the records for the given block_id (using the catalog
+        index), or every stored record if block_id is not passed.
+        """
+        if not block_id:
+            return list(self.soup.data.values())
+        _, docids = self.soup.catalog.query(Eq("block_id", block_id))
+        return [self.soup.data[docid] for docid in docids]
+
+    @staticmethod
+    def _matches_date_range(record, start_date, end_date):
+        """
+        Whether a single record's stored 'date' attribute falls
+        within [start_date, end_date]. A record with no 'date'
+        attribute never matches a date-range filter.
+        """
+        record_date = record.attrs.get("date")
+        if record_date is None:
+            return False
+        if start_date and record_date < start_date:
+            return False
+        if end_date and record_date > end_date:
+            return False
+        return True
 
     def delete(self, id):
         record = self.soup.get(id)
