@@ -99,13 +99,15 @@ class FormData:
 
     def expand_records(self, record):
         fields_labels = record.attrs.get("fields_labels", {})
+        fields_types = record.attrs.get("fields_types", {})
         data = {}
         for k, v in record.attrs.items():
-            if k in ["fields_labels", "fields_order"]:
+            if k in ["fields_labels", "fields_order", "fields_types"]:
                 continue
             data[k] = {
                 "value": json_compatible(v),
                 "label": fields_labels.get(k, k),
+                "field_type": fields_types.get(k, ""),
             }
         data["id"] = record.intid
         return data

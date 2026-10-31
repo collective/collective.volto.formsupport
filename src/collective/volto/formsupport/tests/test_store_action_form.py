@@ -1,3 +1,6 @@
+from collective.volto.formsupport.restapi.services.form_data.csv import (
+    FormDataExportGet,
+)
 from collective.volto.formsupport.testing import (  # noqa: E501,
     VOLTO_FORMSUPPORT_API_FUNCTIONAL_TESTING,
 )
@@ -9,6 +12,7 @@ from plone.app.testing import SITE_OWNER_NAME
 from plone.app.testing import SITE_OWNER_PASSWORD
 from plone.app.testing import TEST_USER_ID
 from plone.restapi.testing import RelativeSession
+from Products.Five import BrowserView
 from Products.MailHost.interfaces import IMailHost
 from zope.component import getUtility
 
@@ -158,9 +162,16 @@ class TestMailStore(unittest.TestCase):
         )
         self.assertEqual(
             data["items"][0]["message"],
-            {"label": "Message", "value": "just want to say hi"},
+            {
+                "label": "Message",
+                "value": "just want to say hi",
+                "field_type": "text",
+            },
         )
-        self.assertEqual(data["items"][0]["name"], {"label": "Name", "value": "John"})
+        self.assertEqual(
+            data["items"][0]["name"],
+            {"label": "Name", "value": "John", "field_type": "text"},
+        )
         response = self.submit_form(
             data={
                 "from": "sally@doe.com",
@@ -378,3 +389,103 @@ class TestMailStore(unittest.TestCase):
         now = datetime.now().strftime("%Y-%m-%dT%H:%M")
         self.assertTrue(sorted_data[0][-1].startswith(now))
         self.assertTrue(sorted_data[1][-1].startswith(now))
+
+    def test_stored_record_carries_each_field_type(self):
+        """A stored record remembers what KIND of field each answer came from.
+
+        The label alone does not say that; a consumer reading back a
+        submission cannot tell a free-text answer from a chosen option or an
+        upload, so it cannot render or re-validate one. The type is known
+        when the answer is stored, so it is stored with it, and @form-data
+        reports it alongside the value and the label.
+        """
+        self.document.blocks = {
+            "form-id": {
+                "@type": "form",
+                "store": True,
+                "subblocks": [
+                    {
+                        "label": "Message",
+                        "field_id": "message",
+                        "field_type": "textarea",
+                    },
+                    {
+                        "label": "Favourite",
+                        "field_id": "favourite",
+                        "field_type": "single_choice",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+        response = self.submit_form(
+            data={
+                "from": "john@doe.com",
+                "data": [
+                    {"field_id": "message", "value": "just want to say hi"},
+                    {"field_id": "favourite", "value": "one"},
+                ],
+                "subject": "test subject",
+                "block_id": "form-id",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+
+        items = self.export_data().json()["items"]
+        self.assertEqual(len(items), 1)
+        item = items[0]
+        self.assertEqual(item["message"]["field_type"], "textarea")
+        self.assertEqual(item["favourite"]["field_type"], "single_choice")
+        # The types are per-field metadata, not an answer of their own: the
+        # map they are read from must not surface as a field.
+        self.assertNotIn("fields_types", item)
+
+    def test_export_orders_by_the_id_a_record_is_stored_under(self):
+        """The CSV's fallback ordering uses the key the records actually have.
+
+        A renamed field is STORED under its custom id (see
+        FormDataStore.add), in both spellings: the field carries
+        `custom_field_id` itself, or the form block carries one key per field
+        named after the field's id (the "Data ID mapping" of the older
+        editor). Ordering by the raw `field_id` therefore matches nothing, and
+        every answer falls through to the "stored in the record but not in the
+        form" branch, which orders by whatever order the record's attributes
+        happen to come back in.
+        """
+        self.document.blocks = {
+            "form-id": {
+                "@type": "form",
+                "store": True,
+                "mapped-on-the-block": "from-the-block",
+                "subblocks": [
+                    {
+                        "label": "Message",
+                        "field_id": "message",
+                        "field_type": "text",
+                    },
+                    {
+                        "label": "On the field",
+                        "field_id": "mapped-on-the-field",
+                        "field_type": "text",
+                        "custom_field_id": "from-the-field",
+                    },
+                    {
+                        "label": "On the block",
+                        "field_id": "mapped-on-the-block",
+                        "field_type": "text",
+                    },
+                ],
+            },
+        }
+        transaction.commit()
+
+        # plone.rest's `service` directive builds the published class as
+        # `type(factory.__name__, (factory, BrowserView), ...)` — the view
+        # gets its `__init__` from BrowserView, and the class in the module
+        # cannot be constructed on its own. Build it the same way.
+        published = type("Published", (FormDataExportGet, BrowserView), {})
+        service = published(self.document, self.layer["request"])
+        self.assertEqual(
+            service.form_fields_order,
+            ["message", "from-the-field", "from-the-block"],
+        )

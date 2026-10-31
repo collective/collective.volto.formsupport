@@ -81,21 +81,28 @@ class FormDataStore:
         for field in form_fields:
             custom_field_id = field.get("custom_field_id")
             field_id = custom_field_id if custom_field_id else field["field_id"]
-            fields[field_id] = field.get("label", field_id)
+            fields[field_id] = {
+                "label": field.get("label", field_id),
+                "type": field.get("field_type", "text"),
+            }
 
         record = Record()
         fields_labels = {}
         fields_order = []
+        fields_types = {}
         for field_data in data:
             field_id = field_data.field_id
             # TODO: not nice using the protected member to access the real internal value, but easiest way.
             value = field_data.internal_value
             if field_id in fields:
+                stored_field = fields[field_id]
                 record.attrs[field_id] = value
-                fields_labels[field_id] = fields[field_id]
+                fields_labels[field_id] = stored_field["label"]
+                fields_types[field_id] = stored_field["type"]
                 fields_order.append(field_id)
         record.attrs["fields_labels"] = fields_labels
         record.attrs["fields_order"] = fields_order
+        record.attrs["fields_types"] = fields_types
         record.attrs["date"] = datetime.now()
         record.attrs["block_id"] = self.block_id
         return self.soup.add(record)

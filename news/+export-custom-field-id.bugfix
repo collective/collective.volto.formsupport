@@ -1,0 +1,4 @@
+Order the CSV export by the id a record is actually stored under. A renamed
+field is stored under its custom id, in either spelling (``custom_field_id`` on
+the field, or the block's "Data ID mapping" key), so an order built from the
+raw ``field_id`` matched none of its answers. [@djay]

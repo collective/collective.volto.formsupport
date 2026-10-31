@@ -7,7 +7,7 @@ from zope.component import getMultiAdapter
 import csv
 
 
-SKIP_ATTRS = ["block_id", "fields_labels", "fields_order"]
+SKIP_ATTRS = ["block_id", "fields_labels", "fields_order", "fields_types"]
 
 
 class FormDataExportGet(Service):
@@ -26,8 +26,18 @@ class FormDataExportGet(Service):
 
         if self.form_block:
             for field in self.form_block.get("subblocks", []):
-                field_id = field["field_id"]
-                self.form_fields_order.append(field_id)
+                # The key a record is STORED under: the custom id where there
+                # is one for this field, else the field's own id. Two spellings
+                # mean the same thing. A field edited in the sidebar carries
+                # `custom_field_id` itself; an older form instead carries one
+                # key per field on the BLOCK, named after the field's id (the
+                # "Data ID mapping"). FormDataStore.add honours both, so an
+                # order built from the raw `field_id` matches none of the
+                # answers a renamed field stored.
+                custom_field_id = field.get("custom_field_id") or self.form_block.get(
+                    field["field_id"]
+                )
+                self.form_fields_order.append(custom_field_id or field["field_id"])
 
     def get_ordered_keys(self, record):
         """
