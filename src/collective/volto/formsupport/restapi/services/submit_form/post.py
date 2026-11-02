@@ -39,6 +39,10 @@ from zope.interface import implementer
 
 logger = logging.getLogger(__name__)
 CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
+# Sent next to the form data by forms with the "honeypot" option, like the
+# website field of the Volto contact form.  A reserved name: form fields must
+# not use it.
+HONEYPOT_FIELD = "website"
 
 
 @implementer(IPostEvent)
@@ -63,6 +67,19 @@ class SubmitPost(Service):
 
         if self.block_id:
             self.block = self.get_block_data(block_id=self.block_id)
+
+        if self.block.get("honeypot") and self.form_data.get(HONEYPOT_FIELD):
+            # The honeypot field is hidden with CSS, so only bots fill it in.
+            # Answer as if the form was sent, so they do not try again.  Log it
+            # to count them, but not the value or the form data: a browser may
+            # have filled it in after all.
+            logger.info(
+                "Spam blocked: reason=honeypot form=%s block=%s",
+                "/".join(self.context.getPhysicalPath()),
+                self.block_id,
+            )
+            return {"data": self.form_data.get("data", [])}
+
         store_action = self.block.get("store", False)
         send_action = self.block.get("send", [])
 

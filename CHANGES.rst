@@ -4,7 +4,10 @@ Changelog
 3.3.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Add a ``honeypot`` option to the form block: when the hidden ``website`` field is filled in,
+  ``@submit-form`` answers as if the form was sent, but does not send or store anything.
+  It can be combined with any captcha provider. ``website`` is now a reserved field name.
+  [jladage]
 
 
 3.3.3 (2026-10-06)

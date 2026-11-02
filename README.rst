@@ -291,6 +291,20 @@ If honeypot dependency is available in the buildout, the honeypot validation is 
 Default field name is ``protected_1`` and you can change it with an environment variable.
 See the `collective.honeypot configuration <https://github.com/collective/collective.honeypot?tab=readme-ov-file#configuration>`_ for details.
 
+Honeypot field
+--------------
+
+Independent of the captcha provider, a form block can have a honeypot field: enable "Add honeypot field" in the block settings
+(``"honeypot": true`` in the block data).
+The form then has a ``website`` text field that is hidden with CSS, so visitors leave it empty, but bots that read the HTML fill it in.
+The form sends it as ``website`` next to the form ``data``, and when it is filled in,
+``@submit-form`` answers as if the form was sent, but does not send, store or log anything.
+Because it is not a captcha provider, it can be combined with any of them.
+It needs no extra dependencies.
+
+``website`` is a reserved name for this field.
+If a form needs a real website field, give it another name, like ``company_website`` or ``organisation_website``.
+
 Attachments upload limits
 =========================
 
