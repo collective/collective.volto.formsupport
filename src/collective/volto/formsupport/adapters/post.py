@@ -1,4 +1,5 @@
 from collective.volto.formsupport import _
+from collective.volto.formsupport import form_token
 from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import IPostAdapter
 from collective.volto.formsupport.utils import get_blocks
@@ -137,6 +138,13 @@ class PostAdapter:
                 ICaptchaSupport,
                 name=self.block["captcha"],
             ).verify(self.form_data.get("captcha"))
+        if form_token.is_enabled():
+            form_token.verify_token(
+                self.context,
+                self.request,
+                self.block_id,
+                self.form_data.get("form_token"),
+            )
 
         self.validate_email_fields()
         self.validate_bcc()

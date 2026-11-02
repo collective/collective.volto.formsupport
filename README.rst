@@ -291,6 +291,39 @@ If honeypot dependency is available in the buildout, the honeypot validation is 
 Default field name is ``protected_1`` and you can change it with an environment variable.
 See the `collective.honeypot configuration <https://github.com/collective/collective.honeypot?tab=readme-ov-file#configuration>`_ for details.
 
+Form tokens
+===========
+
+Form tokens make bots wait, for every form and next to its captcha, if it has one.
+Each form gets a single-use token from the ``@form-token`` endpoint of plone.restapi when it is shown,
+and ``@submit-form`` only accepts that token once, and only when it is at least ``FORM_TOKEN_MIN_AGE`` seconds old:
+bots post at once, people need time to fill in a form.
+A token that is used too early is used up as well. Scripts that post to ``@submit-form`` directly have no token at all.
+All of these get the same ``400 Invalid request.`` response.
+
+The tokens are kept in memcached, because issuing one is a write on a ``GET`` request, which the ZODB is not made for.
+They cannot be part of the serialized block either, because that is cached and shared between visitors:
+``@form-token`` responds with ``Cache-Control: no-store, private``.
+Instead the serialized form block has ``"form_token": {"min_age": 15}``, which tells the form to get a token.
+`volto-form-block`_ sends it as ``form_token`` next to the form ``data``.
+
+Form tokens come from plone.restapi, which also checks them for the contact form of Volto.
+They are only enabled with a plone.restapi that has them, installed with ``plone.restapi[token]`` for pymemcache,
+and with ``FORM_TOKEN_MEMCACHE`` set. Otherwise forms work as before, without tokens.
+They are configured with environment variables:
+
+``FORM_TOKEN_MEMCACHE``
+    The memcached servers, separated by spaces, for example ``memcached:11211``.
+
+``FORM_TOKEN_MIN_AGE``
+    The minimum age of a token in seconds before the form can be submitted with it. Default: ``15``.
+
+``FORM_TOKEN_LIFETIME``
+    How long a token stays valid, in seconds. Default: ``3600``.
+
+A submission with a token that is too new is logged as ``Spam blocked: reason=early-token form=<path> block=<block id>``,
+without the form data, so you can count them.
+
 Attachments upload limits
 =========================
 

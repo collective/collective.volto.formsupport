@@ -4,7 +4,11 @@ Changelog
 3.3.4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Check form tokens for all forms, next to their captcha: the form gets a single-use token from the ``@form-token`` endpoint
+  of plone.restapi, and ``@submit-form`` only accepts it after a minimum time (15 seconds by default), so bots have to wait for each submission.
+  The tokens are kept in memcached: install ``plone.restapi[token]`` and set ``FORM_TOKEN_MEMCACHE``.
+  Without these, forms work as before.
+  [jladage]
 
 
 3.3.3 (2026-10-06)

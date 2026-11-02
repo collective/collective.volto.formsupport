@@ -104,6 +104,7 @@ setup(
             "plone.formwidget.recaptcha",
             "collective.z3cform.norobots",
             "collective.volto.otp",
+            "pymemcache",
         ],
     },
     entry_points="""

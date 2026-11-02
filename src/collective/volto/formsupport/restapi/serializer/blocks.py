@@ -1,3 +1,4 @@
+from collective.volto.formsupport import form_token
 from collective.volto.formsupport.interfaces import ICaptchaSupport
 from collective.volto.formsupport.interfaces import ICollectiveVoltoFormsupportLayer
 from plone import api
@@ -39,6 +40,10 @@ class FormSerializer:
                 ICaptchaSupport,
                 name=value["captcha"],
             ).serialize()
+        if form_token.is_enabled():
+            # Tells the form to get a token from @form-token.  The token itself
+            # cannot be here: the block data is cached and shared.
+            value["form_token"] = {"min_age": form_token.get_min_age()}
         attachments_limit = os.environ.get("FORM_ATTACHMENTS_LIMIT", "")
         if attachments_limit:
             value["attachments_limit"] = attachments_limit
