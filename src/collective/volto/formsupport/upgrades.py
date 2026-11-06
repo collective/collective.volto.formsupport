@@ -13,7 +13,6 @@ from zope.schema import getFields
 
 import json
 
-
 try:
     from collective.volto.blocksfield.field import BlocksField
 
@@ -22,7 +21,6 @@ except ImportError:
     HAS_BLOCKSFIELD = False
 
 from collective.volto.formsupport import logger
-
 
 DEFAULT_PROFILE = "profile-collective.volto.formsupport:default"
 

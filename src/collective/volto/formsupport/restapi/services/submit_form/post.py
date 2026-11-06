@@ -10,7 +10,6 @@ import logging
 import os
 import re
 
-
 try:
     from plone.base.interfaces.controlpanel import IMailSchema
 except ImportError:
@@ -35,7 +34,6 @@ from zope.event import notify
 from zope.i18n import translate
 from zope.interface import alsoProvides
 from zope.interface import implementer
-
 
 logger = logging.getLogger(__name__)
 CTE = os.environ.get("MAIL_CONTENT_TRANSFER_ENCODING", None)
