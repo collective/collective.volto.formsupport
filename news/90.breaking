@@ -1,0 +1,2 @@
+Add support for Plone 6.1 and drop support for Plone 5.2 and 6.0. The project
+now uses the Cookieplone template. @wesleybl

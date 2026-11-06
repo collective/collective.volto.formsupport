@@ -1,3 +1,4 @@
+import glob
 import os
 import pkg_resources
 import subprocess
@@ -8,10 +9,10 @@ os.chdir(pkg_resources.resource_filename(domain, ""))
 os.chdir("../../../../")
 target_path = "src/collective/volto/formsupport/"
 locale_path = target_path + "locales/"
-i18ndude = "./bin/i18ndude"
+i18ndude = os.path.abspath("./bin/i18ndude")
 
 # ignore node_modules files resulting in errors
-excludes = '"*.html *json-schema*.xml"'
+excludes = "*.html *json-schema*.xml"
 
 
 def locale_folder_setup():
@@ -24,45 +25,38 @@ def locale_folder_setup():
         else:
             lc_messages_path = lang + "/LC_MESSAGES/"
             os.mkdir(lc_messages_path)
-            cmd = "msginit --locale={} --input={}.pot --output={}/LC_MESSAGES/{}.po".format(  # NOQA: E501
-                lang,
-                domain,
-                lang,
-                domain,
-            )
-            subprocess.call(
-                cmd,
-                shell=True,
+            subprocess.call(  # noqa: S603
+                [  # noqa: S607
+                    "msginit",
+                    f"--locale={lang}",
+                    f"--input={domain}.pot",
+                    f"--output={lang}/LC_MESSAGES/{domain}.po",
+                ]
             )
 
     os.chdir("../../../../../")
 
 
 def _rebuild():
-    cmd = "{i18ndude} rebuild-pot --pot {locale_path}/{domain}.pot --exclude {excludes} --create {domain} {target_path}".format(  # NOQA: E501
-        i18ndude=i18ndude,
-        locale_path=locale_path,
-        domain=domain,
-        target_path=target_path,
-        excludes=excludes,
-    )
-    subprocess.call(
-        cmd,
-        shell=True,
+    subprocess.call(  # noqa: S603
+        [
+            i18ndude,
+            "rebuild-pot",
+            "--pot",
+            f"{locale_path}/{domain}.pot",
+            "--exclude",
+            excludes,
+            "--create",
+            domain,
+            target_path,
+        ]
     )
 
 
 def _sync():
-    cmd = "{} sync --pot {}/{}.pot {}*/LC_MESSAGES/{}.po".format(
-        i18ndude,
-        locale_path,
-        domain,
-        locale_path,
-        domain,
-    )
-    subprocess.call(
-        cmd,
-        shell=True,
+    po_files = glob.glob(f"{locale_path}*/LC_MESSAGES/{domain}.po")
+    subprocess.call(  # noqa: S603
+        [i18ndude, "sync", "--pot", f"{locale_path}/{domain}.pot", *po_files]
     )
 
 

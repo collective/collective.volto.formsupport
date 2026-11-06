@@ -1,64 +1,47 @@
-# Generated from:
-# https://github.com/plone/meta/tree/main/config/default
-# See the inline comments on how to expand/tweak this configuration file
 # python related
 *.egg-info
 *.pyc
 *.pyo
 
-# translation related
-*.mo
-
 # tools related
-build/
+__pycache__/
+.vscode/
 .coverage
-.*project
+.mypy_cache
+.pytest_cache
+.ruff_cache
+/build/
 coverage.xml
 dist/
 docs/_build
-__pycache__/
 .tox
 node_modules/
-forest.*
 
 # venv / buildout related
+.eggs/
+.installed.cfg
+.mr.developer.cfg
+.venv/
 bin/
 develop-eggs/
 eggs/
-.eggs/
 etc/
-.installed.cfg
 include/
 lib/
 lib64
-.mr.developer.cfg
 parts/
 pyvenv.cfg
 var/
-local.cfg
-.python-version
 
 # mxdev
-/instance/
+/.mxdev_cache/
+.installed.txt
+.lock
 /.make-sentinels/
 /*-mxdev.txt
+/instance/
 /reports/
 /sources/
 /venv/
-.installed.txt
-
-# visual code editor
-*.code-workspace
-
-##
-# Add extra configuration options in .meta.toml:
-#  [gitignore]
-#  extra_lines = """
-#  _your own configuration lines_
-#  """
-##
-temp_auto_push.bat
-temp_interactive_push.bat
-.gitignore
-.vscode/
-public/
+constraints*.txt
+requirements*.txt

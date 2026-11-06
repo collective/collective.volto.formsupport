@@ -49,10 +49,13 @@ class PostEventService:
 
 
 class SubmitPost(Service):
-    block = {}
     block_id = ""
     form_data_adapter = None
-    form_data = {}
+
+    def __init__(self, context, request):
+        super().__init__(context, request)
+        self.block = {}
+        self.form_data = {}
 
     def reply(self):
         self.form_data_adapter = getMultiAdapter(
@@ -81,12 +84,15 @@ class SubmitPost(Service):
                 message = translate(
                     _(
                         "mail_send_exception",
-                        default="Unable to send confirm email. Please retry later or contact site administrator.",
+                        default=(
+                            "Unable to send confirm email. Please retry later or "
+                            "contact site administrator."
+                        ),
                     ),
                     context=self.request,
                 )
                 self.request.response.setStatus(500)
-                return dict(type="InternalServerError", message=message)
+                return {"type": "InternalServerError", "message": message}
 
         notify(FormSubmittedEvent(self.context, self.block, self.form_data))
 
@@ -126,8 +132,8 @@ class SubmitPost(Service):
         blocks = get_blocks(self.context)
         if not blocks:
             return {}
-        for id, block in blocks.items():
-            if id != block_id:
+        for block_key, block in blocks.items():
+            if block_key != block_id:
                 continue
             block_type = block.get("@type", "")
             if block_type != "form":
@@ -171,7 +177,7 @@ class SubmitPost(Service):
             if not field_id:
                 continue
 
-            # Handle this kind of id format: `field_name_123321, whichj is used by frontend package logics
+            # Handle frontend field ids such as `field_name_123321`.
             pattern = r"\$\{[^}]+\}"
             matches = re.findall(pattern, subject)
 
@@ -181,7 +187,7 @@ class SubmitPost(Service):
 
         return subject
 
-    def send_data(self):
+    def send_data(self):  # noqa: C901
         subject = self.get_subject()
 
         mfrom = self.form_data.get("from", "") or self.block.get("default_from", "")
@@ -216,7 +222,8 @@ class SubmitPost(Service):
             mto = self.block.get("default_to", mail_settings.email_from_address)
             message = self.prepare_message()
             text_message = (
-                portal_transforms.convertTo("text/plain", message, mimetype="text/html")
+                portal_transforms
+                .convertTo("text/plain", message, mimetype="text/html")
                 .getData()
                 .strip()
             )
@@ -258,9 +265,8 @@ class SubmitPost(Service):
                 acknowledgement_mail["To"] = acknowledgement_address
                 ack_msg = acknowledgement_message.get("data")
                 ack_msg_text = (
-                    portal_transforms.convertTo(
-                        "text/plain", ack_msg, mimetype="text/html"
-                    )
+                    portal_transforms
+                    .convertTo("text/plain", ack_msg, mimetype="text/html")
                     .getData()
                     .strip()
                 )
@@ -292,8 +298,8 @@ class SubmitPost(Service):
                             frontend_domain or portal.absolute_url()
                         ) + link["href"]
 
-        mail_header = bs_mail_header.get_text() and bs_mail_header.prettify() or None
-        mail_footer = bs_mail_footer.get_text() and bs_mail_footer.prettify() or None
+        mail_header = (bs_mail_header.get_text() and bs_mail_header.prettify()) or None
+        mail_footer = (bs_mail_footer.get_text() and bs_mail_footer.prettify()) or None
 
         email_format_page_template_mapping = {
             "list": "send_mail_template",
@@ -360,7 +366,8 @@ class SubmitPost(Service):
 
     def attach_xml(self, msg):
         now = (
-            datetime.now()
+            datetime
+            .now()
             .isoformat(timespec="seconds")
             .replace(" ", "-")
             .replace(":", "")

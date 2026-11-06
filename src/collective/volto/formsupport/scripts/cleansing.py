@@ -10,11 +10,10 @@ import transaction
 
 
 @click.command(
-    help="bin/instance -OPlone run bin/formsupport_data_cleansing [--dryrun|--no-dryrun]",
-    context_settings=dict(
-        ignore_unknown_options=True,
-        allow_extra_args=True,
+    help=(
+        "bin/instance -OPlone run bin/formsupport_data_cleansing [--dryrun|--no-dryrun]"
     ),
+    context_settings={"ignore_unknown_options": True, "allow_extra_args": True},
 )
 @click.option(
     "--dryrun/--no-dryrun",
@@ -22,6 +21,26 @@ import transaction
     default=True,
     help="--dryrun (default) simulate, --no-dryrun actually save the changes",
 )
+def _clean_form_block(obj, request, content_path, block_id, block):
+    if block.get("@type", "") != "form" or not block.get("store", False):
+        return
+    remove_data_after_days = int(block.get("remove_data_after_days") or 0)
+    # 0/None -> default value; -1 -> don't remove
+    if remove_data_after_days <= 0:
+        print(f"SKIP record cleanup from {content_path} block: {block_id}")
+        return
+    data = FormData(obj, request, block_id)
+    store = getMultiAdapter((obj, request), IFormDataStore)
+    expired_items = data.get_expired_items()
+    for item in expired_items:
+        store.delete(item["id"])
+    if expired_items:
+        print(
+            f"[INFO] removed {len(expired_items)} records from {content_path} "
+            f"block: {block_id}"
+        )
+
+
 def main(dryrun):
     if dryrun:
         print("CHECK ONLY")
@@ -38,28 +57,7 @@ def main(dryrun):
         blocks = getattr(obj, "blocks", None)
         if isinstance(blocks, dict):
             for block_id, block in blocks.items():
-                if block.get("@type", "") != "form":
-                    continue
-                if not block.get("store", False):
-                    continue
-                remove_data_after_days = int(block.get("remove_data_after_days") or 0)
-                # 0/None -> default value
-                # -1 -> don't remove
-                if remove_data_after_days <= 0:
-                    print(
-                        f"SKIP record cleanup from {brain.getPath()} block: {block_id}"
-                    )
-                    continue
-                data = FormData(obj, request, block_id)
-                store = getMultiAdapter((obj, request), IFormDataStore)
-                deleted = 0
-                for item in data.get_expired_items():
-                    store.delete(item["id"])
-                    deleted += 1
-                if deleted:
-                    print(
-                        f"[INFO] removed {deleted} records from {brain.getPath()} block: {block_id}"
-                    )
+                _clean_form_block(obj, request, brain.getPath(), block_id, block)
     if not dryrun:
         print("COMMIT")
         transaction.commit()

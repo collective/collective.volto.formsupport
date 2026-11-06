@@ -20,10 +20,12 @@ def flatten_block_hierachy(blocks):
 
         block_value = blocktuple[1]
 
-        if "data" in block_value:
-            if isinstance(block_value["data"], dict):
-                if "blocks" in block_value["data"]:
-                    queue.extend(list(block_value["data"]["blocks"].items()))
+        if (
+            "data" in block_value
+            and isinstance(block_value["data"], dict)
+            and "blocks" in block_value["data"]
+        ):
+            queue.extend(list(block_value["data"]["blocks"].items()))
 
         if "blocks" in block_value:
             queue.extend(list(block_value["blocks"].items()))

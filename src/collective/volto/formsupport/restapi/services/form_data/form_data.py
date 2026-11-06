@@ -112,13 +112,13 @@ class FormData:
 
     def has_batching_params(self):
         """
-        Pagination is activated only if in if both "b_size" and "b_start"
-        paramsin are passed in. If either one is missing, @form-data returns
+        Pagination is active only when both "b_size" and "b_start"
+        are present. If either one is missing, @form-data returns
         every matching item, unsliced.
         """
         return (
-            self.request.get("b_size") is not None  # noqa
-            and self.request.get("b_start") is not None  # noqa
+            self.request.get("b_size") is not None
+            and self.request.get("b_start") is not None
         )
 
     def __call__(self, expand=False):
@@ -157,9 +157,7 @@ class FormData:
         }
         if batching_links:
             form_data["batching"] = batching_links
-
         result["form_data"] = form_data
-
         adapters = getAdapters((self.context, self.request), provided=IDataAdapter)
         for _, adpt in adapters:
             result = adpt(result, block_id=self.block_id)
@@ -173,16 +171,19 @@ class FormData:
             blocks = json.loads(blocks)
         if not blocks:
             return {}
-        for id, block in blocks.items():
-            if block.get("@type", "") == "form" and block.get("store", False):
-                if not self.block_id or self.block_id == id:
-                    return block
+        for block_key, block in blocks.items():
+            if (
+                block.get("@type", "") == "form"
+                and block.get("store", False)
+                and (not self.block_id or self.block_id == block_key)
+            ):
+                return block
         return {}
 
     def show_component(self):
         if not api.user.has_permission("Modify portal content", obj=self.context):
             return False
-        return self.form_block and True or False
+        return (self.form_block and True) or False
 
     def expand_records(self, record):
         fields_labels = record.attrs.get("fields_labels", {})
@@ -197,7 +198,10 @@ class FormData:
             }
             if isinstance(v, NamedBlobFile):
                 data[k]["value"] = {
-                    "url": f"{self.context.absolute_url()}/saved_data/@@download/{record.intid}/{k}/{v.filename}",
+                    "url": (
+                        f"{self.context.absolute_url()}/saved_data/@@download/"
+                        f"{record.intid}/{k}/{v.filename}"
+                    ),
                     "filename": v.filename,
                     "contentType": v.contentType,
                     "size": v.getSize(),
