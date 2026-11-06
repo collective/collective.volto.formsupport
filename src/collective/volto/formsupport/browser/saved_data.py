@@ -46,10 +46,10 @@ class AttachmentDownload(BrowserView):
         try:
             record = store.soup.get(self.record_id)
         except KeyError:
-            raise NotFound("Record not found")
+            raise NotFound("Record not found") from None
         try:
             field = record.attrs.get(self.field_id)
         except KeyError:
-            raise NotFound("Field not found")
+            raise NotFound("Field not found") from None
         set_headers(field, self.request.response, filename=field.filename)
         return stream_data(field)

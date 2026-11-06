@@ -28,10 +28,7 @@ DEFAULT_PROFILE = "profile-collective.volto.formsupport:default"
 
 
 def _has_block_form(block_data):
-    for block in block_data.values():
-        if block.get("@type", "") == "form":
-            return True
-    return False
+    return any(block.get("@type", "") == "form" for block in block_data.values())
 
 
 def _get_all_content_with_blocks():
@@ -41,8 +38,8 @@ def _get_all_content_with_blocks():
     portal_blocks = getattr(portal, "blocks", "")
     if portal_blocks:
         portal_blocks = (
-            type(portal_blocks) is str and json.loads(portal_blocks) or portal_blocks
-        )
+            type(portal_blocks) is str and json.loads(portal_blocks)
+        ) or portal_blocks
 
         if _has_block_form(portal_blocks):
             content.append(portal)
@@ -56,10 +53,9 @@ def _get_all_content_with_blocks():
             logger.info(f"Progress: {i + 1}/{total}")
         item = brain.getObject()
         for schema in iterSchemata(item.aq_base):
-            for name, field in getFields(schema).items():
-                if name == "blocks":
-                    if _has_block_form(getattr(item, "blocks", {})):
-                        content.append(item)
+            for name in getFields(schema):
+                if name == "blocks" and _has_block_form(getattr(item, "blocks", {})):
+                    content.append(item)
 
     return content
 
@@ -111,14 +107,13 @@ def to_1100(context):  # noqa: C901 # pragma: no cover
                     value = deepcopy(field.get(item))
                     if not value:
                         continue
-                    if isinstance(value, str):
-                        if value == "":
-                            setattr(
-                                item,
-                                name,
-                                {"blocks": {}, "blocks_layout": {"items": []}},
-                            )
-                            continue
+                    if isinstance(value, str) and value == "":
+                        setattr(
+                            item,
+                            name,
+                            {"blocks": {}, "blocks_layout": {"items": []}},
+                        )
+                        continue
                     if blocks:
                         fix_block(blocks, brain.getURL())
                         setattr(item, name, value)
@@ -131,9 +126,7 @@ def to_1200(context):  # noqa: C901 # pragma: no cover
         normalizer = getUtility(IIDNormalizer)
         for field in block.get("subblocks", []):
             normalized_label = normalizer.normalize(field.get("label", ""))
-            if field_id == normalized_label:
-                return {"id": field["field_id"], "label": field.get("label", "")}
-            elif field_id == field["field_id"]:
+            if field_id == normalized_label or field_id == field["field_id"]:
                 return {"id": field["field_id"], "label": field.get("label", "")}
         return {"id": field_id, "label": field_id}
 
@@ -205,7 +198,7 @@ def to_1200(context):  # noqa: C901 # pragma: no cover
         logger.info(f"- {path}")
 
 
-def to_1300(context):  # noqa: C901 # pragma: no cover
+def to_1300(context):  # pragma: no cover
     def update_send_from_bool_to_list_for_content(item):
         blocks = (
             item.blocks
@@ -219,9 +212,8 @@ def to_1300(context):  # noqa: C901 # pragma: no cover
                 new_send_value = ["recipient"] if block.get("send") else []
                 block["send"] = new_send_value
                 logger.info(
-                    "[CONVERTED] - {} form send value from {} to {}".format(
-                        item, send, new_send_value
-                    )
+                    f"[CONVERTED] - {item} form send value from {send} "
+                    f"to {new_send_value}"
                 )
 
         item.blocks = blocks

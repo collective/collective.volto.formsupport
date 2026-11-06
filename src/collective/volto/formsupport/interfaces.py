@@ -8,6 +8,10 @@ class ICollectiveVoltoFormsupportLayer(IDefaultBrowserLayer):
     """Marker interface that defines a browser layer."""
 
 
+# BBB
+IBrowserLayer = ICollectiveVoltoFormsupportLayer
+
+
 class IFormDataStore(Interface):
     def add(data):
         """

@@ -54,8 +54,8 @@ class FormDataStore:
         if not blocks:
             return {}
         form_block = {}
-        for id, block in blocks.items():
-            if id != self.block_id:
+        for block_key, block in blocks.items():
+            if block_key != self.block_id:
                 continue
             block_type = block.get("@type", "")
             if block_type == "form":
@@ -65,7 +65,7 @@ class FormDataStore:
 
         subblocks = form_block.get("subblocks", [])
 
-        # Add the 'custom_field_id' field back in as this isn't stored with each subblock
+        # Restore 'custom_field_id', which is not stored with each subblock.
         for index, field in enumerate(subblocks):
             if form_block.get(field["field_id"]):
                 subblocks[index]["custom_field_id"] = form_block.get(field["field_id"])
@@ -76,9 +76,8 @@ class FormDataStore:
         form_fields = self.get_form_fields()
         if not form_fields:
             logger.error(
-                'Block with id {} and type "form" not found in context: {}.'.format(
-                    self.block_id, self.context.absolute_url()
-                )
+                f'Block with id {self.block_id} and type "form" not found in '
+                f"context: {self.context.absolute_url()}."
             )
             return None
 
@@ -111,22 +110,21 @@ class FormDataStore:
         record.attrs["block_id"] = self.block_id
         return self.soup.add(record)
 
-    def storedValue(self, value, type):
-        if type == "attachment":
-            if value:
-                if value.get("encoding") == "base64":
-                    data = b64decode(value["data"])
-                else:
-                    data = value["data"]
-                return NamedBlobFile(
-                    data=data,
-                    filename=value.get("filename"),
-                    contentType=value.get("content-type", "application/octet-stream"),
-                )
+    def storedValue(self, value, field_type):
+        if field_type == "attachment" and value:
+            if value.get("encoding") == "base64":
+                data = b64decode(value["data"])
+            else:
+                data = value["data"]
+            return NamedBlobFile(
+                data=data,
+                filename=value.get("filename"),
+                contentType=value.get("content-type", "application/octet-stream"),
+            )
         return value
 
     def length(self, query=None):
-        return len([x for x in self.soup.data.values()])
+        return len(self.soup.data)
 
     def search(self, query=None):
         """
@@ -144,7 +142,6 @@ class FormDataStore:
         end_date = query.get("end_date")
 
         records = self._records_by_block_id(block_id)
-
         if start_date or end_date:
             records = [
                 record
@@ -177,12 +174,10 @@ class FormDataStore:
             return False
         if start_date and record_date < start_date:
             return False
-        if end_date and record_date > end_date:
-            return False
-        return True
+        return not (end_date and record_date > end_date)
 
-    def delete(self, id):
-        record = self.soup.get(id)
+    def delete(self, record_id):
+        record = self.soup.get(record_id)
         del self.soup[record]
 
     def clear(self):

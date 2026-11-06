@@ -23,11 +23,11 @@ import os
 @adapter(Interface, Interface)
 class PostAdapter:
     block_id = None
-    block = {}
 
     def __init__(self, context, request):
         self.context = context
         self.request = request
+        self.block = {}
         self.form_data = self.extract_data_from_request()
         self.block_id = self.form_data.get("block_id", "")
         if self.block_id:
@@ -73,8 +73,8 @@ class PostAdapter:
         blocks = get_blocks(self.context)
         if not blocks:
             return {}
-        for id, block in blocks.items():
-            if id != block_id:
+        for block_key, block in blocks.items():
+            if block_key != block_id:
                 continue
             block_type = block.get("@type", "")
             if block_type != "form":
@@ -98,7 +98,10 @@ class PostAdapter:
                 translate(
                     _(
                         "block_form_not_found_label",
-                        default='Block with @type "form" and id "$block" not found in this context: $context',
+                        default=(
+                            'Block with @type "form" and id "$block" not found '
+                            "in this context: $context"
+                        ),
                         mapping={
                             "block": self.block_id,
                             "context": self.context.absolute_url(),
@@ -113,7 +116,7 @@ class PostAdapter:
                 translate(
                     _(
                         "missing_action",
-                        default='You need to set at least one form action between "send" and "store".',  # noqa
+                        default='You need to set at least one form action between "send" and "store".',  # noqa: E501
                     ),
                     context=self.request,
                 )
@@ -177,15 +180,11 @@ class PostAdapter:
                 field_id = field.get("field_id", "")
                 if field_id not in bcc_fields:
                     bcc_fields.append(field_id)
-        if not bcc_fields:
-            return
-        if not email_otp_verification:
+        if not bcc_fields or not email_otp_verification:
             return
         for data in self.form_data.get("data", []):
             value = data.get("value", "")
-            if not value:
-                continue
-            if data.get("field_id", "") not in bcc_fields:
+            if not value or data.get("field_id", "") not in bcc_fields:
                 continue
             otp = data.get("otp", "")
             if not otp:
@@ -226,7 +225,7 @@ class PostAdapter:
                 attachments_len += len(data)
         if attachments_len > float(attachments_limit) * pow(1024, 2):
             size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-            i = int(math.floor(math.log(attachments_len, 1024)))
+            i = math.floor(math.log(attachments_len, 1024))
             p = math.pow(1024, i)
             s = round(attachments_len / p, 2)
             uploaded_str = f"{s} {size_name[i]}"

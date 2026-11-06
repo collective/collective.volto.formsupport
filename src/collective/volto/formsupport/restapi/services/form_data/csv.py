@@ -24,13 +24,13 @@ class FormDataExportGet(Service):
         blocks = getattr(context, "blocks", {})
         if not blocks:
             raise NotFound("No blocks found")
-        for id, block in blocks.items():
-            if self.block_id and id != self.block_id:
+        for block_key, block in blocks.items():
+            if self.block_id and block_key != self.block_id:
                 continue
             block_type = block.get("@type", "")
             if block_type == "form":
                 self.form_block = block
-                self.form_block_id = id
+                self.form_block_id = block_key
 
         if self.form_block:
             for field in self.form_block.get("subblocks", []):
@@ -43,8 +43,8 @@ class FormDataExportGet(Service):
         if not blocks:
             return {}
         form_block = {}
-        for id, block in blocks.items():
-            if id != self.form_block_id:
+        for block_key, block in blocks.items():
+            if block_key != self.form_block_id:
                 continue
             block_type = block.get("@type", "")
             if block_type == "form":
@@ -54,7 +54,7 @@ class FormDataExportGet(Service):
 
         subblocks = form_block.get("subblocks", [])
 
-        # Add the 'custom_field_id' field back in as this isn't stored with each subblock
+        # Restore 'custom_field_id', which is not stored with each subblock.
         for index, field in enumerate(subblocks):
             if form_block.get(field["field_id"]):
                 subblocks[index]["custom_field_id"] = form_block.get(field["field_id"])
@@ -63,8 +63,8 @@ class FormDataExportGet(Service):
 
     def get_ordered_keys(self, record):
         """
-        We need this method because we want to maintain the fields order set in the form.
-        The form can also change during time, and each record can have different fields stored in it.
+        Keep the form's field order, even when its schema changes over time.
+        A record may contain fields that are no longer in the form.
         """
         record_order = record.attrs.get("fields_order", [])
         if record_order:
@@ -74,8 +74,8 @@ class FormDataExportGet(Service):
         for k in self.form_fields_order:
             if k in record.attrs:
                 order.append(k)
-        # finally append the keys stored in the record but that are not in the form (maybe the form changed during time)
-        for k in record.attrs.keys():
+        # Append stored fields that are no longer in the form.
+        for k in record.attrs:
             if k not in order and k not in SKIP_ATTRS:
                 order.append(k)
         return order
